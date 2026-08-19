@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/home/Home";
 import CreateAccount from "./pages/loginpages/CreateAccount";
 import Login from "./pages/loginpages/Login";
 import Forgotpage from "./pages/loginpages/Forgotpage";
@@ -14,10 +15,14 @@ function App() {
     <BrowserRouter>
 
       <Routes>
+        {/* Homepage */}
+        <Route
+         path="/"
+          element={<Home />} />
 
         {/* Create Account Page */}
         <Route
-          path="/"
+          path="/create-account"
           element={<CreateAccount />}
         />
 

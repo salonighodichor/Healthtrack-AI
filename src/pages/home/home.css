@@ -1,0 +1,799 @@
+```css
+/* =========================
+   MAIN
+========================= */
+
+.ht-root {
+  font-family: 'Inter', sans-serif;
+  background: #faf8f4;
+  color: #1c2430;
+  line-height: 1.5;
+}
+
+.ht-root * {
+  box-sizing: border-box;
+}
+
+.ht-root h1,
+.ht-root h2,
+.ht-root h3,
+.ht-root .serif {
+  font-family: 'Playfair Display', serif;
+}
+
+.ht-root a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.ht-root ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ht-root .wrap {
+  max-width: 1180px;
+  margin: auto;
+  padding: 0 32px;
+}
+
+.ht-root section {
+  position: relative;
+}
+
+
+/* =========================
+   BUTTON
+========================= */
+
+.ht-root .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 13px 24px;
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.ht-root .btn-primary {
+  background: #d9583f;
+  color: white;
+}
+
+.ht-root .btn-primary:hover {
+  background: #c24a33;
+}
+
+.ht-root .btn-outline {
+  background: transparent;
+  color: #1c2430;
+  border-color: #e7e2d8;
+}
+
+.ht-root .btn-light {
+  background: white;
+  color: #1c2836;
+}
+
+.ht-root .btn-ghost-light {
+  background: transparent;
+  color: white;
+  border-color: rgba(255,255,255,0.4);
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.ht-root header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
+  background: #faf8f4;
+  border-bottom: 1px solid #e7e2d8;
+}
+
+.ht-root .nav {
+  max-width: 1180px;
+  margin: auto;
+  padding: 16px 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ht-root .brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.ht-root .brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+
+  background: #348273;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;
+}
+
+.ht-root .brand-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.ht-root .brand-tag {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.ht-root .nav-links {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+
+.ht-root .nav-links a {
+  font-size: 14px;
+  color: #3c4656;
+}
+
+.ht-root .nav-links a.active {
+  color: #1c2430;
+  font-weight: 600;
+}
+
+.ht-root .nav-actions {
+  display: flex;
+  gap: 12px;
+}
+
+
+/* =========================
+   HERO
+========================= */
+
+.ht-root .hero {
+  padding: 88px 0 70px;
+}
+
+.ht-root .hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.ht-root .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  color: #348273;
+  margin-bottom: 18px;
+}
+
+.ht-root .eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #348273;
+}
+
+.ht-root .hero h1 {
+  font-size: 47px;
+  font-weight: 700;
+  line-height: 1.16;
+  color: #1c2430;
+}
+
+.ht-root .hero h1 .accent {
+  color: #348273;
+  font-style: italic;
+}
+
+.ht-root .hero p.lead {
+  margin: 22px 0 32px;
+  max-width: 480px;
+
+  font-size: 16px;
+  line-height: 1.65;
+
+  color: #6b7280;
+}
+
+.ht-root .hero-ctas {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.ht-root .pill-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ht-root .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 8px 15px;
+  border-radius: 999px;
+
+  background: white;
+  border: 1px solid #e7e2d8;
+
+  font-size: 13px;
+  color: #3c4656;
+}
+
+
+/* =========================
+   HERO VISUAL
+========================= */
+
+.ht-root .hero-visual {
+  background: #1c2836;
+  color: white;
+
+  border-radius: 22px;
+  padding: 34px;
+
+  min-height: 430px;
+}
+
+.ht-root .hv-badge {
+  display: inline-flex;
+  align-items: center;
+
+  background: #293746;
+  border: 1px solid #3a4857;
+
+  padding: 9px 16px;
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ht-root .hv-stat {
+  margin-top: 26px;
+
+  background: #293746;
+  border: 1px solid #3a4857;
+
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.ht-root .hv-stat + .hv-stat {
+  margin-top: 14px;
+}
+
+.ht-root .hv-stat .label {
+  font-size: 12px;
+  color: #aaa;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.ht-root .hv-stat .value {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.ht-root .hv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ht-root .hv-mini-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+
+  height: 34px;
+  margin-top: 10px;
+}
+
+.ht-root .hv-mini-chart span {
+  flex: 1;
+  background: #348273;
+  border-radius: 3px;
+}
+
+
+/* =========================
+   SECTION HEADING
+========================= */
+
+.ht-root .section-head {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 46px;
+}
+
+.ht-root .section-head .eyebrow {
+  justify-content: center;
+}
+
+.ht-root .section-head h2 {
+  font-size: 34px;
+  font-weight: 700;
+  color: #1c2430;
+}
+
+.ht-root .section-head p {
+  margin-top: 14px;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+
+/* =========================
+   SERVICES
+========================= */
+
+.ht-root .services {
+  padding: 88px 0;
+}
+
+.ht-root .service-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ht-root .service-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  background: white;
+  border: 1px solid #e7e2d8;
+  border-radius: 16px;
+
+  padding: 22px 28px;
+}
+
+.ht-root .service-row:hover {
+  border-color: #348273;
+}
+
+.ht-root .service-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+
+  background: #eef2ee;
+  color: #348273;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 20px;
+}
+
+.ht-root .service-text h3 {
+  font-size: 16px;
+  margin-bottom: 3px;
+}
+
+.ht-root .service-text p {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+
+/* =========================
+   TIMELINE
+========================= */
+
+.ht-root .timeline-section {
+  background: #1c2836;
+  color: white;
+
+  padding: 76px 0;
+
+  border-radius: 28px;
+  max-width: 1180px;
+  margin: auto;
+}
+
+.ht-root .timeline-section h2 {
+  color: white;
+}
+
+.ht-root .timeline-section .eyebrow {
+  color: #8fd0bd;
+}
+
+.ht-root .timeline-section .eyebrow::before {
+  background: #8fd0bd;
+}
+
+.ht-root .timeline-section .section-head p {
+  color: #aaa;
+}
+
+.ht-root .steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+
+  margin-top: 18px;
+}
+
+.ht-root .step {
+  padding: 0 18px;
+}
+
+.ht-root .step-num {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+
+  border: 1px solid #666;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 18px;
+}
+
+.ht-root .step h4 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.ht-root .step p {
+  font-size: 13px;
+  color: #aaa;
+}
+
+
+/* =========================
+   MODULES
+========================= */
+
+.ht-root .modules {
+  padding: 88px 0;
+}
+
+.ht-root .module-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.ht-root .module-card {
+  background: white;
+
+  border: 1px solid #e7e2d8;
+  border-radius: 16px;
+
+  padding: 28px 26px;
+}
+
+.ht-root .module-card:hover {
+  border-color: #348273;
+}
+
+.ht-root .module-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+
+  background: #fbeee9;
+  color: #d9583f;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 19px;
+  margin-bottom: 16px;
+}
+
+.ht-root .module-card h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.ht-root .module-card p {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+
+/* =========================
+   SMART AI
+========================= */
+
+.ht-root .ai-module {
+  padding: 20px 0 96px;
+}
+
+.ht-root .ai-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.ht-root .ai-copy h2 {
+  font-size: 32px;
+  line-height: 1.25;
+  margin-bottom: 16px;
+}
+
+.ht-root .ai-copy > p {
+  color: #5e6470;
+  font-size: 15px;
+  line-height: 1.65;
+  margin-bottom: 26px;
+  max-width: 460px;
+}
+
+.ht-root .feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.ht-root .feature-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  font-size: 14px;
+  font-weight: 500;
+  color: #3c4656;
+}
+
+.ht-root .feature-list .dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+
+  background: #eef2ee;
+  color: #348273;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* =========================
+   QUEUE CARD
+========================= */
+
+.ht-root .queue-card {
+  background: white;
+
+  border: 1px solid #e7e2d8;
+  border-radius: 18px;
+
+  padding: 26px;
+}
+
+.ht-root .queue-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 18px;
+}
+
+.ht-root .queue-head span {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.ht-root .queue-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 6px;
+  border-top: 1px solid #e7e2d8;
+}
+
+.ht-root .queue-row:first-of-type {
+  border-top: none;
+}
+
+.ht-root .patient-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ht-root .patient-meta {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.ht-root .risk-badge {
+  font-size: 12px;
+  font-weight: 700;
+
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+.ht-root .risk-high {
+  background: #fdeceb;
+  color: #e8635a;
+}
+
+.ht-root .risk-medium {
+  background: #fdf3e0;
+  color: #e0a53f;
+}
+
+.ht-root .risk-low {
+  background: #e9f5ef;
+  color: #4a9b7f;
+}
+
+
+/* =========================
+   FOOTER CTA
+========================= */
+
+.ht-root .footer-cta {
+  background: #1c2836;
+  color: white;
+
+  border-radius: 24px;
+  max-width: 1180px;
+
+  margin: 0 auto 90px;
+  padding: 64px 40px;
+
+  text-align: center;
+}
+
+.ht-root .footer-cta p {
+  font-size: 19px;
+  max-width: 600px;
+
+  margin: 0 auto 30px;
+  color: #eee;
+}
+
+.ht-root .footer-cta .hero-ctas {
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+.ht-root footer.site-footer {
+  border-top: 1px solid #e7e2d8;
+  padding: 34px 0;
+}
+
+.ht-root .foot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.ht-root .foot-row .brand-name {
+  font-size: 15px;
+}
+
+.ht-root .foot-links {
+  display: flex;
+  gap: 24px;
+}
+
+.ht-root .foot-links a {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 920px) {
+
+  .ht-root .nav-links {
+    display: none;
+  }
+
+  .ht-root .hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ht-root .hero h1 {
+    font-size: 36px;
+  }
+
+  .ht-root .steps {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ht-root .module-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ht-root .ai-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+  .ht-root .wrap {
+    padding: 0 20px;
+  }
+
+  .ht-root .module-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ht-root .steps {
+    grid-template-columns: 1fr;
+  }
+
+  .ht-root .hero {
+    padding: 56px 0 40px;
+  }
+
+  .ht-root .hero h1 {
+    font-size: 30px;
+  }
+
+  .ht-root .timeline-section,
+  .ht-root .footer-cta {
+    border-radius: 16px;
+  }
+}
+```
