@@ -25,7 +25,8 @@ function Login() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!role) {
@@ -33,18 +34,32 @@ function Login() {
       return;
     }
 
-    console.log("Login Data:", {
-      ...formData,
-      role,
-      rememberMe,
-    });
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          role: role.toLowerCase(),
+        }),
+      });
 
-    alert(`${role} Login Successful!`);
+      const data = await response.json();
 
-    // Later connect with backend
-    // navigate("/dashboard");
+      if (response.ok) {
+        alert(`${role} Login Successful!`);
+        // navigate("/dashboard");
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      alert("Backend se connect nahi ho paya. Check karo server chal raha hai ya nahi.");
+      console.error(error);
+    }
   };
 
+  
   return (
     <div className="login-page">
 

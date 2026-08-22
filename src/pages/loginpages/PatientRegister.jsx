@@ -53,7 +53,7 @@ function PatientRegister() {
     }
   }, [formData.dob]);
 
-  const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
@@ -61,12 +61,25 @@ function PatientRegister() {
       return;
     }
 
-    console.log("Patient Registration Data:", formData);
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/register/patient", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    alert("Patient Registration Successful!");
+      const data = await response.json();
 
-    // Later we can connect this to backend
-    // navigate("/login");
+      if (response.ok) {
+        alert("Patient Registration Successful!");
+        navigate("/login");
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      alert("Could not connect to server. Please make sure the backend is running.");
+      console.error(error);
+    }
   };
 
   return (
