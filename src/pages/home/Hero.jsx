@@ -6,20 +6,37 @@ export default function Hero() {
   return (
     <section className="hero">
       <div className="wrap hero-grid">
-        <div>
+
+        {/* LEFT SIDE */}
+        <div className="hero-content">
           <div className="eyebrow">AI-Powered Care Platform</div>
+
           <h1>
-            Smart AI Powered <span className="accent">Personalized</span>
+            Smart AI Powered{" "}
+            <span className="accent">Personalized</span>
             <br />
             Healthcare Management System
           </h1>
+
           <p className="lead">
-            AI-driven platform to manage health, appointments, medications and recovery with personalized care.
+            AI-driven platform to manage health, appointments, medications
+            and recovery with personalized care.
           </p>
 
           <div className="hero-ctas">
-            <Link to="/create-account" className="btn btn-primary">Create your account →</Link>
-            <a href="#services" className="btn btn-outline">See how it works</a>
+            <Link
+              to="/create-account"
+              className="btn btn-primary hero-btn"
+            >
+              Create your account →
+            </Link>
+
+            <a
+              href="#services"
+              className="btn btn-outline hero-btn"
+            >
+              See how it works
+            </a>
           </div>
 
           <div className="pill-row">
@@ -29,32 +46,90 @@ export default function Hero() {
           </div>
         </div>
 
+        {/* RIGHT SIDE */}
         <div className="hero-visual">
-          <div className="hv-badge">💚 Healthcare</div>
 
+          <div className="hv-badge">
+            💚 Healthcare
+          </div>
+
+          {/* HEALTH OVERVIEW */}
+          <div className="hv-stat health-overview">
+            <div className="hv-row">
+              <div>
+                <div className="label">Patient Health Overview</div>
+                <div className="value">92%</div>
+              </div>
+
+              <span className="risk-badge risk-low">
+                On track
+              </span>
+            </div>
+
+            <div className="progress-container">
+              <div
+                className="progress-bar"
+                style={{ width: "92%" }}
+              ></div>
+            </div>
+
+            <div className="progress-text">
+              <span>Recovery progress</span>
+              <span>Excellent</span>
+            </div>
+          </div>
+
+          {/* HEALTH CHART */}
           <div className="hv-stat">
             <div className="hv-row">
               <div>
-                <div className="label">Recovery score</div>
-                <div className="value">92%</div>
+                <div className="label">Recovery Activity</div>
+                <div className="chart-subtitle">
+                  Weekly health progress
+                </div>
               </div>
-              <span className="risk-badge risk-low">On track</span>
+
+              <span className="chart-status">+18%</span>
             </div>
+
             <div className="hv-mini-chart">
               {chartBars.map((h, i) => (
-                <span key={i} style={{ height: `${h}%` }}></span>
+                <span
+                  key={i}
+                  style={{ height: `${h}%` }}
+                ></span>
               ))}
             </div>
           </div>
 
-          <div className="hv-stat">
-            <div className="label">Next reminder</div>
-            <div className="hv-row" style={{ marginTop: 4 }}>
-              <span style={{ fontSize: 14.5, fontWeight: 600 }}>
-                Evening medication — 8:00 PM
-              </span>
+          {/* AI INSIGHT */}
+          <div className="hv-stat ai-insight">
+            <div className="ai-icon">✨</div>
+
+            <div>
+              <div className="label">AI Insight</div>
+              <p>
+                Your recovery trend is improving. Keep following
+                your medication schedule.
+              </p>
             </div>
           </div>
+
+          {/* MEDICATION */}
+          <div className="hv-stat medication-card">
+            <div>
+              <div className="label">Next reminder</div>
+
+              <div className="medication-name">
+                💊 Evening medication
+              </div>
+            </div>
+
+            <span className="medication-time">
+              8:00 PM
+            </span>
+          </div>
+
         </div>
       </div>
     </section>

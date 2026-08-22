@@ -3,28 +3,18 @@
 ========================================= */
 
 :root {
-  --page-bg: #f3f4f6;
+  --page-bg: #f4f6f8;
   --card-bg: #ffffff;
-  --text-primary: #071a33;
-  --text-secondary: #63748a;
+  --text-primary: #07152b;
+  --text-secondary: #607087;
   --border-color: #d1d7df;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-}
-
-/* MAIN PAGE */
+/* PAGE */
 
 .create-account-page {
-  width: 100%;
   min-height: 100vh;
-
+  width: 100%;
   background: var(--page-bg);
 
   display: flex;
@@ -33,38 +23,33 @@ body {
 
   position: relative;
 
-  padding: 30px 20px;
-
   font-family: Arial, Helvetica, sans-serif;
 
   transition: 0.3s ease;
 }
 
-/* =========================================
-   CENTER CARD
-========================================= */
+/* CARD */
 
 .account-card {
   width: 540px;
-  max-width: 100%;
+  min-height: 680px;
 
   background: var(--card-bg);
 
-  border-radius: 18px;
+  border-radius: 0 0 25px 25px;
 
-  padding: 45px 48px 40px;
+  padding: 65px 48px 45px;
+
+  box-sizing: border-box;
 
   text-align: center;
 
-  box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
 
-  border: 1px solid #d7dce2;
-
-  margin: auto;
+  transition: 0.3s ease;
 }
 
-/* TITLE */
+/* MAIN TITLE */
 
 .account-card h1 {
   margin: 0;
@@ -80,11 +65,14 @@ body {
 /* TAGLINE */
 
 .tagline {
-  margin: 15px 0 38px;
+  margin-top: 17px;
+  margin-bottom: 40px;
 
   font-size: 22px;
 
   color: var(--text-secondary);
+
+  font-weight: 400;
 }
 
 /* CREATE ACCOUNT */
@@ -94,31 +82,29 @@ body {
 
   font-size: 36px;
 
-  font-weight: 600;
-
   color: var(--text-primary);
+
+  font-weight: 600;
 }
 
 /* REGISTER TEXT */
 
 .register-text {
-  margin: 14px 0 28px;
+  margin-top: 15px;
+  margin-bottom: 30px;
 
   font-size: 21px;
 
   color: var(--text-secondary);
 }
 
-/* =========================================
-   ROLE BUTTONS
-========================================= */
+/* ROLE BUTTONS */
 
 .role-buttons {
-  width: 100%;
-
   display: flex;
-
   gap: 14px;
+
+  width: 100%;
 }
 
 .role-btn {
@@ -132,11 +118,11 @@ body {
 
   border-radius: 11px;
 
-  color: #111827;
-
-  font-size: 20px;
+  font-size: 21px;
 
   font-weight: 600;
+
+  color: #111827;
 
   cursor: pointer;
 
@@ -144,21 +130,21 @@ body {
 }
 
 .role-btn:hover {
+  background: #f3f4f6;
+
   border-color: #111827;
 
-  background: #f8fafc;
+  transform: translateY(-2px);
 }
 
-/* =========================================
-   REGISTER BUTTON
-========================================= */
+/* REGISTER BUTTON */
 
 .register-btn {
   width: 100%;
 
   height: 66px;
 
-  margin-top: 34px;
+  margin-top: 35px;
 
   border: none;
 
@@ -166,8 +152,8 @@ body {
 
   background: linear-gradient(
     90deg,
-    #09baf0,
-    #5968e8,
+    #08baf0,
+    #5669e8,
     #f000b8
   );
 
@@ -186,19 +172,22 @@ body {
 
 .register-btn:hover {
   transform: translateY(-2px);
+
+  box-shadow: 0 12px 28px rgba(240, 0, 184, 0.35);
 }
 
-/* =========================================
-   LOGIN
-========================================= */
+/* LOGIN TEXT */
 
 .login-text {
-  margin: 37px 0 20px;
+  margin-top: 38px;
+  margin-bottom: 20px;
 
   font-size: 20px;
 
   color: var(--text-secondary);
 }
+
+/* LOGIN BUTTON */
 
 .login-btn {
   width: 100%;
@@ -218,21 +207,23 @@ body {
   font-weight: 700;
 
   cursor: pointer;
+
+  transition: 0.2s ease;
 }
 
 .login-btn:hover {
   background: #f0fbff;
+
+  transform: translateY(-2px);
 }
 
-/* =========================================
-   THEME BUTTON
-========================================= */
+/* THEME TOGGLE */
 
 .theme-toggle {
   position: fixed;
 
-  top: 20px;
-  right: 25px;
+  top: 25px;
+  right: 30px;
 
   width: 48px;
   height: 48px;
@@ -249,7 +240,7 @@ body {
 
   z-index: 10;
 
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
 }
 
 /* =========================================
@@ -264,10 +255,6 @@ body {
   --border-color: #374151;
 }
 
-.dark-mode .account-card {
-  border-color: #374151;
-}
-
 .dark-mode .account-card h1 {
   color: white;
 }
@@ -278,9 +265,18 @@ body {
   border-color: #374151;
 }
 
+.dark-mode .role-btn:hover {
+  background: #374151;
+}
+
 .dark-mode .login-btn {
   background: #1f2937;
   color: white;
+  border-color: #00bfff;
+}
+
+.dark-mode .login-btn:hover {
+  background: #263548;
 }
 
 .dark-mode .theme-toggle {
@@ -289,19 +285,17 @@ body {
 }
 
 /* =========================================
-   MOBILE
+   RESPONSIVE
 ========================================= */
 
 @media (max-width: 600px) {
 
-  .create-account-page {
-    padding: 20px 15px;
-  }
-
   .account-card {
-    width: 100%;
+    width: 92%;
 
-    padding: 38px 22px 30px;
+    min-height: auto;
+
+    padding: 45px 25px 35px;
   }
 
   .account-card h1 {
@@ -312,15 +306,16 @@ body {
     font-size: 30px;
   }
 
-  .tagline {
-    font-size: 19px;
-  }
-
   .role-buttons {
     flex-direction: column;
   }
 
   .role-btn {
     width: 100%;
+  }
+
+  .theme-toggle {
+    top: 15px;
+    right: 15px;
   }
 }

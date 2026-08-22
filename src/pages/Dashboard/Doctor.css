@@ -1,0 +1,1378 @@
+/* =====================================================
+   RESET
+===================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  background: #f3f6fb;
+  color: #263b55;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+.doctor-dashboard {
+  min-height: 100vh;
+  background: #f3f6fb;
+}
+
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+.sidebar {
+  width: 245px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: #ffffff;
+  padding: 22px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  border-right: 1px solid #e3eaf2;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 6px;
+  margin-bottom: 25px;
+}
+
+.brand-icon {
+  width: 43px;
+  height: 43px;
+  border-radius: 10px;
+  background: #173b6c;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-text > span {
+  color: #173b6c;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.brand-text small {
+  color: #8b9aad;
+  font-size: 10px;
+  margin-top: 5px;
+}
+
+
+/* =====================================================
+   MENU
+===================================================== */
+
+.sidebar-scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.menu-heading {
+  font-size: 9px;
+  font-weight: 700;
+  color: #9aa7b8;
+  margin: 0 12px 10px;
+  letter-spacing: 1px;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.menu-item {
+  width: 100%;
+  min-height: 45px;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 12px;
+  color: #40556d;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.menu-item:hover {
+  background: #edf3fa;
+  color: #173b6c;
+  transform: translateX(2px);
+}
+
+.menu-item.active {
+  background: #173b6c;
+  color: #ffffff;
+  box-shadow: 0 5px 13px rgba(23, 59, 108, 0.2);
+}
+
+.menu-icon {
+  width: 24px;
+  text-align: center;
+  font-size: 18px;
+}
+
+
+/* =====================================================
+   SIDEBAR BOTTOM
+   Duplicate Settings hide karne ke liye
+===================================================== */
+
+.sidebar-bottom {
+  border-top: 1px solid #e7ebf0;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+/* Bottom Settings ko hide kar diya
+   kyunki Settings MAIN MENU mein already hai */
+.bottom-button {
+  display: none;
+}
+
+.logout-button {
+  width: 100%;
+  min-height: 42px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #d45d52;
+}
+
+.logout-button:hover {
+  background: #fff0ee;
+}
+
+
+/* =====================================================
+   MAIN CONTENT
+===================================================== */
+
+.main-content {
+  margin-left: 245px;
+  min-height: 100vh;
+  width: calc(100% - 245px);
+  background: #f3f6fb;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.top-header {
+  height: 78px;
+  background: #ffffff;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5eaf1;
+}
+
+.search-box {
+  width: 320px;
+  height: 42px;
+  border: 1px solid #c8d4e2;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  background: #ffffff;
+}
+
+.search-box span {
+  font-size: 16px;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 13px;
+  color: #354b63;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.mode-button,
+.notification {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 19px;
+  position: relative;
+}
+
+.notification span {
+  width: 6px;
+  height: 6px;
+  background: #e86655;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.patient-header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.patient-small-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e5edf7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #173b6c;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.patient-header strong {
+  display: block;
+  font-size: 14px;
+  color: #243b55;
+}
+
+.patient-header small {
+  color: #8d9aab;
+  font-size: 10px;
+}
+
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
+.dashboard-container {
+  width: 100%;
+  max-width: 1350px;
+  margin: 0 auto;
+  padding: 30px 45px 45px;
+}
+
+.page-stack {
+  width: 100%;
+}
+
+
+/* =====================================================
+   WELCOME
+===================================================== */
+
+.welcome-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.welcome-section h1 {
+  font-size: 27px;
+  color: #173b6c;
+  font-weight: 800;
+}
+
+.welcome-section p {
+  color: #8290a1;
+  font-size: 13px;
+  margin-top: 7px;
+}
+
+.primary-button {
+  background: #173b6c;
+  border: none;
+  color: #ffffff;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.primary-button:hover {
+  background: #102d54;
+  transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   PAGE HEADINGS
+===================================================== */
+
+.page-heading {
+  margin-bottom: 23px;
+}
+
+.page-heading h1 {
+  font-size: 27px;
+  color: #173b6c;
+  font-weight: 800;
+}
+
+.page-heading p {
+  color: #8290a1;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+
+/* =====================================================
+   CARDS
+===================================================== */
+
+.top-grid {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 25px;
+  margin-bottom: 24px;
+}
+
+.profile-card,
+.recovery-card,
+.dashboard-card,
+.statistics-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 21px 23px;
+  box-shadow: 0 4px 15px rgba(31, 55, 80, 0.06);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.card-title h2 {
+  color: #23415f;
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.card-title p {
+  color: #8b99a9;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.date-select {
+  border: 1px solid #b8c9dc;
+  padding: 8px 11px;
+  border-radius: 7px;
+  font-size: 11px;
+  color: #28568b;
+  background: #f7faff;
+}
+
+
+/* =====================================================
+   PROFILE
+===================================================== */
+
+.profile-card {
+  text-align: center;
+}
+
+.patient-avatar {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background: #e7eef8;
+  color: #173b6c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 11px;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.doctor-avatar {
+  background: #dfeaf8;
+  color: #173b6c;
+}
+
+.profile-card h2 {
+  font-size: 18px;
+  color: #253e59;
+}
+
+.patient-age {
+  color: #8492a2;
+  font-size: 11px;
+  margin-top: 5px;
+}
+
+.profile-details {
+  margin-top: 16px;
+  text-align: left;
+}
+
+.profile-details div {
+  display: flex;
+  justify-content: space-between;
+  margin: 9px 0;
+  font-size: 11px;
+}
+
+.profile-details span {
+  color: #7d8d9f;
+}
+
+.profile-details strong {
+  color: #365574;
+  font-size: 11px;
+}
+
+.outline-button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px;
+  border: 1px solid #b8c9dc;
+  background: #ffffff;
+  color: #173b6c;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.outline-button:hover {
+  background: #edf3fa;
+}
+
+
+/* =====================================================
+   RECOVERY
+===================================================== */
+
+.recovery-content {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+
+.progress-circle {
+  min-width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #2563a6 0deg 295deg,
+    #e4eaf1 295deg 360deg
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.progress-circle::before {
+  content: "";
+  position: absolute;
+  width: 95px;
+  height: 95px;
+  background: #ffffff;
+  border-radius: 50%;
+}
+
+.progress-circle div {
+  position: relative;
+  text-align: center;
+}
+
+.progress-circle strong {
+  display: block;
+  color: #173b6c;
+  font-size: 24px;
+}
+
+.progress-circle small {
+  color: #8795a5;
+  font-size: 10px;
+}
+
+.recovery-info {
+  width: 100%;
+}
+
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.progress-row span {
+  color: #64788e;
+}
+
+.progress-row strong {
+  color: #173b6c;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #e9eef4;
+  border-radius: 10px;
+  margin-top: 5px;
+  overflow: hidden;
+}
+
+.progress-bar div {
+  height: 100%;
+  background: #2563a6;
+  border-radius: 10px;
+}
+
+
+/* =====================================================
+   TODAY'S OVERVIEW
+===================================================== */
+
+.health-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.health-card {
+  padding: 17px;
+  min-height: 135px;
+  border-radius: 11px;
+}
+
+.health-card.patients {
+  background: #eaf2fc;
+}
+
+.health-card.appointments {
+  background: #edf0fa;
+}
+
+.health-card.recovery {
+  background: #e9f5f4;
+}
+
+.health-card.reports {
+  background: #fff2ec;
+}
+
+.health-icon {
+  font-size: 22px;
+  margin-bottom: 9px;
+}
+
+.health-card span {
+  font-size: 13px;
+  color: #536a80;
+  font-weight: 600;
+}
+
+.health-card h3 {
+  margin-top: 7px;
+  color: #173b6c;
+  font-size: 26px;
+}
+
+.health-card label {
+  display: inline-block;
+  margin-top: 7px;
+  background: #ffffff;
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-size: 10px;
+  color: #2e7590;
+}
+
+
+/* =====================================================
+   MIDDLE GRID
+===================================================== */
+
+.middle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 19px;
+  margin-bottom: 19px;
+}
+
+
+/* =====================================================
+   RECORDS
+===================================================== */
+
+.record-item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 0;
+  border-bottom: 1px solid #e9edf2;
+  text-align: left;
+}
+
+.record-icon {
+  width: 37px;
+  height: 37px;
+  background: #edf3fa;
+  color: #173b6c;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.record-item div:nth-child(2) {
+  flex: 1;
+}
+
+.record-item strong {
+  font-size: 12px;
+  color: #31516f;
+}
+
+.record-item p {
+  color: #8c9aa9;
+  font-size: 10px;
+  margin-top: 3px;
+}
+
+
+/* =====================================================
+   AI
+===================================================== */
+
+.ai-card {
+  background: linear-gradient(135deg, #ffffff, #f0f5fb);
+}
+
+.ai-message {
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #dce6f0;
+  border-radius: 9px;
+}
+
+.ai-message strong {
+  font-size: 13px;
+  color: #173b6c;
+}
+
+.ai-message p {
+  color: #718294;
+  font-size: 11px;
+  line-height: 1.6;
+  margin: 8px 0;
+}
+
+.ai-warning {
+  background: #fff6e3;
+  padding: 9px;
+  border-radius: 7px;
+  color: #a77c32;
+  font-size: 10px;
+}
+
+.ai-button {
+  border: none;
+  background: #173b6c;
+  color: white;
+  border-radius: 7px;
+  padding: 10px 14px;
+  margin-top: 11px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+
+/* =====================================================
+   LOWER GRID
+===================================================== */
+
+.lower-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1.1fr 1fr;
+  gap: 19px;
+  margin-bottom: 19px;
+}
+
+.medicine-item,
+.appointment,
+.alert-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e9edf2;
+}
+
+.medicine-icon {
+  width: 35px;
+  height: 35px;
+  border-radius: 7px;
+  background: #edf3fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.medicine-item div:nth-child(2) {
+  flex: 1;
+}
+
+.medicine-item strong,
+.appointment strong,
+.alert-item strong {
+  font-size: 11px;
+  color: #334f6a;
+}
+
+.medicine-item p,
+.appointment p,
+.appointment small,
+.alert-item p {
+  color: #8998a7;
+  font-size: 10px;
+  margin-top: 3px;
+}
+
+.taken {
+  color: #277b6d;
+  background: #e7f6f1;
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-size: 9px;
+}
+
+.pending {
+  color: #a87829;
+  background: #fff4dd;
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-size: 9px;
+}
+
+
+/* =====================================================
+   APPOINTMENTS
+===================================================== */
+
+.appointment-date {
+  width: 42px;
+  height: 44px;
+  background: #eaf2fc;
+  border-radius: 7px;
+  text-align: center;
+  padding-top: 5px;
+}
+
+.appointment-date strong {
+  display: block;
+  color: #173b6c;
+  font-size: 16px;
+}
+
+.appointment-date span {
+  font-size: 9px;
+  color: #8998a7;
+}
+
+.appointment div:nth-child(2) {
+  flex: 1;
+}
+
+.appointment-status {
+  background: #e8f0fa;
+  color: #285b93;
+  padding: 6px 8px;
+  border-radius: 5px;
+  font-size: 9px;
+}
+
+
+/* =====================================================
+   ALERTS
+===================================================== */
+
+.alert-item > span {
+  width: 31px;
+  height: 31px;
+  border-radius: 7px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.alert-item.warning > span {
+  background: #fff3dc;
+}
+
+.alert-item.info > span {
+  background: #e8f1fb;
+}
+
+.alert-item.success > span {
+  background: #e8f7ef;
+}
+
+.alert-item div {
+  flex: 1;
+}
+
+
+/* =====================================================
+   PATIENT LIST TABLE
+===================================================== */
+
+.patient-table {
+  width: 100%;
+}
+
+.table-header,
+.patient-row {
+  display: grid;
+  grid-template-columns: 1.5fr 0.5fr 1fr 1fr 0.8fr;
+  align-items: center;
+  gap: 15px;
+}
+
+.table-header {
+  padding: 12px 10px;
+  background: #f4f7fb;
+  border-radius: 8px;
+  color: #78899b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.patient-row {
+  padding: 14px 10px;
+  border-bottom: 1px solid #e9edf2;
+  font-size: 11px;
+  color: #60758a;
+}
+
+.patient-name {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.patient-name strong {
+  font-size: 12px;
+  color: #304d69;
+}
+
+.patient-table-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e5edf8;
+  color: #173b6c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.table-progress strong {
+  display: block;
+  color: #173b6c;
+  font-size: 11px;
+}
+
+.small-progress {
+  width: 85px;
+  height: 5px;
+  background: #e7edf3;
+  border-radius: 10px;
+  margin-top: 5px;
+  overflow: hidden;
+}
+
+.small-progress div {
+  height: 100%;
+  background: #2563a6;
+  border-radius: 10px;
+}
+
+.status-badge {
+  background: #e8f3f1;
+  color: #27796c;
+  padding: 6px 9px;
+  border-radius: 5px;
+  font-size: 9px;
+  width: fit-content;
+}
+
+
+/* =====================================================
+   RECOVERY PAGE
+===================================================== */
+
+.recovery-main-card {
+  margin-bottom: 19px;
+}
+
+.recovery-main {
+  display: flex;
+  align-items: center;
+  gap: 55px;
+}
+
+.progress-circle.large {
+  min-width: 155px;
+  height: 155px;
+}
+
+.progress-circle.large::before {
+  width: 115px;
+  height: 115px;
+}
+
+.progress-circle.large strong {
+  font-size: 29px;
+}
+
+.recovery-details {
+  width: 100%;
+}
+
+.recovery-details h2 {
+  color: #173b6c;
+  font-size: 19px;
+}
+
+.recovery-details > p {
+  color: #8593a3;
+  font-size: 12px;
+  margin: 5px 0 13px;
+}
+
+.progress-item {
+  margin-bottom: 11px;
+}
+
+.content-grid {
+  display: grid;
+  gap: 19px;
+}
+
+.three-col {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.mini-stat {
+  background: #ffffff;
+  border-radius: 13px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(31, 55, 80, 0.06);
+  text-align: center;
+}
+
+.mini-stat span {
+  display: block;
+  font-size: 24px;
+  margin-bottom: 7px;
+}
+
+.mini-stat strong {
+  display: block;
+  color: #173b6c;
+  font-size: 26px;
+}
+
+.mini-stat small {
+  display: block;
+  color: #8493a3;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+
+/* =====================================================
+   AI MAIN PAGE
+===================================================== */
+
+.ai-main-card {
+  padding: 26px;
+}
+
+.ai-top {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.ai-icon.big {
+  width: 58px;
+  height: 58px;
+  border-radius: 9px;
+  background: #e2ecf8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 26px;
+}
+
+.ai-top h2 {
+  color: #173b6c;
+  font-size: 19px;
+}
+
+.ai-top p {
+  color: #8492a2;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.ai-insights {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 23px 0;
+}
+
+.ai-insights > div {
+  padding: 16px;
+  background: #f4f7fb;
+  border-radius: 9px;
+}
+
+.ai-insights strong {
+  color: #173b6c;
+  font-size: 12px;
+}
+
+.ai-insights p {
+  color: #7f8e9e;
+  font-size: 10px;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+
+/* =====================================================
+   DARK MODE
+===================================================== */
+
+.dark-mode,
+.dark-mode .doctor-dashboard {
+  background: #142638;
+  color: #eaf2f8;
+}
+
+.dark-mode .main-content,
+.dark-mode .dashboard-container {
+  background: #142638;
+}
+
+.dark-mode .top-header,
+.dark-mode .sidebar,
+.dark-mode .profile-card,
+.dark-mode .recovery-card,
+.dark-mode .dashboard-card,
+.dark-mode .mini-stat {
+  background: #1b344a;
+  border-color: #2c475d;
+}
+
+.dark-mode .brand-text > span,
+.dark-mode .welcome-section h1,
+.dark-mode .page-heading h1,
+.dark-mode .profile-card h2,
+.dark-mode .card-title h2,
+.dark-mode .recovery-details h2,
+.dark-mode .ai-top h2,
+.dark-mode .mini-stat strong {
+  color: #eaf3fb;
+}
+
+.dark-mode .menu-item {
+  color: #c7d5e2;
+}
+
+.dark-mode .menu-item:hover {
+  background: #203d54;
+}
+
+.dark-mode .menu-item.active {
+  background: #285b93;
+}
+
+.dark-mode .search-box {
+  background: #203d54;
+  border-color: #48677f;
+}
+
+.dark-mode .search-box input {
+  background: transparent;
+  color: white;
+}
+
+.dark-mode .search-box input::placeholder {
+  color: #9db0c1;
+}
+
+.dark-mode .patient-header strong {
+  color: #eaf3fb;
+}
+
+.dark-mode .patient-avatar,
+.dark-mode .patient-small-avatar,
+.dark-mode .patient-table-avatar {
+  background: #294862;
+  color: #dbeaf7;
+}
+
+.dark-mode .progress-circle::before {
+  background: #1b344a;
+}
+
+.dark-mode .progress-bar {
+  background: #30485b;
+}
+
+.dark-mode .ai-message {
+  background: #203d54;
+  border-color: #36566d;
+}
+
+.dark-mode .ai-card {
+  background: linear-gradient(
+    135deg,
+    #1b344a,
+    #203d54
+  );
+}
+
+.dark-mode .ai-insights > div {
+  background: #203d54;
+}
+
+.dark-mode .record-item,
+.dark-mode .medicine-item,
+.dark-mode .appointment,
+.dark-mode .alert-item,
+.dark-mode .patient-row {
+  border-color: #2d485e;
+}
+
+.dark-mode .record-item strong,
+.dark-mode .medicine-item strong,
+.dark-mode .appointment strong,
+.dark-mode .alert-item strong {
+  color: #dceaf5;
+}
+
+.dark-mode .table-header {
+  background: #203d54;
+  color: #b8c8d7;
+}
+
+.dark-mode .outline-button {
+  background: #1b344a;
+  color: #dceaf5;
+  border-color: #48677f;
+}
+
+.dark-mode .date-select {
+  background: #203d54;
+  border-color: #48677f;
+  color: #dceaf5;
+}
+
+.dark-mode .health-card.patients,
+.dark-mode .health-card.appointments,
+.dark-mode .health-card.recovery,
+.dark-mode .health-card.reports {
+  background: #203d54;
+}
+
+.dark-mode .health-card span {
+  color: #c1d0dc;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1200px) {
+  .sidebar {
+    width: 220px;
+  }
+
+  .main-content {
+    margin-left: 220px;
+    width: calc(100% - 220px);
+  }
+
+  .top-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .health-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .lower-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ai-insights {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 850px) {
+  .sidebar {
+    width: 68px;
+    padding: 20px 8px;
+  }
+
+  .brand {
+    justify-content: center;
+  }
+
+  .brand-text,
+  .menu-heading,
+  .menu-item span:last-child,
+  .logout-button span:last-child {
+    display: none;
+  }
+
+  .menu-item,
+  .logout-button {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .main-content {
+    margin-left: 68px;
+    width: calc(100% - 68px);
+  }
+
+  .middle-grid,
+  .lower-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .three-col {
+    grid-template-columns: 1fr;
+  }
+
+  .table-header,
+  .patient-row {
+    grid-template-columns: 1.5fr 0.5fr 1fr 1fr;
+  }
+
+  .table-header span:last-child,
+  .patient-row > .status-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-container {
+    padding: 16px;
+  }
+
+  .top-header {
+    padding: 0 15px;
+  }
+
+  .search-box {
+    width: 190px;
+  }
+
+  .patient-header div:nth-child(2),
+  .patient-header > span {
+    display: none;
+  }
+
+  .welcome-section {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .welcome-section h1 {
+    font-size: 22px;
+  }
+
+  .health-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .recovery-content,
+  .recovery-main {
+    flex-direction: column;
+  }
+
+  .ai-insights {
+    grid-template-columns: 1fr;
+  }
+
+  .patient-table {
+    overflow-x: auto;
+  }
+
+  .table-header,
+  .patient-row {
+    min-width: 650px;
+  }
+}
