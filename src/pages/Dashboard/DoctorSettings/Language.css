@@ -1,0 +1,90 @@
+.language-container {
+  min-height: 100vh;
+  padding: 40px;
+  background-color: #f5f8fc;
+  font-family: Arial, sans-serif;
+}
+
+/* Header */
+
+.language-header {
+  margin-bottom: 30px;
+}
+
+.language-header h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  color: #1e293b;
+}
+
+.language-header p {
+  margin: 0;
+  font-size: 15px;
+  color: #64748b;
+}
+
+/* Card */
+
+.language-card {
+  max-width: 650px;
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+.language-card label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+/* Select */
+
+.language-card select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  background-color: white;
+  color: #1e293b;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.language-card select:focus {
+  border-color: #2563eb;
+}
+
+/* Button */
+
+.save-language-btn {
+  margin-top: 25px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background-color: #2563eb;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-language-btn:hover {
+  background-color: #1d4ed8;
+}
+
+/* Responsive */
+
+@media (max-width: 600px) {
+  .language-container {
+    padding: 20px;
+  }
+
+  .language-card {
+    padding: 20px;
+  }
+}

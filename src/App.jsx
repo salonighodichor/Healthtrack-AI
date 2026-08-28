@@ -10,7 +10,13 @@ import Caretaker from "./pages/Dashboard/Caretaker";
 import PatientRegister from "./pages/loginpages/PatientRegister";
 import DoctorRegister from "./pages/loginpages/DoctorRegister";
 import CaretakerRegister from "./pages/loginpages/CaretakerRegister";
-
+import DoctorProfile from "./pages/Dashboard/DoctorProfile";
+import DoctorSettings from "./pages/Dashboard/DoctorSettings/DoctorSettings";
+import Notifications from "./pages/Dashboard/DoctorSettings/Notifications";
+import ChangePassword from "./pages/Dashboard/DoctorSettings/ChangePassword";
+import Language from "./pages/Dashboard/DoctorSettings/Language";
+import Availability from "./pages/Dashboard/DoctorSettings/Availability";
+import Help from "./pages/Dashboard/DoctorSettings/Help";
 
 
 
@@ -66,7 +72,43 @@ function App() {
 <Route
   path="/doctor"
   element={<Doctor />}
+
 />
+
+<Route
+  path="/doctor/settings"
+  element={<DoctorSettings />}
+/>
+<Route
+  path="/doctor/settings/notifications"
+  element={<Notifications />}
+/>
+
+<Route
+  path="/doctor/settings/change-password"
+  element={<ChangePassword />}
+/>
+
+<Route
+  path="/doctor/settings/language"
+  element={<Language />}
+/>
+
+<Route
+  path="/doctor/settings/availability"
+  element={<Availability />}
+/>
+
+<Route
+  path="/doctor/settings/help"
+  element={<Help />}
+/>
+<Route
+  path="/doctor-profile"
+  element={<DoctorProfile />}
+/>
+
+
 <Route
   path="/caretaker"
   element={<Caretaker />}

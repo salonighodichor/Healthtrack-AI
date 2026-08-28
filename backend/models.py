@@ -18,8 +18,10 @@ class User(db.Model):
     emergency_contact = db.Column(db.String(15))
 
     # Doctor-specific fields
+    # Doctor-specific fields
     medical_registration_no = db.Column(db.String(50))
     specialization = db.Column(db.String(50))
+    qualification = db.Column(db.String(100))
     hospital_clinic = db.Column(db.String(100))
     experience = db.Column(db.String(20))
     address = db.Column(db.Text)

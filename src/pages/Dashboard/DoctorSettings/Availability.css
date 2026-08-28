@@ -1,0 +1,150 @@
+.availability-container {
+  min-height: 100vh;
+  padding: 40px;
+  background-color: #f5f8fc;
+  font-family: Arial, sans-serif;
+}
+
+/* Header */
+
+.availability-header {
+  margin-bottom: 30px;
+}
+
+.availability-header h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  color: #1e293b;
+}
+
+.availability-header p {
+  margin: 0;
+  font-size: 15px;
+  color: #64748b;
+}
+
+/* Main Card */
+
+.availability-card {
+  max-width: 800px;
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+.availability-card h2 {
+  margin: 0 0 20px;
+  font-size: 18px;
+  color: #1e293b;
+}
+
+/* Days */
+
+.days-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.day-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #334155;
+  font-size: 14px;
+}
+
+.day-item:hover {
+  border-color: #2563eb;
+}
+
+.day-item input {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  accent-color: #2563eb;
+}
+
+/* Working Hours */
+
+.working-hours-section {
+  padding-top: 25px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.time-inputs {
+  display: flex;
+  gap: 25px;
+}
+
+.time-group {
+  flex: 1;
+}
+
+.time-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.time-group input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+  color: #1e293b;
+}
+
+.time-group input:focus {
+  border-color: #2563eb;
+}
+
+/* Save Button */
+
+.save-availability-btn {
+  margin-top: 30px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background-color: #2563eb;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-availability-btn:hover {
+  background-color: #1d4ed8;
+}
+
+/* Responsive */
+
+@media (max-width: 600px) {
+  .availability-container {
+    padding: 20px;
+  }
+
+  .availability-card {
+    padding: 20px;
+  }
+
+  .days-list {
+    grid-template-columns: 1fr;
+  }
+
+  .time-inputs {
+    flex-direction: column;
+    gap: 18px;
+  }
+}

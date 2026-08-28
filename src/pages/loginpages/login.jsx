@@ -48,11 +48,22 @@ function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        alert(`${role} Login Successful!`);
-        // navigate("/dashboard");
-      } else {
-        alert(data.message);
-      }
+  alert(`${role} Login Successful!`);
+
+  // Logged-in user's information save karo
+  localStorage.setItem("user", JSON.stringify(data.user));
+
+  if (role === "Doctor") {
+      navigate("/doctor");
+  } else if (role === "Patient") {
+      navigate("/patient");
+  } else if (role === "Caretaker") {
+      navigate("/caretaker");
+  }
+} else {
+      alert(data.message);
+}
+      
     } catch (error) {
       alert("Backend se connect nahi ho paya. Check karo server chal raha hai ya nahi.");
       console.error(error);
