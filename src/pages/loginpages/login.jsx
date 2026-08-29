@@ -11,9 +11,7 @@ function Login() {
   });
 
   const [role, setRole] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
-
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleChange = (e) => {
@@ -25,7 +23,6 @@ function Login() {
     }));
   };
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -35,49 +32,59 @@ function Login() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          role: role.toLowerCase(),
-        }),
-      });
+      const response = await fetch(
+        "http://127.0.0.1:5000/api/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            role: role.toLowerCase(),
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
-  alert(`${role} Login Successful!`);
+        alert(`${role} Login Successful!`);
 
-  // Logged-in user's information save karo
-  localStorage.setItem("user", JSON.stringify(data.user));
+        // Logged-in user's information save karo
+        localStorage.setItem("user", JSON.stringify(data.user));
 
-  if (role === "Doctor") {
-      navigate("/doctor");
-  } else if (role === "Patient") {
-      navigate("/patient");
-  } else if (role === "Caretaker") {
-      navigate("/caretaker");
-  }
-} else {
-      alert(data.message);
-}
-      
+        // Patient ka ID save karo
+        if (data.user.role === "patient") {
+          localStorage.setItem("userId", data.user.id);
+        }
+
+        // Role ke according dashboard open karo
+        if (data.user.role === "patient") {
+          navigate("/patient");
+        } else if (data.user.role === "doctor") {
+          navigate("/doctor");
+        } else if (data.user.role === "caretaker") {
+          navigate("/caretaker");
+        }
+      } else {
+        alert(data.message);
+      }
     } catch (error) {
-      alert("Backend se connect nahi ho paya. Check karo server chal raha hai ya nahi.");
+      alert(
+        "Unable to connect to the backend. Please check if the server is running."
+      );
+
       console.error(error);
     }
   };
 
-  
   return (
     <div className="login-page">
-
       <div className="login-card">
 
         {/* Header */}
-
         <h1>HealTrack AI</h1>
 
         <p className="tagline">
@@ -90,13 +97,10 @@ function Login() {
           Login to your account
         </p>
 
-
         <form onSubmit={handleSubmit}>
 
           {/* Email / Phone */}
-
           <div className="input-group">
-
             <label>Email / Phone Number</label>
 
             <input
@@ -107,18 +111,13 @@ function Login() {
               placeholder="Enter Email or Phone Number"
               required
             />
-
           </div>
 
-
           {/* Password */}
-
           <div className="input-group">
-
             <label>Password</label>
 
             <div className="password-wrapper">
-
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
@@ -137,18 +136,13 @@ function Login() {
               >
                 {showPassword ? "🙈" : "👁️"}
               </button>
-
             </div>
-
           </div>
 
-
           {/* Remember + Forgot */}
-
           <div className="login-options">
 
             <label className="remember-me">
-
               <input
                 type="checkbox"
                 checked={rememberMe}
@@ -158,25 +152,21 @@ function Login() {
               />
 
               <span>Remember me</span>
-
             </label>
-
-
-            {/* FIXED FORGOT PASSWORD */}
 
             <button
               type="button"
               className="forgot-password"
-              onClick={() => navigate("/forgot-password")}
+              onClick={() =>
+                navigate("/forgot-password")
+              }
             >
               Forgot Password?
             </button>
 
           </div>
 
-
           {/* Role */}
-
           <div className="role-section">
 
             <label>Login as</label>
@@ -214,12 +204,9 @@ function Login() {
               </button>
 
             </div>
-
           </div>
 
-
           {/* Login Button */}
-
           <button
             type="submit"
             className="login-submit-btn"
@@ -227,9 +214,7 @@ function Login() {
             Login
           </button>
 
-
           {/* Create Account */}
-
           <p className="create-account-text">
 
             Don't have an account?{" "}
@@ -245,11 +230,10 @@ function Login() {
           </p>
 
         </form>
-
       </div>
-
     </div>
   );
 }
 
 export default Login;
+```

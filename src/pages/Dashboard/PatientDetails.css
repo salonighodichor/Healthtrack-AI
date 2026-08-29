@@ -1,0 +1,290 @@
+.patient-details-page {
+  min-height: 100vh;
+  padding: 32px 40px 50px;
+  background: #f5f8fc;
+  box-sizing: border-box;
+}
+
+.patient-details-card {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ================= HEADER ================= */
+
+.details-header {
+  position: relative;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 28px 32px 30px;
+  margin-bottom: 24px;
+  border: 1px solid #e5eaf1;
+  box-shadow: 0 8px 25px rgba(30, 55, 90, 0.06);
+}
+
+.details-header h1 {
+  margin: 42px 0 6px;
+  font-size: 30px;
+  font-weight: 700;
+  color: #172033;
+}
+
+.details-header p {
+  margin: 0;
+  color: #718096;
+  font-size: 15px;
+}
+
+/* ================= BACK BUTTON ================= */
+
+.back-btn {
+  position: absolute;
+  top: 22px;
+  left: 24px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 9px 16px;
+
+  border: 1px solid #dbe3ed;
+  border-radius: 10px;
+
+  background: #ffffff;
+  color: #40516a;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: #f1f6fb;
+  border-color: #b9c9dc;
+  transform: translateX(-2px);
+}
+
+/* ================= SECTIONS ================= */
+
+.details-section {
+  background: #ffffff;
+  border: 1px solid #e5eaf1;
+  border-radius: 20px;
+  padding: 28px 30px;
+  margin-bottom: 22px;
+
+  box-shadow: 0 8px 25px rgba(30, 55, 90, 0.05);
+}
+
+.details-section h2 {
+  margin: 0 0 24px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 19px;
+  font-weight: 700;
+  color: #1d2a3d;
+
+  padding-bottom: 14px;
+  border-bottom: 1px solid #edf1f5;
+}
+
+/* ================= GRID ================= */
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+/* ================= INPUTS ================= */
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #526174;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 12px 14px;
+
+  border: 1px solid #dce4ed;
+  border-radius: 11px;
+
+  background: #fbfcfe;
+  color: #253247;
+
+  font-size: 14px;
+  font-family: inherit;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.input-group input,
+.input-group select {
+  min-height: 45px;
+}
+
+.input-group textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.5;
+}
+
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus {
+  border-color: #6b8fb3;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(107, 143, 179, 0.12);
+}
+
+.input-group input[readonly] {
+  background: #f4f7fa;
+  color: #66758a;
+  cursor: not-allowed;
+}
+
+/* ================= SAVE AREA ================= */
+
+.details-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  padding: 8px 0 20px;
+}
+
+/* ================= SAVE BUTTON ================= */
+
+.save-details-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  min-width: 175px;
+  padding: 13px 24px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #2f6f8f;
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 7px 18px rgba(47, 111, 143, 0.22);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.save-details-btn:hover {
+  background: #275f7b;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(47, 111, 143, 0.28);
+}
+
+.save-details-btn:active {
+  transform: translateY(0);
+}
+
+/* ================= LOADING ================= */
+
+.patient-details-loading {
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f5f8fc;
+
+  color: #526174;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+  .patient-details-page {
+    padding: 20px 16px 35px;
+  }
+
+  .details-header {
+    padding: 24px 20px 25px;
+  }
+
+  .details-header h1 {
+    margin-top: 45px;
+    font-size: 25px;
+  }
+
+  .details-section {
+    padding: 22px 18px;
+    border-radius: 16px;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 17px;
+  }
+
+  .full-width {
+    grid-column: auto;
+  }
+
+  .details-actions {
+    justify-content: stretch;
+  }
+
+  .save-details-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    top: 16px;
+    left: 16px;
+  }
+
+  .details-header h1 {
+    font-size: 22px;
+  }
+
+  .details-section h2 {
+    font-size: 17px;
+  }
+}

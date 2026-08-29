@@ -1,122 +1,180 @@
+```jsx
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/home/Home";
+import Login from "./pages/loginpages/login";
 import CreateAccount from "./pages/loginpages/CreateAccount";
-import Login from "./pages/loginpages/Login";
-import Forgotpage from "./pages/loginpages/Forgotpage";
-import Patient from "./pages/Dashboard/Patient";
-import Doctor from "./pages/Dashboard/Doctor";
-import Caretaker from "./pages/Dashboard/Caretaker";
+
 import PatientRegister from "./pages/loginpages/PatientRegister";
 import DoctorRegister from "./pages/loginpages/DoctorRegister";
 import CaretakerRegister from "./pages/loginpages/CaretakerRegister";
+
+// Patient Dashboard
+import Patient from "./pages/Dashboard/Patient";
+import PatientDetails from "./pages/Dashboard/PatientDetails";
+import SettingsPage from "./pages/Dashboard/SettingsPage";
+import NotificationsPage from "./pages/Dashboard/NotificationsPage";
+import SecurityPage from "./pages/Dashboard/SecurityPage";
+import HealthPreferencesPage from "./pages/Dashboard/HealthPreferencesPage";
+import AIPreferencesPage from "./pages/Dashboard/AIPreferencesPage";
+import ConnectedDevicesPage from "./pages/Dashboard/ConnectedDevicesPage";
+import LanguagePage from "./pages/Dashboard/LanguagePage";
+import HelpSupportPage from "./pages/Dashboard/HelpSupportPage";
+
+// Doctor Dashboard
+import Doctor from "./pages/Dashboard/Doctor";
 import DoctorProfile from "./pages/Dashboard/DoctorProfile";
 import DoctorSettings from "./pages/Dashboard/DoctorSettings/DoctorSettings";
-import Notifications from "./pages/Dashboard/DoctorSettings/Notifications";
+import DoctorNotifications from "./pages/Dashboard/DoctorSettings/Notifications";
 import ChangePassword from "./pages/Dashboard/DoctorSettings/ChangePassword";
-import Language from "./pages/Dashboard/DoctorSettings/Language";
+import DoctorLanguage from "./pages/Dashboard/DoctorSettings/Language";
 import Availability from "./pages/Dashboard/DoctorSettings/Availability";
 import Help from "./pages/Dashboard/DoctorSettings/Help";
 
-
+// Caretaker Dashboard
+import Caretaker from "./pages/Dashboard/Caretaker";
 
 function App() {
   return (
     <BrowserRouter>
-
       <Routes>
-        {/* Homepage */}
-        <Route
-         path="/"
-          element={<Home />} />
 
-        {/* Create Account Page */}
-        <Route
-          path="/create-account"
-          element={<CreateAccount />}
-        />
+        {/* Home */}
+        <Route path="/" element={<Home />} />
 
-        {/* Login Page */}
-        <Route
-          path="/login"
-          element={<Login />}
-        />
+        {/* Login */}
+        <Route path="/login" element={<Login />} />
 
-        {/* Forgot Password Page */}
-        <Route
-          path="/forgot-password"
-          element={<Forgotpage />}
-        />
+        {/* Create Account */}
+        <Route path="/create-account" element={<CreateAccount />} />
 
-        {/* Patient Registration */}
+        {/* Registration Pages */}
         <Route
           path="/patient-register"
           element={<PatientRegister />}
         />
 
-        {/* Doctor Registration */}
         <Route
           path="/doctor-register"
           element={<DoctorRegister />}
         />
 
-        {/* Caretaker Registration */}
         <Route
           path="/caretaker-register"
           element={<CaretakerRegister />}
         />
-<Route
-  path="/patient"
-  element={<Patient />}
-/>
-<Route
-  path="/doctor"
-  element={<Doctor />}
 
-/>
+        {/* ================= PATIENT ================= */}
 
-<Route
-  path="/doctor/settings"
-  element={<DoctorSettings />}
-/>
-<Route
-  path="/doctor/settings/notifications"
-  element={<Notifications />}
-/>
+        <Route
+          path="/patient"
+          element={<Patient />}
+        />
 
-<Route
-  path="/doctor/settings/change-password"
-  element={<ChangePassword />}
-/>
+        <Route
+          path="/patient/details/:patientId"
+          element={<PatientDetails />}
+        />
 
-<Route
-  path="/doctor/settings/language"
-  element={<Language />}
-/>
+        <Route
+          path="/patient/settings"
+          element={<SettingsPage />}
+        />
 
-<Route
-  path="/doctor/settings/availability"
-  element={<Availability />}
-/>
+        <Route
+          path="/patient/notifications"
+          element={<NotificationsPage />}
+        />
 
-<Route
-  path="/doctor/settings/help"
-  element={<Help />}
-/>
-<Route
-  path="/doctor-profile"
-  element={<DoctorProfile />}
-/>
+        <Route
+          path="/patient/security"
+          element={<SecurityPage />}
+        />
 
+        <Route
+          path="/patient/health-preferences"
+          element={<HealthPreferencesPage />}
+        />
 
-<Route
-  path="/caretaker"
-  element={<Caretaker />}
-/>
+        <Route
+          path="/patient/ai-preferences"
+          element={<AIPreferencesPage />}
+        />
+
+        <Route
+          path="/patient/devices"
+          element={<ConnectedDevicesPage />}
+        />
+
+        <Route
+          path="/patient/language"
+          element={<LanguagePage />}
+        />
+
+        <Route
+          path="/patient/help"
+          element={<HelpSupportPage />}
+        />
+
+        {/* ================= DOCTOR ================= */}
+
+        <Route
+          path="/doctor"
+          element={<Doctor />}
+        />
+
+        <Route
+          path="/doctor-profile"
+          element={<DoctorProfile />}
+        />
+
+        <Route
+          path="/doctor/settings"
+          element={<DoctorSettings />}
+        />
+
+        <Route
+          path="/doctor/settings/notifications"
+          element={<DoctorNotifications />}
+        />
+
+        <Route
+          path="/doctor/settings/change-password"
+          element={<ChangePassword />}
+        />
+
+        <Route
+          path="/doctor/settings/language"
+          element={<DoctorLanguage />}
+        />
+
+        <Route
+          path="/doctor/settings/availability"
+          element={<Availability />}
+        />
+
+        <Route
+          path="/doctor/settings/help"
+          element={<Help />}
+        />
+
+        {/* ================= CARETAKER ================= */}
+
+        <Route
+          path="/caretaker"
+          element={<Caretaker />}
+        />
+
+        {/* Unknown URL */}
+        <Route
+          path="*"
+          element={<Navigate to="/" replace />}
+        />
+
       </Routes>
-
     </BrowserRouter>
   );
 }
 
 export default App;
+```
