@@ -1,864 +1,699 @@
-import { useState } from "react"; 
-import "./Caretaker.css"; 
- 
-export default function Caretaker() { 
-  const [activeMenu, setActiveMenu] = useState("Dashboard"); 
-  const [darkMode, setDarkMode] = useState(false); 
- 
-  const menuItems = [ 
-    ["🏠", "Dashboard"], 
-    ["👤", "Connected Patient"], 
-    ["📈", "Recovery Progress"], 
-    ["📅", "Appointments"], 
-    ["🔔", "Important Alerts"], 
-    ["🩺", "Health Records"], 
-    ["🤖", "AI Inside"], 
-  ]; 
- 
-  return ( 
-    <div className={`caretaker-dashboard ${darkMode ? "dark-mode" : ""}`}> 
- 
-      {/* ================= SIDEBAR ================= */} 
- 
-      <aside className="caretaker-sidebar"> 
- 
-        <div className="caretaker-brand"> 
-          <div className="caretaker-brand-icon">💜</div> 
- 
-          <div className="caretaker-brand-text"> 
-            <span>HealTrack AI</span> 
-            <small>Caretaker Support</small> 
-          </div> 
-        </div> 
- 
-        <p className="caretaker-menu-title">MAIN MENU</p> 
- 
-        <div className="caretaker-sidebar-menu"> 
- 
-          {menuItems.map(([icon, name]) => ( 
-            <button 
-              key={name} 
-              className={`caretaker-menu-item ${ 
-                activeMenu === name ? "active" : "" 
-              }`} 
-              onClick={() => setActiveMenu(name)} 
-            > 
-              <span className="caretaker-menu-icon">{icon}</span> 
-              <span>{name}</span> 
-            </button> 
-          ))} 
- 
-        </div> 
- 
-        <div className="caretaker-sidebar-bottom"> 
- 
-          <button className="caretaker-bottom-button"> 
-            ⚙️ 
-            <span>Settings</span> 
-          </button> 
- 
-          <button className="caretaker-logout-button"> 
-            🚪 
-            <span>Logout</span> 
-          </button> 
- 
-        </div> 
-      </aside> 
- 
- 
-      {/* ================= MAIN ================= */} 
- 
-      <main className="caretaker-main-content"> 
- 
-        {/* HEADER */} 
- 
-        <header className="caretaker-header"> 
- 
-          <div className="caretaker-search"> 
-            🔍 
-            <input 
-              type="text" 
-              placeholder="Search patient, records..." 
-            /> 
-          </div> 
- 
-          <div className="caretaker-header-right"> 
- 
-            <button 
-              className="caretaker-mode-button" 
-              onClick={() => setDarkMode(!darkMode)} 
-            > 
-              {darkMode ? "☀️" : "🌙"} 
-            </button> 
- 
-            <button className="caretaker-notification"> 
-              🔔 
-              <span></span> 
-            </button> 
- 
-            <div className="caretaker-profile"> 
- 
-              <div className="caretaker-avatar"> 
-                SK 
-              </div> 
- 
-              <div> 
-                <strong>Sarah Khan</strong> 
-                <small>Caretaker</small> 
-              </div> 
- 
-            </div> 
- 
-          </div> 
-        </header> 
- 
- 
-        {/* ================= CONTENT ================= */} 
- 
-        <div className="caretaker-container"> 
- 
-          {/* WELCOME */} 
- 
-          <section className="caretaker-welcome"> 
- 
-            <div> 
-              <p className="caretaker-welcome-small"> 
-                CARETAKER DASHBOARD 
-              </p> 
- 
-              <h1>Welcome back, Sarah 👋</h1> 
- 
-              <p> 
-                Stay connected with your patient's recovery 
-                and health journey. 
-              </p> 
-            </div> 
- 
-            <button className="caretaker-primary-button"> 
-              View Patient 
-            </button> 
- 
-          </section> 
- 
- 
-          {/* ================================================= 
-              DASHBOARD 
-          ================================================= */} 
- 
-          {activeMenu === "Dashboard" && ( 
-            <> 
- 
-              {/* TOP GRID */} 
- 
-              <div className="caretaker-top-grid"> 
- 
-                {/* CONNECTED PATIENT */} 
- 
-                <section className="caretaker-card"> 
- 
-                  <div className="caretaker-card-title"> 
-                    <div> 
-                      <h2>Connected Patient</h2> 
-                      <p>Currently monitoring</p> 
-                    </div> 
-                  </div> 
- 
-                  <div className="connected-patient"> 
- 
-                    <div className="patient-large-avatar"> 
-                      AS 
-                    </div> 
- 
-                    <div className="connected-patient-info"> 
-                      <h3>Aditya Sharma</h3> 
- 
-                      <p>Age 42 • Recovery Care</p> 
- 
-                      <span>Connected</span> 
-                    </div> 
- 
-                    <div className="online-status"> 
-                      ● Online 
-                    </div> 
- 
-                  </div> 
- 
-                  <button className="caretaker-outline-button"> 
-                    View Patient Profile 
-                  </button> 
- 
-                </section> 
- 
- 
-                {/* RECOVERY */} 
- 
-                <section className="caretaker-card"> 
- 
-                  <div className="caretaker-card-title"> 
-                    <div> 
-                      <h2>Recovery Progress</h2> 
-                      <p>Overall patient recovery</p> 
-                    </div> 
- 
-                    <span>Today</span> 
-                  </div> 
- 
-                  <div className="caretaker-progress"> 
- 
-                    <div className="caretaker-progress-circle"> 
- 
-                      <div> 
-                        <strong>78%</strong> 
-                        <small>Recovered</small> 
-                      </div> 
- 
-                    </div> 
- 
-                    <div className="progress-details"> 
- 
-                      <div className="progress-row"> 
-                        <span>Physical Activity</span> 
-                        <strong>82%</strong> 
-                      </div> 
- 
-                      <div className="caretaker-progress-bar"> 
-                        <div style={{ width: "82%" }}></div> 
-                      </div> 
- 
- 
-                      <div className="progress-row"> 
-                        <span>Medication</span> 
-                        <strong>90%</strong> 
-                      </div> 
- 
-                      <div className="caretaker-progress-bar"> 
-                        <div style={{ width: "90%" }}></div> 
-                      </div> 
- 
- 
-                      <div className="progress-row"> 
-                        <span>Recovery Goals</span> 
-                        <strong>68%</strong> 
-                      </div> 
- 
-                      <div className="caretaker-progress-bar"> 
-                        <div style={{ width: "68%" }}></div> 
-                      </div> 
- 
-                    </div> 
- 
-                  </div> 
- 
-                </section> 
- 
-              </div> 
- 
- 
-              {/* MIDDLE */} 
- 
-              <div className="caretaker-middle-grid"> 
- 
-                {/* APPOINTMENTS */} 
- 
-                <section className="caretaker-card"> 
- 
-                  <div className="caretaker-card-title"> 
-                    <div> 
-                      <h2>Upcoming Appointments</h2> 
-                      <p>Next scheduled visits</p> 
-                    </div> 
-                  </div> 
- 
-                  <div className="caretaker-appointment"> 
- 
-                    <div className="appointment-date"> 
-                      <strong>24</strong> 
-                      <span>AUG</span> 
-                    </div> 
- 
-                    <div> 
-                      <strong>Dr. Rahul Mehta</strong> 
-                      <p>Cardiology • 10:30 AM</p> 
-                      <small>City Care Hospital</small> 
-                    </div> 
- 
-                    <span className="appointment-status"> 
-                      Upcoming 
-                    </span> 
- 
-                  </div> 
- 
- 
-                  <div className="caretaker-appointment"> 
- 
-                    <div className="appointment-date"> 
-                      <strong>29</strong> 
-                      <span>AUG</span> 
-                    </div> 
- 
-                    <div> 
-                      <strong>Dr. Neha Patel</strong> 
-                      <p>Physiotherapy • 04:00 PM</p> 
-                      <small>Recovery Clinic</small> 
-                    </div> 
- 
-                    <span className="appointment-status"> 
-                      Scheduled 
-                    </span> 
- 
-                  </div> 
- 
-                </section> 
- 
- 
-                {/* ALERTS */} 
- 
-                <section className="caretaker-card"> 
- 
-                  <div className="caretaker-card-title"> 
-                    <div> 
-                      <h2>Important Alerts</h2> 
-                      <p>Things that need attention</p> 
-                    </div> 
- 
-                    <div className="alert-count"> 
-                      3 
-                    </div> 
-                  </div> 
- 
- 
-                  <div className="caretaker-alert warning"> 
- 
-                    <span>⚠️</span> 
- 
-                    <div> 
-                      <strong>Medicine Reminder</strong> 
-                      <p> 
-                        Evening medicine is due at 8:00 PM. 
-                      </p> 
-                    </div> 
- 
-                  </div> 
- 
- 
-                  <div className="caretaker-alert info"> 
- 
-                    <span>ℹ️</span> 
- 
-                    <div> 
-                      <strong>Doctor's Note</strong> 
-                      <p> 
-                        Patient should maintain daily activity. 
-                      </p> 
-                    </div> 
- 
-                  </div> 
- 
- 
-                  <div className="caretaker-alert success"> 
- 
-                    <span>✓</span> 
- 
-                    <div> 
-                      <strong>Recovery Goal Completed</strong> 
-                      <p> 
-                        Today's walking goal has been completed. 
-                      </p> 
-                    </div> 
- 
-                  </div> 
- 
-                </section> 
- 
-              </div> 
- 
- 
-              {/* LOWER */} 
- 
-              <div className="caretaker-lower-grid"> 
- 
-                {/* HEALTH RECORDS */} 
- 
-                <section className="caretaker-card"> 
- 
-                  <div className="caretaker-card-title"> 
-                    <div> 
-                      <h2>Recent Health Records</h2> 
-                      <p>Latest patient readings</p> 
-                    </div> 
-                  </div> 
- 
- 
-                  <div className="health-record"> 
- 
-                    <div className="record-icon"> 
-                      ❤️ 
-                    </div> 
- 
-                    <div> 
-                      <strong>Heart Rate</strong> 
-                      <p>72 BPM • Today, 9:20 AM</p> 
-                    </div> 
- 
-                    <span>Normal</span> 
- 
-                  </div> 
- 
- 
-                  <div className="health-record"> 
- 
-                    <div className="record-icon"> 
-                      🩸 
-                    </div> 
- 
-                    <div> 
-                      <strong>Blood Pressure</strong> 
-                      <p>120/80 mmHg • Today</p> 
-                    </div> 
- 
-                    <span>Normal</span> 
- 
-                  </div> 
- 
- 
-                  <div className="health-record"> 
- 
-                    <div className="record-icon"> 
-                      🍬 
-                    </div> 
- 
-                    <div> 
-                      <strong>Blood Sugar</strong> 
-                      <p>104 mg/dL • Yesterday</p> 
-                    </div> 
- 
-                    <span>Normal</span> 
- 
-                  </div> 
- 
-                </section> 
- 
- 
-                {/* AI */} 
- 
-                <section className="caretaker-card ai-insights-card"> 
- 
-                  <div className="caretaker-card-title"> 
- 
-                    <div> 
-                      <h2>AI Inside</h2> 
-                      <p>Smart recovery insights</p> 
-                    </div> 
- 
-                    <div className="ai-insights-icon"> 
-                      🤖 
-                    </div> 
- 
-                  </div> 
- 
- 
-                  <div className="ai-insight-message"> 
- 
-                    <strong> 
-                      AI Recovery Insight 
-                    </strong> 
- 
-                    <p> 
-                      Aditya's recovery is progressing steadily. 
-                      Medication adherence is good and activity 
-                      levels have improved this week. 
-                    </p> 
- 
-                    <div className="ai-insight-tip"> 
-                      💡 Keep monitoring daily activity and 
-                      medicine timings. 
-                    </div> 
- 
-                    <button className="caretaker-ai-button"> 
-                      View AI Analysis 
-                    </button> 
- 
-                  </div> 
- 
-                </section> 
- 
-              </div> 
- 
-            </> 
-          )} 
- 
- 
-          {/* ================================================= 
-              CONNECTED PATIENT 
-          ================================================= */} 
- 
-          {activeMenu === "Connected Patient" && ( 
- 
-            <> 
- 
-              <div className="caretaker-page-heading"> 
-                <h1>Connected Patient</h1> 
-                <p>Complete information about your connected patient</p> 
-              </div> 
- 
-              <div className="patient-details-grid"> 
- 
-                <section className="caretaker-card patient-profile-large"> 
- 
-                  <div className="patient-large-avatar"> 
-                    AS 
-                  </div> 
- 
-                  <h2>Aditya Sharma</h2> 
- 
-                  <p>42 Years • Male</p> 
- 
-                  <span className="patient-connected-badge"> 
-                    ● Connected 
-                  </span> 
- 
-                  <div className="patient-info-list"> 
- 
-                    <div> 
-                      <span>Recovery Type</span> 
-                      <strong>Post Surgery</strong> 
-                    </div> 
- 
-                    <div> 
-                      <span>Email</span> 
-                      <strong>aditya@example.com</strong> 
-                    </div> 
- 
-                    <div> 
-                      <span>Emergency Contact</span> 
-                      <strong>+91 98XXXXXX45</strong> 
-                    </div> 
- 
-                  </div> 
- 
-                </section> 
- 
- 
-                <section className="caretaker-card"> 
- 
-                  <div className="caretaker-card-title"> 
-                    <div> 
-                      <h2>Patient Health Overview</h2> 
-                      <p>Current health status</p> 
-                    </div> 
-                  </div> 
- 
-                  <div className="health-overview-grid"> 
- 
-                    <div> 
-                      <span>❤️</span> 
-                      <strong>72</strong> 
-                      <small>Heart Rate</small> 
-                    </div> 
- 
-                    <div> 
-                      <span>🩸</span> 
-                      <strong>120/80</strong> 
-                      <small>Blood Pressure</small> 
-                    </div> 
- 
-                    <div> 
-                      <span>🍬</span> 
-                      <strong>104</strong> 
-                      <small>Blood Sugar</small> 
-                    </div> 
- 
-                    <div> 
-                      <span>🌡️</span> 
-                      <strong>98.4°F</strong> 
-                      <small>Temperature</small> 
-                    </div> 
- 
-                  </div> 
- 
-                </section> 
- 
-              </div> 
- 
-            </> 
-          )} 
- 
- 
-          {/* ================================================= 
-              RECOVERY PROGRESS 
-          ================================================= */} 
- 
-          {activeMenu === "Recovery Progress" && ( 
- 
-            <> 
- 
-              <div className="caretaker-page-heading"> 
-                <h1>Recovery Progress</h1> 
-                <p>Monitor your patient's recovery journey</p> 
-              </div> 
- 
-              <section className="caretaker-card"> 
- 
-                <div className="full-recovery"> 
- 
-                  <div className="caretaker-progress-circle large-progress"> 
- 
-                    <div> 
-                      <strong>78%</strong> 
-                      <small>Overall Recovery</small> 
-                    </div> 
- 
-                  </div> 
- 
-                  <div className="recovery-goals"> 
- 
-                    <h2>Recovery Goals</h2> 
- 
-                    <p>Physical Activity — 82%</p> 
-                    <div className="caretaker-progress-bar"> 
-                      <div style={{ width: "82%" }}></div> 
-                    </div> 
- 
-                    <p>Medication Adherence — 90%</p> 
-                    <div className="caretaker-progress-bar"> 
-                      <div style={{ width: "90%" }}></div> 
-                    </div> 
- 
-                    <p>Daily Exercises — 74%</p> 
-                    <div className="caretaker-progress-bar"> 
-                      <div style={{ width: "74%" }}></div> 
-                    </div> 
- 
-                    <p>Recovery Milestones — 68%</p> 
-                    <div className="caretaker-progress-bar"> 
-                      <div style={{ width: "68%" }}></div> 
-                    </div> 
- 
-                  </div> 
- 
-                </div> 
- 
-              </section> 
- 
-            </> 
-          )} 
- 
- 
-          {/* ================================================= 
-              APPOINTMENTS 
-          ================================================= */} 
- 
-          {activeMenu === "Appointments" && ( 
- 
-            <> 
- 
-              <div className="caretaker-page-heading"> 
-                <h1>Appointments</h1> 
-                <p>Manage and track patient appointments</p> 
-              </div> 
- 
-              <section className="caretaker-card"> 
- 
-                <div className="caretaker-appointment"> 
- 
-                  <div className="appointment-date"> 
-                    <strong>24</strong> 
-                    <span>AUG</span> 
-                  </div> 
- 
-                  <div> 
-                    <strong>Dr. Rahul Mehta</strong> 
-                    <p>Cardiology • 10:30 AM</p> 
-                    <small>City Care Hospital</small> 
-                  </div> 
- 
-                  <span className="appointment-status"> 
-                    Upcoming 
-                  </span> 
- 
-                </div> 
- 
- 
-                <div className="caretaker-appointment"> 
- 
-                  <div className="appointment-date"> 
-                    <strong>29</strong> 
-                    <span>AUG</span> 
-                  </div> 
- 
-                  <div> 
-                    <strong>Dr. Neha Patel</strong> 
-                    <p>Physiotherapy • 04:00 PM</p> 
-                    <small>Recovery Clinic</small> 
-                  </div> 
- 
-                  <span className="appointment-status"> 
-                    Scheduled 
-                  </span> 
- 
-                </div> 
- 
-              </section> 
- 
-            </> 
- 
-          )} 
- 
- 
-          {/* ================================================= 
-              ALERTS 
-          ================================================= */} 
- 
-          {activeMenu === "Important Alerts" && ( 
- 
-            <> 
- 
-              <div className="caretaker-page-heading"> 
-                <h1>Important Alerts</h1> 
-                <p>Important notifications regarding your patient</p> 
-              </div> 
- 
-              <section className="caretaker-card"> 
- 
-                <div className="caretaker-alert warning"> 
-                  <span>⚠️</span> 
- 
-                  <div> 
-                    <strong>Medicine Reminder</strong> 
-                    <p> 
-                      Evening medicine is due at 8:00 PM. 
-                    </p> 
-                  </div> 
-                </div> 
- 
- 
-                <div className="caretaker-alert info"> 
-                  <span>ℹ️</span> 
- 
-                  <div> 
-                    <strong>Doctor's Note</strong> 
-                    <p> 
-                      Patient should maintain daily activity. 
-                    </p> 
-                  </div> 
-                </div> 
- 
- 
-                <div className="caretaker-alert success"> 
-                  <span>✓</span> 
- 
-                  <div> 
-                    <strong>Recovery Goal Completed</strong> 
-                    <p> 
-                      Today's walking goal has been completed. 
-                    </p> 
-                  </div> 
-                </div> 
- 
-              </section> 
- 
-            </> 
- 
-          )} 
- 
- 
-          {/* ================================================= 
-              HEALTH RECORDS 
-          ================================================= */} 
- 
-          {activeMenu === "Health Records" && ( 
- 
-            <> 
- 
-              <div className="caretaker-page-heading"> 
-                <h1>Health Records</h1> 
-                <p>Monitor your patient's recent health readings</p> 
-              </div> 
- 
-              <section className="health-overview-grid full-health-grid"> 
- 
-                <div className="health-big-card"> 
-                  ❤️ 
-                  <strong>72 BPM</strong> 
-                  <span>Heart Rate</span> 
-                  <small>Normal</small> 
-                </div> 
- 
-                <div className="health-big-card"> 
-                  🩸 
-                  <strong>120/80</strong> 
-                  <span>Blood Pressure</span> 
-                  <small>Normal</small> 
-                </div> 
- 
-                <div className="health-big-card"> 
-                  🍬 
-                  <strong>104 mg/dL</strong> 
-                  <span>Blood Sugar</span> 
-                  <small>Normal</small> 
-                </div> 
- 
-                <div className="health-big-card"> 
-                  🌡️ 
-                  <strong>98.4°F</strong> 
-                  <span>Temperature</span> 
-                  <small>Normal</small> 
-                </div> 
- 
-              </section> 
- 
-            </> 
- 
-          )} 
- 
- 
-          {/* ================================================= 
-              AI INSIDE 
-          ================================================= */} 
- 
-          {activeMenu === "AI Inside" && ( 
- 
-            <> 
- 
-              <div className="caretaker-page-heading"> 
-                <h1>AI Inside</h1> 
-                <p>AI-powered insights for better patient support</p> 
-              </div> 
- 
-              <section className="caretaker-card ai-full-card"> 
- 
-                <div className="ai-insights-icon"> 
-                  🤖 
-                </div> 
- 
-                <h2>AI Recovery Analysis</h2> 
- 
-                <p> 
-                  Aditya's recovery is progressing steadily. 
-                  Current health readings are within normal 
-                  range and medication adherence is good. 
-                </p> 
- 
-                <div className="ai-insight-tip"> 
-                  💡 Caretaker Tip: Continue monitoring daily 
-                  activity, medication timings and upcoming 
-                  appointments. 
-                </div> 
- 
-                <button className="caretaker-primary-button"> 
-                  Run New AI Analysis 
-                </button> 
- 
-              </section> 
- 
-            </> 
- 
-          )} 
- 
-        </div> 
- 
-      </main> 
- 
-    </div> 
-  ); 
-} 
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { API_BASE } from "../../api";
+import "./Caretaker.css";
+
+function Caretaker() {
+  const navigate = useNavigate();
+  const [caretakerId, setCaretakerId] = useState(null);
+  const [caretakerName, setCaretakerName] = useState("");
+  const [patientId, setPatientId] = useState(null);
+  const [patientData, setPatientData] = useState(null);
+  const [doctorInfo, setDoctorInfo] = useState(null);
+  const [healthRecords, setHealthRecords] = useState([]);
+  const [medicines, setMedicines] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [recoveryTasks, setRecoveryTasks] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [loading, setLoading] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    const userName = localStorage.getItem("userName");
+    const userRole = localStorage.getItem("userRole");
+
+    if (!userId || userRole !== "caretaker") {
+      navigate("/login");
+      return;
+    }
+
+    setCaretakerId(userId);
+    setCaretakerName(userName);
+
+    // Fetch caretaker's assigned patient (for demo, using patient_id from profile)
+    fetchCaretakerData(userId);
+  }, [navigate]);
+
+  const fetchCaretakerData = async (caretakerId) => {
+    setLoading(true);
+    try {
+      const caretakerRes = await fetch(
+        `${API_BASE}/api/caretaker/${caretakerId}/patient`
+      );
+      const caretakerInfo = await caretakerRes.json();
+
+      if (!caretakerInfo.patient) {
+        setLoading(false);
+        return;
+      }
+
+      const patId = caretakerInfo.patient.id;
+      setPatientId(patId);
+      setDoctorInfo(caretakerInfo.doctor);
+
+      const patientRes = await fetch(
+        `${API_BASE}/api/patient/${patId}`
+      );
+      const patientInfo = await patientRes.json();
+      setPatientData(patientInfo);
+
+      const healthRes = await fetch(
+        `${API_BASE}/api/health-record/${patId}`
+      );
+      const healthData = await healthRes.json();
+      setHealthRecords(healthData.records || []);
+
+      const medRes = await fetch(`${API_BASE}/api/medicines/${patId}`);
+      const medData = await medRes.json();
+      setMedicines(medData.medicines || []);
+
+      const apptRes = await fetch(
+        `${API_BASE}/api/appointments/${patId}`
+      );
+      const apptData = await apptRes.json();
+      setAppointments(apptData.appointments || []);
+
+      const taskRes = await fetch(
+        `${API_BASE}/api/recovery-tasks/${patId}`
+      );
+      const taskData = await taskRes.json();
+      setRecoveryTasks(taskData.tasks || []);
+
+      const alertRes = await fetch(`${API_BASE}/api/alerts/${patId}`);
+      const alertData = await alertRes.json();
+      setAlerts(Array.isArray(alertData) ? alertData : alertData.alerts || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
+  const getRecoveryProgress = () => {
+    if (recoveryTasks.length === 0) return 0;
+    const completed = recoveryTasks.filter((t) => t.status === "completed").length;
+    return Math.round((completed / recoveryTasks.length) * 100);
+  };
+
+  return (
+    <div className={`caretaker-dashboard ${darkMode ? "dark-mode" : ""}`}>
+      {/* Sidebar */}
+      <aside className="caretaker-sidebar">
+        <div className="caretaker-brand">
+          <div className="caretaker-brand-icon">🏥</div>
+          <div className="caretaker-brand-text">
+            <span>HealTrack</span>
+            <small>Caretaker</small>
+          </div>
+        </div>
+
+        <div className="caretaker-menu-title">MENU</div>
+        <nav className="caretaker-sidebar-menu">
+          <button
+            className={`caretaker-menu-item ${
+              activeTab === "dashboard" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("dashboard")}
+          >
+            <span className="caretaker-menu-icon">📊</span>
+            Dashboard
+          </button>
+          <button
+            className={`caretaker-menu-item ${
+              activeTab === "vitals" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("vitals")}
+          >
+            <span className="caretaker-menu-icon">❤️</span>
+            Vitals
+          </button>
+          <button
+            className={`caretaker-menu-item ${
+              activeTab === "medicines" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("medicines")}
+          >
+            <span className="caretaker-menu-icon">💊</span>
+            Medicines
+          </button>
+          <button
+            className={`caretaker-menu-item ${
+              activeTab === "tasks" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("tasks")}
+          >
+            <span className="caretaker-menu-icon">✅</span>
+            Tasks
+          </button>
+          <button
+            className={`caretaker-menu-item ${
+              activeTab === "appointments" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("appointments")}
+          >
+            <span className="caretaker-menu-icon">📅</span>
+            Appointments
+          </button>
+          <button
+            className={`caretaker-menu-item ${
+              activeTab === "alerts" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("alerts")}
+          >
+            <span className="caretaker-menu-icon">🔔</span>
+            Alerts
+          </button>
+        </nav>
+
+        <div className="caretaker-sidebar-bottom">
+          <button
+            className="caretaker-bottom-button"
+            onClick={toggleDarkMode}
+          >
+            <span className="caretaker-menu-icon">
+              {darkMode ? "☀️" : "🌙"}
+            </span>
+            {darkMode ? "Light Mode" : "Dark Mode"}
+          </button>
+          <button className="caretaker-logout-button" onClick={handleLogout}>
+            <span className="caretaker-menu-icon">🚪</span>
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <div className="caretaker-main-content">
+        {/* Header */}
+        <header className="caretaker-header">
+          <div className="caretaker-search">
+            <span>🔍</span>
+            <input type="text" placeholder="Search patient info..." />
+          </div>
+
+          <div className="caretaker-header-right">
+            <button className="caretaker-mode-button" onClick={toggleDarkMode}>
+              {darkMode ? "☀️" : "🌙"}
+            </button>
+            <button className="caretaker-notification">
+              🔔
+              {alerts.length > 0 && <span></span>}
+            </button>
+            <div className="caretaker-profile">
+              <div className="caretaker-avatar">
+                {caretakerName.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <strong>{caretakerName}</strong>
+                <small>Caregiver</small>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Container */}
+        <div className="caretaker-container">
+          {/* Welcome Section */}
+          {activeTab === "dashboard" && (
+            <>
+              <div className="caretaker-welcome">
+                <div>
+                  <div className="caretaker-welcome-small">HELLO THERE 👋</div>
+                  <h1>Welcome back, {caretakerName}!</h1>
+                  <p>Here's an overview of your patient's health status</p>
+                </div>
+              </div>
+
+              {/* Top Grid */}
+              <div className="caretaker-top-grid">
+                {/* Connected Patient Card */}
+                <div className="caretaker-card">
+                  <div className="caretaker-card-title">
+                    <div>
+                      <h2>👤 Patient Information</h2>
+                      <p>Current patient under care</p>
+                    </div>
+                  </div>
+
+                  {patientData ? (
+                    <div className="connected-patient">
+                      <div className="patient-large-avatar">
+                        {patientData.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="connected-patient-info">
+                        <h3>{patientData.name}</h3>
+                        <p>
+                          Age: {patientData.age} • {patientData.gender}
+                        </p>
+                        <p>Recovery: {patientData.recoveryType || patientData.recovery_type}</p>
+                        <p>
+                          Doctor: {doctorInfo?.name || patientData.assignedDoctor?.name || "Not assigned"}
+                        </p>
+                        <p>
+                          Care team: {doctorInfo?.specialization || "Monitoring support"}
+                        </p>
+                        <span className="patient-connected-badge">
+                          ✓ Connected
+                        </span>
+                        <span className="online-status">🟢 Online</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p>No patient data available</p>
+                  )}
+                </div>
+
+                {/* Recovery Progress */}
+                <div className="caretaker-card">
+                  <div className="caretaker-card-title">
+                    <div>
+                      <h2>📈 Recovery Progress</h2>
+                      <p>Task completion status</p>
+                    </div>
+                  </div>
+
+                  <div className="caretaker-progress">
+                    <div className="caretaker-progress-circle">
+                      <div>
+                        <strong>{getRecoveryProgress()}%</strong>
+                        <small>Complete</small>
+                      </div>
+                    </div>
+                    <div className="progress-details">
+                      <div className="progress-row">
+                        <span>Total Tasks</span>
+                        <strong>{recoveryTasks.length}</strong>
+                      </div>
+                      <div className="caretaker-progress-bar">
+                        <div
+                          style={{
+                            width: `${getRecoveryProgress()}%`,
+                          }}
+                        ></div>
+                      </div>
+
+                      <div className="progress-row">
+                        <span>Completed</span>
+                        <strong>
+                          {recoveryTasks.filter((t) => t.status === "completed")
+                            .length}
+                        </strong>
+                      </div>
+
+                      <div className="progress-row">
+                        <span>Pending</span>
+                        <strong>
+                          {recoveryTasks.filter((t) => t.status === "pending")
+                            .length}
+                        </strong>
+                      </div>
+
+                      <button className="caretaker-outline-button">
+                        View All Tasks
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Middle Grid */}
+              <div className="caretaker-middle-grid">
+                {/* Upcoming Appointments */}
+                <div className="caretaker-card">
+                  <div className="caretaker-card-title">
+                    <div>
+                      <h2>📅 Appointments</h2>
+                      <p>Upcoming medical visits</p>
+                    </div>
+                    <span>{appointments.length}</span>
+                  </div>
+
+                  {appointments.length === 0 ? (
+                    <p style={{ color: "#9690a2", fontSize: "12px" }}>
+                      No appointments scheduled
+                    </p>
+                  ) : (
+                    appointments.slice(0, 3).map((apt, idx) => (
+                      <div key={idx} className="caretaker-appointment">
+                        <div className="appointment-date">
+                          <strong>
+                            {new Date(apt.date).getDate()}
+                          </strong>
+                          <span>
+                            {new Date(apt.date).toLocaleString("default", {
+                              month: "short",
+                            })}
+                          </span>
+                        </div>
+                        <div>
+                          <strong>{apt.title}</strong>
+                          <p>{apt.subtitle}</p>
+                          <small>{apt.time || "N/A"}</small>
+                        </div>
+                        <span className="appointment-status">
+                          {apt.status}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Recent Alerts */}
+                <div className="caretaker-card">
+                  <div className="caretaker-card-title">
+                    <div>
+                      <h2>🔔 Alerts</h2>
+                      <p>Health warnings</p>
+                    </div>
+                    <div className="alert-count">{alerts.length}</div>
+                  </div>
+
+                  {alerts.length === 0 ? (
+                    <p style={{ color: "#9690a2", fontSize: "12px" }}>
+                      No alerts at the moment
+                    </p>
+                  ) : (
+                    alerts.slice(0, 3).map((alert, idx) => (
+                      <div
+                        key={idx}
+                        className={`caretaker-alert ${alert.type}`}
+                      >
+                        <span>
+                          {alert.type === "warning"
+                            ? "⚠️"
+                            : alert.type === "info"
+                            ? "ℹ️"
+                            : "✓"}
+                        </span>
+                        <div>
+                          <strong>{alert.title}</strong>
+                          <p>{alert.message}</p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Lower Grid */}
+              <div className="caretaker-lower-grid">
+                {/* Medicines */}
+                <div className="caretaker-card">
+                  <div className="caretaker-card-title">
+                    <div>
+                      <h2>💊 Medicines</h2>
+                      <p>Today's medication schedule</p>
+                    </div>
+                    <span>{medicines.length}</span>
+                  </div>
+
+                  {medicines.length === 0 ? (
+                    <p style={{ color: "#9690a2", fontSize: "12px" }}>
+                      No medicines scheduled
+                    </p>
+                  ) : (
+                    medicines.slice(0, 3).map((med, idx) => (
+                      <div key={idx} className="health-record">
+                        <div className="record-icon">💊</div>
+                        <div>
+                          <strong>{med.name}</strong>
+                          <p>{med.instruction}</p>
+                        </div>
+                        <span
+                          style={{
+                            background:
+                              med.status === "taken"
+                                ? "#eaf9f2"
+                                : "#fff6e5",
+                            color:
+                              med.status === "taken"
+                                ? "#209364"
+                                : "#d88a16",
+                          }}
+                        >
+                          {med.status.toUpperCase()}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* AI Insights */}
+                <div className="caretaker-card ai-insights-card">
+                  <div className="caretaker-card-title">
+                    <div>
+                      <h2>🤖 AI Insights</h2>
+                      <p>Personalized recommendations</p>
+                    </div>
+                    <div className="ai-insights-icon">✨</div>
+                  </div>
+
+                  <div className="ai-insight-message">
+                    <strong>Patient Recovery Status</strong>
+                    <p>
+                      Based on recent vitals and activity, the patient is
+                      showing steady progress. Continue with current medication
+                      schedule.
+                    </p>
+                    <div className="ai-insight-tip">
+                      💡 <strong>Tip:</strong> Ensure patient drinks 2-3 liters
+                      of water daily and maintains regular sleep schedule.
+                    </div>
+                  </div>
+
+                  <button className="caretaker-ai-button">
+                    Get More Insights →
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Vitals Tab */}
+          {activeTab === "vitals" && (
+            <div>
+              <div className="caretaker-page-heading">
+                <h1>❤️ Health Vitals</h1>
+                <p>Patient's vital signs and health parameters</p>
+              </div>
+
+              {healthRecords.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "50px" }}>
+                  <p style={{ color: "#9690a2", fontSize: "14px" }}>
+                    No health records available
+                  </p>
+                </div>
+              ) : (
+                <div className="full-health-grid">
+                  {healthRecords.slice(0, 4).map((record, idx) => (
+                    <div key={idx} className="health-big-card">
+                      <span>
+                        {idx === 0
+                          ? "🩸"
+                          : idx === 1
+                          ? "❤️"
+                          : idx === 2
+                          ? "🫀"
+                          : "🔴"}
+                      </span>
+                      <strong>
+                        {idx === 0
+                          ? record.blood_sugar
+                          : idx === 1
+                          ? record.heart_rate
+                          : idx === 2
+                          ? record.systolic
+                          : record.hemoglobin}
+                      </strong>
+                      <span>
+                        {idx === 0
+                          ? "Blood Sugar (mg/dL)"
+                          : idx === 1
+                          ? "Heart Rate (BPM)"
+                          : idx === 2
+                          ? "Systolic (mmHg)"
+                          : "Hemoglobin (g/dL)"}
+                      </span>
+                      <small>✓ Normal</small>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Medicines Tab */}
+          {activeTab === "medicines" && (
+            <div>
+              <div className="caretaker-page-heading">
+                <h1>💊 Medications</h1>
+                <p>Complete medication schedule and history</p>
+              </div>
+
+              <div className="caretaker-card">
+                {medicines.length === 0 ? (
+                  <p style={{ color: "#9690a2", fontSize: "14px" }}>
+                    No medicines found
+                  </p>
+                ) : (
+                  medicines.map((med, idx) => (
+                    <div key={idx} className="health-record">
+                      <div className="record-icon">💊</div>
+                      <div>
+                        <strong>{med.name}</strong>
+                        <p>{med.instruction}</p>
+                      </div>
+                      <span
+                        style={{
+                          background:
+                            med.status === "taken" ? "#eaf9f2" : "#fff6e5",
+                          color:
+                            med.status === "taken" ? "#209364" : "#d88a16",
+                        }}
+                      >
+                        {med.status.toUpperCase()}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Tasks Tab */}
+          {activeTab === "tasks" && (
+            <div>
+              <div className="caretaker-page-heading">
+                <h1>✅ Recovery Tasks</h1>
+                <p>Daily recovery and rehabilitation tasks</p>
+              </div>
+
+              <div className="caretaker-card">
+                {recoveryTasks.length === 0 ? (
+                  <p style={{ color: "#9690a2", fontSize: "14px" }}>
+                    No tasks assigned
+                  </p>
+                ) : (
+                  recoveryTasks.map((task, idx) => (
+                    <div key={idx} className="health-record">
+                      <div className="record-icon">📋</div>
+                      <div>
+                        <strong>{task.name}</strong>
+                        <p>Date: {new Date(task.date).toDateString()}</p>
+                      </div>
+                      <span
+                        style={{
+                          background:
+                            task.status === "completed"
+                              ? "#eaf9f2"
+                              : "#fff6e5",
+                          color:
+                            task.status === "completed"
+                              ? "#209364"
+                              : "#d88a16",
+                        }}
+                      >
+                        {task.status.toUpperCase()}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Appointments Tab */}
+          {activeTab === "appointments" && (
+            <div>
+              <div className="caretaker-page-heading">
+                <h1>📅 Appointments</h1>
+                <p>Scheduled medical visits and consultations</p>
+              </div>
+
+              <div className="caretaker-card">
+                {appointments.length === 0 ? (
+                  <p style={{ color: "#9690a2", fontSize: "14px" }}>
+                    No appointments scheduled
+                  </p>
+                ) : (
+                  appointments.map((apt, idx) => (
+                    <div key={idx} className="caretaker-appointment">
+                      <div className="appointment-date">
+                        <strong>
+                          {new Date(apt.date).getDate()}
+                        </strong>
+                        <span>
+                          {new Date(apt.date).toLocaleString("default", {
+                            month: "short",
+                          })}
+                        </span>
+                      </div>
+                      <div>
+                        <strong>{apt.title}</strong>
+                        <p>{apt.subtitle}</p>
+                        <small>{apt.time || "N/A"}</small>
+                      </div>
+                      <span className="appointment-status">
+                        {apt.status}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Alerts Tab */}
+          {activeTab === "alerts" && (
+            <div>
+              <div className="caretaker-page-heading">
+                <h1>🔔 Health Alerts</h1>
+                <p>Critical health warnings and notifications</p>
+              </div>
+
+              <div className="caretaker-card">
+                {alerts.length === 0 ? (
+                  <p style={{ color: "#9690a2", fontSize: "14px" }}>
+                    No alerts at the moment
+                  </p>
+                ) : (
+                  alerts.map((alert, idx) => (
+                    <div
+                      key={idx}
+                      className={`caretaker-alert ${alert.type}`}
+                    >
+                      <span>
+                        {alert.type === "warning"
+                          ? "⚠️"
+                          : alert.type === "info"
+                          ? "ℹ️"
+                          : "✓"}
+                      </span>
+                      <div>
+                        <strong>{alert.title}</strong>
+                        <p>{alert.message}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Caretaker;

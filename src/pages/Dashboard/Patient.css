@@ -1,7 +1,3 @@
-/* =====================================================
-   RESET
-===================================================== */
-
 * {
   margin: 0;
   padding: 0;
@@ -303,6 +299,173 @@ select {
   font-size: 9px;
 }
 
+.patient-dashboard .search-panel {
+ position: relative;
+}
+
+.patient-dashboard .search-results {
+ position: absolute;
+ top: 48px;
+ left: 0;
+ width: 300px;
+ background: #fff;
+ border: 1px solid #d9ebeb;
+ border-radius: 12px;
+ box-shadow: 0 18px 40px rgba(31, 78, 85, 0.12);
+ z-index: 20;
+ overflow: hidden;
+}
+
+.patient-dashboard .search-results button {
+ display: flex;
+ align-items: center;
+ gap: 10px;
+ width: 100%;
+ background: transparent;
+ border: none;
+ padding: 12px 14px;
+ text-align: left;
+ font-size: 11px;
+ color: #2d5d61;
+ cursor: pointer;
+}
+
+.patient-dashboard .search-results button:hover {
+ background: #eafaf8;
+}
+
+.patient-dashboard .profile-menu-wrap {
+ position: relative;
+}
+
+.patient-dashboard .profile-trigger {
+ cursor: pointer;
+}
+
+.patient-dashboard .profile-menu {
+ position: absolute;
+ right: 0;
+ top: 52px;
+ background: #fff;
+ border: 1px solid #dfeeee;
+ border-radius: 12px;
+ box-shadow: 0 18px 40px rgba(31, 78, 85, 0.12);
+ min-width: 180px;
+ padding: 8px;
+ z-index: 25;
+}
+
+.patient-dashboard .profile-menu button {
+ width: 100%;
+ border: none;
+ background: transparent;
+ text-align: left;
+ padding: 10px 12px;
+ border-radius: 8px;
+ font-size: 11px;
+ color: #2e5a5d;
+ cursor: pointer;
+}
+
+.patient-dashboard .profile-menu button:hover {
+ background: #eefaf8;
+}
+
+.patient-dashboard .profile-menu .logout-link {
+ color: #d45d52;
+}
+
+.patient-dashboard .doctor-connect-card {
+ margin-top: 24px;
+}
+
+.patient-dashboard .doctor-search-box {
+ display: flex;
+ align-items: center;
+ gap: 10px;
+ border: 1px solid #cfe1e2;
+ background: #f5fafa;
+ border-radius: 10px;
+ padding: 11px 12px;
+ margin-bottom: 12px;
+}
+
+.patient-dashboard .doctor-search-box input {
+ border: none;
+ background: transparent;
+ width: 100%;
+ color: #245c60;
+ font-size: 11px;
+ outline: none;
+}
+
+.patient-dashboard .doctor-connect-status {
+ background: #edfdf6;
+ border: 1px solid #ccead9;
+ color: #1f7d58;
+ padding: 10px 12px;
+ border-radius: 10px;
+ font-size: 11px;
+ margin-bottom: 12px;
+}
+
+.patient-dashboard .doctor-list {
+ display: grid;
+ gap: 12px;
+}
+
+.patient-dashboard .doctor-row {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 14px;
+ border: 1px solid #e7efef;
+ background: #f9fdfd;
+ border-radius: 12px;
+ padding: 14px 16px;
+}
+
+.patient-dashboard .doctor-row-meta {
+ display: flex;
+ gap: 12px;
+ align-items: center;
+}
+
+.patient-dashboard .doctor-avatar-mini {
+ width: 42px;
+ height: 42px;
+ border-radius: 50%;
+ background: linear-gradient(135deg, #d9f6f2, #cfe8ef);
+ color: #0d646a;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ font-weight: 700;
+ font-size: 10px;
+}
+
+.patient-dashboard .doctor-row strong {
+ display: block;
+ font-size: 12px;
+ color: #1d5056;
+}
+
+.patient-dashboard .doctor-row p,
+.patient-dashboard .doctor-row small {
+ color: #6f8c8e;
+ font-size: 10px;
+}
+
+.patient-dashboard .doctor-empty {
+ color: #6d8c8d;
+ font-size: 11px;
+}
+
+.patient-dashboard .doctor-connect-btn {
+ margin-top: 0;
+ white-space: nowrap;
+}
+
 /* =====================================================
    CONTENT
 ===================================================== */
@@ -529,8 +692,8 @@ select {
   height: 145px;
   border-radius: 50%;
   background: conic-gradient(
-    #0ca69e 0deg 280deg,
-    #dceceb 280deg 360deg
+    var(--progress-color, #0ca69e) var(--progress, 0%),
+    #dceceb 0
   );
   display: flex;
   align-items: center;
@@ -843,6 +1006,105 @@ select {
   padding: 4px 6px;
   border-radius: 5px;
   font-size: 7px;
+}
+
+.patient-dashboard .missed {
+  color: #c04945;
+  background: #ffe8e5;
+  padding: 4px 6px;
+  border-radius: 5px;
+  font-size: 7px;
+}
+
+.patient-dashboard .alert-item.unread {
+  border-left: 3px solid #e86655;
+  padding-left: 8px;
+}
+
+.patient-dashboard .alert-dot {
+  width: 9px;
+  height: 9px;
+  background: #e86655;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: auto;
+}
+
+.patient-dashboard .alert-item > .alert-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+}
+
+.patient-dashboard .alert-delete {
+  border: none;
+  background: transparent;
+  color: #9aa9aa;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+.patient-dashboard .alert-delete:hover {
+  color: #c04945;
+}
+
+.patient-dashboard .notification-toast {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(440px, calc(100vw - 32px));
+  display: flex;
+  align-items: stretch;
+  background: #ffffff;
+  border: 1px solid #b9dedd;
+  border-left: 4px solid #0ca69e;
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(31, 78, 85, 0.2);
+  z-index: 300;
+}
+
+.patient-dashboard .notification-toast > button:first-child {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  padding: 12px 14px;
+  text-align: left;
+  color: #17464d;
+  cursor: pointer;
+}
+
+.patient-dashboard .notification-toast > button:first-child span {
+  color: #668183;
+  font-size: 12px;
+}
+
+.patient-dashboard .notification-toast-close {
+  border: none;
+  background: transparent;
+  color: #7d8f91;
+  font-size: 20px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.patient-dashboard.dark-mode .notification-toast {
+  background: #173337;
+  border-color: #2b5b5f;
+}
+
+.patient-dashboard.dark-mode .notification-toast > button:first-child,
+.patient-dashboard.dark-mode .notification-toast-close {
+  color: #e1f1ef;
+}
+
+.patient-dashboard.dark-mode .notification-toast > button:first-child span {
+  color: #a9c1c0;
 }
 
 /* =====================================================
@@ -1233,29 +1495,29 @@ select {
    DARK MODE
 ===================================================== */
 
-.patient-dashboard .dark-mode {
+.patient-dashboard.dark-mode {
   background: #14282c;
   color: #eaf4f4;
 }
 
-.patient-dashboard .dark-mode .main-content,
-.patient-dashboard .dark-mode .dashboard-container {
+.patient-dashboard.dark-mode .main-content,
+.patient-dashboard.dark-mode .dashboard-container {
   background: #14282c;
 }
 
-.patient-dashboard .dark-mode .top-header,
-.patient-dashboard .dark-mode .sidebar,
-.patient-dashboard .dark-mode .profile-card,
-.patient-dashboard .dark-mode .recovery-card,
-.patient-dashboard .dark-mode .dashboard-card,
-.patient-dashboard .dark-mode .health-section,
-.patient-dashboard .dark-mode .statistics-card,
-.patient-dashboard .dark-mode .modal-box,
-.patient-dashboard .dark-mode .mini-stat {
+.patient-dashboard.dark-mode .top-header,
+.patient-dashboard.dark-mode .sidebar,
+.patient-dashboard.dark-mode .profile-card,
+.patient-dashboard.dark-mode .recovery-card,
+.patient-dashboard.dark-mode .dashboard-card,
+.patient-dashboard.dark-mode .health-section,
+.patient-dashboard.dark-mode .statistics-card,
+.patient-dashboard.dark-mode .modal-box,
+.patient-dashboard.dark-mode .mini-stat {
   background: #1b353a;
 }
 
-.patient-dashboard .dark-mode .welcome-section {
+.patient-dashboard.dark-mode .welcome-section {
   background: linear-gradient(
     135deg,
     #1b353a,
@@ -1264,37 +1526,37 @@ select {
   border-color: #31565a;
 }
 
-.patient-dashboard .dark-mode .welcome-section h1,
-.patient-dashboard .dark-mode .profile-card h2,
-.patient-dashboard .dark-mode .medicine-item strong,
-.patient-dashboard .dark-mode .appointment strong,
-.patient-dashboard .dark-mode .alert-item strong,
-.patient-dashboard .dark-mode .page-heading h1,
-.patient-dashboard .dark-mode .recovery-details h2 {
+.patient-dashboard.dark-mode .welcome-section h1,
+.patient-dashboard.dark-mode .profile-card h2,
+.patient-dashboard.dark-mode .medicine-item strong,
+.patient-dashboard.dark-mode .appointment strong,
+.patient-dashboard.dark-mode .alert-item strong,
+.patient-dashboard.dark-mode .page-heading h1,
+.patient-dashboard.dark-mode .recovery-details h2 {
   color: #eaf7f7;
 }
 
-.patient-dashboard .dark-mode .search-box {
+.patient-dashboard.dark-mode .search-box {
   border-color: #47696d;
 }
 
-.patient-dashboard .dark-mode .search-box input {
+.patient-dashboard.dark-mode .search-box input {
   background: transparent;
   color: white;
 }
 
-.patient-dashboard .dark-mode .progress-circle::before {
+.patient-dashboard.dark-mode .progress-circle::before {
   background: #1b353a;
 }
 
-.patient-dashboard .dark-mode .ai-message {
+.patient-dashboard.dark-mode .ai-message {
   background: #203d42;
 }
 
-.patient-dashboard .dark-mode .record-item,
-.patient-dashboard .dark-mode .medicine-item,
-.patient-dashboard .dark-mode .appointment,
-.patient-dashboard .dark-mode .alert-item {
+.patient-dashboard.dark-mode .record-item,
+.patient-dashboard.dark-mode .medicine-item,
+.patient-dashboard.dark-mode .appointment,
+.patient-dashboard.dark-mode .alert-item {
   border-color: #2b494e;
 }
 
@@ -1427,4 +1689,732 @@ select {
   .patient-dashboard .recovery-plan-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.date-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f7faf9;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+.date-switch button {
+  background: #fff;
+  border: 1px solid #e3e8e7;
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  color: #0b6e63;
+}
+.date-switch button:disabled { opacity: 0.35; cursor: not-allowed; }
+.day-summary { font-size: 13px; color: #7d8b88; margin-bottom: 14px; }
+
+.status-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  margin-left: auto;
+}
+.status-done { background: #e4f7f1; color: #0f9b8e; }
+.status-missed { background: #fde9e9; color: #d0453f; }
+.status-pending { background: #f1f4f3; color: #9aa6a3; }
+
+.photo-grid { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; }
+.photo-thumb-wrap { text-align: center; }
+.photo-thumb {
+  width: 100px; height: 100px; border-radius: 12px;
+  object-fit: cover; border: 1px solid #e3e8e7;
+}
+.photo-date { font-size: 10px; color: #9aa6a3; margin-top: 4px; }
+.upload-box {
+  width: 100px; height: 100px; border-radius: 12px;
+  border: 2px dashed #cfe0dc; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 4px;
+  color: #0f9b8e; font-size: 12px; cursor: pointer; background: #f7faf9;
+}
+.upload-box:hover { background: #eef7f5; }
+
+
+
+/* =====================================================
+   RECOVERY PAGE - FINAL DESIGN
+===================================================== */
+
+/* ---------- Recovery Progress ---------- */
+
+.patient-dashboard .recovery-main-card {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.patient-dashboard .recovery-main {
+  display: flex;
+  align-items: center;
+  gap: 45px;
+  margin-top: 25px;
+}
+
+/* Circular Progress */
+
+.patient-dashboard .recovery-main .progress-circle.large {
+  width: 145px;
+  min-width: 145px;
+  height: 145px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    conic-gradient(
+      #0d806f var(--progress),
+      #e4e9e8 0
+    );
+
+  position: relative;
+}
+
+/* White center */
+
+.patient-dashboard .recovery-main .progress-circle.large::before {
+  content: "";
+  position: absolute;
+
+  width: 108px;
+  height: 108px;
+
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+/* Center content */
+
+.patient-dashboard .recovery-main .progress-circle-inner {
+  position: relative;
+  z-index: 2;
+
+  width: 108px;
+  height: 108px;
+
+  border-radius: 50%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+}
+
+.patient-dashboard .recovery-main .progress-circle-inner strong {
+  display: block;
+
+  font-size: 28px;
+  font-weight: 800;
+
+  color: #123f4d;
+}
+
+.patient-dashboard .recovery-main .progress-circle-inner small {
+  font-size: 13px;
+  color: #777;
+  margin-top: 2px;
+}
+
+
+/* ---------- Weekly Progress ---------- */
+
+.patient-dashboard .recovery-details {
+  width: 100%;
+  flex: 1;
+}
+
+.patient-dashboard .weekly-progress {
+  width: 100%;
+}
+
+.patient-dashboard .weekly-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 12px;
+}
+
+.patient-dashboard .weekly-title span {
+  color: #777;
+  font-size: 14px;
+}
+
+.patient-dashboard .weekly-title strong {
+  color: #333;
+  font-size: 14px;
+}
+
+
+/* 7 days bars */
+
+.patient-dashboard .week-bars {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.patient-dashboard .week-bars span {
+  height: 8px;
+  flex: 1;
+
+  border-radius: 20px;
+
+  background: #d9dddd;
+}
+
+/* Completed days */
+
+.patient-dashboard .week-bars span.active {
+  background: #0d806f;
+}
+
+.patient-dashboard .weekly-progress p {
+  margin-top: 12px;
+
+  color: #777;
+  font-size: 13px;
+}
+
+
+/* =====================================================
+   RECOVERY PLAN
+===================================================== */
+
+.patient-dashboard .recovery-plan-grid {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-top: 10px;
+}
+
+
+/* Each task */
+
+.patient-dashboard .recovery-plan-grid .plan-item {
+  width: 100%;
+
+  background: #f7faf9;
+
+  border: 1px solid #edf2f1;
+  border-radius: 10px;
+
+  padding: 10px 12px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  transition: 0.2s ease;
+}
+
+.patient-dashboard .recovery-plan-grid .plan-item:hover {
+  background: #f1f8f6;
+}
+
+
+/* Checkbox circle */
+
+.patient-dashboard .plan-check {
+  width: 24px;
+  min-width: 24px;
+  height: 24px;
+
+  border-radius: 6px;
+
+  background: #ffffff;
+
+  border: 1px solid #bfcac7;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #0d806f;
+
+  font-size: 15px;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+
+/* Completed checkbox */
+
+.patient-dashboard .plan-item.completed .plan-check {
+  background: #0d806f;
+  border-color: #0d806f;
+  color: white;
+}
+
+
+/* Task name */
+
+.patient-dashboard .plan-item strong {
+  display: block;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  color: #263b3d;
+}
+
+
+/* Completed task */
+
+.patient-dashboard .plan-item.completed strong {
+  text-decoration: line-through;
+  color: #8b9694;
+}
+
+
+/* Task description */
+
+.patient-dashboard .plan-item p {
+  margin: 3px 0 0;
+
+  font-size: 11px;
+  color: #8b999b;
+}
+
+
+/* ---------- Day navigation ---------- */
+
+.patient-dashboard .date-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: #f7faf9;
+
+  border-radius: 10px;
+
+  padding: 10px 14px;
+
+  margin: 15px 0;
+}
+
+.patient-dashboard .date-switch strong {
+  color: #123f4d;
+  font-size: 16px;
+}
+
+.patient-dashboard .date-switch button {
+  width: 36px;
+  height: 36px;
+
+  border: 1px solid #dfe7e5;
+  border-radius: 9px;
+
+  background: white;
+
+  color: #08766d;
+
+  cursor: pointer;
+
+  font-size: 16px;
+}
+
+.patient-dashboard .date-switch button:hover {
+  background: #eef7f5;
+}
+
+.patient-dashboard .date-switch button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+
+/* ---------- Task count ---------- */
+
+.patient-dashboard .day-summary {
+  margin: 8px 0 12px;
+
+  color: #777;
+
+  font-size: 13px;
+}
+
+
+/* ---------- Status badges ---------- */
+
+.patient-dashboard .status-badge {
+  font-size: 10px;
+  font-weight: 600;
+
+  padding: 4px 8px;
+
+  border-radius: 20px;
+
+  margin-left: auto;
+}
+
+.patient-dashboard .status-done {
+  background: #e4f7f1;
+  color: #0f9b8e;
+}
+
+.patient-dashboard .status-missed {
+  background: #fde9e9;
+  color: #d0453f;
+}
+
+.patient-dashboard .status-pending {
+  background: #f1f4f3;
+  color: #7d8987;
+}
+
+
+/* ---------- Edit input ---------- */
+
+.patient-dashboard .plan-item input {
+  width: 100%;
+
+  padding: 7px 9px;
+
+  border: 1px solid #cfdad7;
+  border-radius: 6px;
+
+  outline: none;
+
+  font-size: 13px;
+}
+
+.patient-dashboard .plan-item input:focus {
+  border-color: #0d806f;
+}
+
+
+/* ---------- Edit/Delete buttons ---------- */
+
+.patient-dashboard .plan-item button {
+  border: none;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  padding: 4px;
+
+  font-size: 14px;
+}
+
+.patient-dashboard .plan-item button:hover {
+  transform: scale(1.08);
+}
+
+
+/* ---------- Add Task ---------- */
+
+.patient-dashboard .recovery-plan-grid + div {
+  display: flex;
+  gap: 8px;
+
+  margin-top: 12px;
+}
+
+.patient-dashboard .recovery-plan-grid + div input {
+  flex: 1;
+
+  height: 38px;
+
+  padding: 0 12px;
+
+  border: 1px solid #d6e0de;
+  border-radius: 8px;
+
+  outline: none;
+
+  font-size: 13px;
+
+  background: #ffffff;
+}
+
+.patient-dashboard .recovery-plan-grid + div input:focus {
+  border-color: #0d806f;
+}
+
+.patient-dashboard .recovery-plan-grid + div button {
+  height: 38px;
+
+  padding: 0 14px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #0d806f;
+
+  color: white;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.patient-dashboard .recovery-plan-grid + div button:hover {
+  background: #096b60;
+}
+
+
+/* ---------- Empty task message ---------- */
+
+.patient-dashboard .recovery-plan-grid > p {
+  text-align: center;
+
+  padding: 25px 10px;
+
+  color: #89999b;
+
+  font-size: 14px;
+}
+
+
+/* =====================================================
+   RECOVERY PAGE RESPONSIVE
+===================================================== */
+
+@media (max-width: 850px) {
+
+  .patient-dashboard .recovery-main {
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .patient-dashboard .recovery-details {
+    width: 100%;
+  }
+
+  .patient-dashboard .recovery-main .progress-circle.large {
+    width: 135px;
+    min-width: 135px;
+    height: 135px;
+  }
+
+  .patient-dashboard .week-bars {
+    gap: 5px;
+  }
+}
+
+
+@media (max-width: 600px) {
+
+  .patient-dashboard .recovery-main-card {
+    padding: 18px;
+  }
+
+  .patient-dashboard .date-switch {
+    padding: 8px 10px;
+  }
+
+  .patient-dashboard .date-switch strong {
+    font-size: 14px;
+  }
+
+  .patient-dashboard .recovery-plan-grid + div {
+    flex-direction: column;
+  }
+
+  .patient-dashboard .recovery-plan-grid + div button {
+    width: 100%;
+  }
+}
+
+/* Recovery Add Task Input */
+.add-task-row input {
+  color: #1f2937 !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.add-task-row input::placeholder {
+  color: #64748b !important;
+  opacity: 1;
+}
+
+.add-task-row input:focus {
+  color: #111827 !important;
+  outline: none;
+  border-color: #4f46e5;
+}
+
+/* =====================================================
+   DAILY ACTIVITY CARD
+===================================================== */
+
+.daily-activity-card {
+  padding: 24px;
+  border-radius: 18px;
+  margin-top: 20px;
+}
+
+.daily-activity-card .card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.daily-activity-card .card-title h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.daily-activity-card .card-title p {
+  margin: 5px 0 0;
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.daily-activity-card .card-title > strong {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* Progress bar */
+
+.activity-progress {
+  width: 100%;
+  height: 10px;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 18px 0 10px;
+  background: rgba(100, 120, 140, 0.15);
+}
+
+.activity-progress > div {
+  height: 100%;
+  border-radius: 20px;
+  transition: width 0.5s ease;
+}
+
+/* Summary */
+
+.activity-summary {
+  margin: 8px 0 18px;
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+/* Activity list */
+
+.daily-activity-list {
+  display: grid;
+  gap: 12px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(100, 120, 140, 0.12);
+  transition: all 0.25s ease;
+}
+
+.activity-item:hover {
+  transform: translateY(-2px);
+}
+
+.activity-item.completed {
+  opacity: 0.75;
+}
+
+.activity-check {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.activity-item > div {
+  flex: 1;
+}
+
+.activity-item strong {
+  display: block;
+  font-size: 15px;
+}
+
+.activity-item p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+.activity-item > span {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Completed state */
+
+.activity-item.completed .activity-check {
+  font-size: 17px;
+}
+
+.activity-item.completed > span {
+  font-weight: 600;
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+  .daily-activity-card {
+    padding: 18px;
+  }
+
+  .activity-item {
+    padding: 12px;
+  }
+
+  .activity-item > span {
+    display: none;
+  }
+}
+
+.date-select {
+  padding: 9px 14px;
+  border: 1px solid #dfe7e3;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #344054;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.date-select:hover {
+  border-color: #8ac7a5;
+}
+
+.date-select:focus {
+  border-color: #55a875;
+  box-shadow: 0 0 0 3px rgba(85, 168, 117, 0.12);
 }

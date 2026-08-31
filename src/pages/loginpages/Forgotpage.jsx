@@ -223,12 +223,12 @@ function Forgotpage() {
         {/* BACK TO LOGIN */}
 
         <button
-  type="button"
-  className="forgot-password"
-  onClick={() => navigate("/forgot-password")}
->
-  Forgot Password?
-</button>
+         type="button"
+         className="forgot-password"
+         onClick={() => navigate("/login")}
+       >
+         Back to Login
+       </button>
 
       </div>
 

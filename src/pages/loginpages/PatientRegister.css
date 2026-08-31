@@ -87,13 +87,10 @@ body {
 
 .patient-register-page {
   min-height: 100vh;
-
   display: flex;
   justify-content: center;
-  align-items: center;
-
+  align-items: flex-start;
   padding: 40px 20px;
-
   box-sizing: border-box;
 
   background-color: var(--page-bg);
@@ -389,4 +386,3 @@ body {
     font-size: 1rem;
   }
 }
-

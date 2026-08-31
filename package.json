@@ -4,12 +4,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "server": "node backend/server.js",
+    "client": "vite --host 0.0.0.0",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "start": "npm run dev",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
+    "concurrently": "^10.0.5",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2"

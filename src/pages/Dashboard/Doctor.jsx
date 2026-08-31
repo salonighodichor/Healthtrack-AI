@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Doctor.css";
+import DoctorSettings from "./DoctorSettings/DoctorSettings";
+
 
 const menuItems = [
   { name: "Dashboard", icon: "🏠" },
@@ -432,513 +435,640 @@ const Alerts = () => (
   </div>
 );
 
-/* ================= SETTINGS ================= */
 
-const Settings = ({ darkMode, setDarkMode }) => (
-  <div className="page-stack">
-
-    <PageHeader
-      icon="⚙️"
-      title="Settings"
-      subtitle="Manage your dashboard preferences"
-    />
-
-    <div className="dashboard-card settings-card">
-
-      <div className="setting-row">
-
-        <div>
-          <strong>Appearance</strong>
-          <p>
-            Switch between light and dark mode
-          </p>
-        </div>
-
-        <button
-          className="setting-toggle"
-          onClick={() => setDarkMode(!darkMode)}
-        >
-          {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
-        </button>
-
-      </div>
-
-    </div>
-  </div>
-);
 
 /* ================= DASHBOARD HOME ================= */
 
-const DashboardHome = () => (
-  <div className="page-stack">
+/*
+  IMPORTANT:
+  Doctor ka data ab parent component se aa raha hai.
+  Isliye Profile se updated data aane par
+  Dashboard bhi updated data show karega.
+*/
 
-    <div className="welcome-section">
+const DashboardHome = ({ doctor }) => {
+  const navigate = useNavigate();
 
-      <div>
-        <h1>Good Morning, Dr. Arjun 👋</h1>
 
-        <p>
-          Here's your patient overview and today's healthcare summary.
-        </p>
-      </div>
 
-      <button className="primary-button">
-        📊 View Summary
-      </button>
 
-    </div>
+  // Doctor data ke liye fallback
+  const doctorName = doctor?.name || "Doctor";
 
-    <div className="top-grid">
+  // Initials
+  const doctorInitials = doctorName
+    .replace(/^Dr\.\s*/i, "")
+    .split(" ")
+    .filter(Boolean)
+    .map((name) => name[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
+    
 
-      {/* DOCTOR PROFILE */}
 
-      <div className="profile-card">
+  return (
+    <div className="page-stack">
 
-        <div className="patient-avatar doctor-avatar">
-          AS
+      <div className="welcome-section">
+
+        <div>
+          <h1>
+            Good Morning, {doctorName} 👋
+          </h1>
+
+          <p>
+            Here's your patient overview and today's healthcare summary.
+          </p>
         </div>
 
-        <h2>Dr. Arjun Sharma</h2>
-
-        <p className="patient-age">
-          Cardiologist
-        </p>
-
-        <div className="profile-details">
-
-          <div>
-            <span>Doctor ID</span>
-            <strong>DR20458</strong>
-          </div>
-
-          <div>
-            <span>Specialization</span>
-            <strong>Cardiology</strong>
-          </div>
-
-          <div>
-            <span>Experience</span>
-            <strong>8 Years</strong>
-          </div>
-
-          <div>
-            <span>Patients</span>
-            <strong>35</strong>
-          </div>
-
-          <div>
-            <span>Rating</span>
-            <strong>4.9 ⭐</strong>
-          </div>
-
-        </div>
-
-        <button className="outline-button">
-          👨‍⚕️ View Profile
+        <button className="primary-button">
+          📊 View Summary
         </button>
 
       </div>
 
+      <div className="top-grid">
 
-      {/* PATIENT RECOVERY */}
+        {/* ================= DOCTOR PROFILE ================= */}
 
-      <div className="recovery-card">
+        <div className="profile-card">
 
-        <div className="card-title">
-
-          <div>
-            <h2>💙 Patient Recovery Status</h2>
-            <p>Overall recovery of your patients</p>
+          <div className="patient-avatar doctor-avatar">
+            {doctorInitials}
           </div>
 
-          <span className="date-select">
-            This Month ⌄
-          </span>
+          <h2>{doctorName}</h2>
 
-        </div>
-
-        <div className="recovery-content">
-
-          <div className="progress-circle">
-
-            <div>
-              <strong>82%</strong>
-              <small>Recovery</small>
-            </div>
-
-          </div>
-
-          <div className="recovery-info">
-
-            <div className="progress-row">
-              <span>Physical Recovery</span>
-              <strong>86%</strong>
-            </div>
-
-            <div className="progress-bar">
-              <div style={{ width: "86%" }}></div>
-            </div>
-
-            <div className="progress-row">
-              <span>Medication</span>
-              <strong>91%</strong>
-            </div>
-
-            <div className="progress-bar">
-              <div style={{ width: "91%" }}></div>
-            </div>
-
-            <div className="progress-row">
-              <span>Daily Activity</span>
-              <strong>74%</strong>
-            </div>
-
-            <div className="progress-bar">
-              <div style={{ width: "74%" }}></div>
-            </div>
-
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-
-
-    {/* TODAY'S OVERVIEW */}
-
-    <div className="dashboard-card">
-
-      <div className="card-title">
-
-        <div>
-          <h2>📊 Today's Overview</h2>
-          <p>Your practice summary for today</p>
-        </div>
-
-      </div>
-
-      <div className="health-cards compact">
-
-        <div className="health-card patients">
-
-          <div className="health-icon">
-            👥
-          </div>
-
-          <span>Total Patients</span>
-
-          <h3>35</h3>
-
-          <label>✓ Active</label>
-
-        </div>
-
-        <div className="health-card appointments">
-
-          <div className="health-icon">
-            📅
-          </div>
-
-          <span>Today's Appointments</span>
-
-          <h3>8</h3>
-
-          <label>✓ Scheduled</label>
-
-        </div>
-
-        <div className="health-card recovery">
-
-          <div className="health-icon">
-            📈
-          </div>
-
-          <span>Avg. Recovery</span>
-
-          <h3>82%</h3>
-
-          <label>✓ Improving</label>
-
-        </div>
-
-        <div className="health-card reports">
-
-          <div className="health-icon">
-            📄
-          </div>
-
-          <span>Pending Reports</span>
-
-          <h3>6</h3>
-
-          <label>⚠ Review</label>
-
-        </div>
-
-      </div>
-    </div>
-
-
-    {/* MIDDLE SECTION */}
-
-    <div className="middle-grid">
-
-      <div className="dashboard-card">
-
-        <div className="card-title">
-
-          <div>
-            <h2>👥 Recent Patients</h2>
-            <p>Recently viewed patients</p>
-          </div>
-
-        </div>
-
-        <div className="record-list">
-
-          <div className="record-item">
-
-            <div className="record-icon">
-              AK
-            </div>
-
-            <div>
-              <strong>Aarav Kumar</strong>
-              <p>Cardiology • Recovery 78%</p>
-            </div>
-
-            <span>→</span>
-
-          </div>
-
-          <div className="record-item">
-
-            <div className="record-icon">
-              PS
-            </div>
-
-            <div>
-              <strong>Priya Sharma</strong>
-              <p>General • Recovery 85%</p>
-            </div>
-
-            <span>→</span>
-
-          </div>
-
-          <div className="record-item">
-
-            <div className="record-icon">
-              RM
-            </div>
-
-            <div>
-              <strong>Rohan Mehta</strong>
-              <p>Diabetes • Recovery 65%</p>
-            </div>
-
-            <span>→</span>
-
-          </div>
-
-        </div>
-      </div>
-
-
-      {/* AI */}
-
-      <div className="dashboard-card ai-card">
-
-        <div className="card-title">
-
-          <div>
-            <h2>🤖 AI Patient Insights</h2>
-            <p>Smart health analysis</p>
-          </div>
-
-        </div>
-
-        <div className="ai-message">
-
-          <strong>💙 AI Recommendation</strong>
-
-          <p>
-            5 patients may require additional monitoring
-            based on their recent health records.
+          <p className="patient-age">
+            Doctor
           </p>
 
-          <div className="ai-warning">
-            ⚠ Review recommended patients.
+          <div className="profile-details">
+
+            <div>
+              <span>Doctor ID</span>
+
+              <strong>
+                {doctor?.id
+                  ? `DR${String(doctor.id).padStart(5, "0")}`
+                  : "Not Available"}
+              </strong>
+            </div>
+
+            <div>
+              <span>Email</span>
+
+              <strong>
+                {doctor?.email || "Not Added"}
+              </strong>
+            </div>
+
+            <div>
+              <span>Specialization</span>
+
+              <strong>
+                {doctor?.specialization || "Not Added"}
+              </strong>
+            </div>
+
+            <div>
+              <span>Experience</span>
+
+              <strong>
+                {doctor?.experience || "Not Added"}
+              </strong>
+            </div>
+
+            <div>
+              <span>Patients</span>
+
+              <strong>
+                35
+              </strong>
+            </div>
+
           </div>
 
-          <button className="ai-button">
-            View Analysis →
+          <button
+            className="outline-button"
+            onClick={() => navigate("/doctor-profile")}
+          >
+            👨‍⚕️ View Profile
           </button>
 
         </div>
 
+
+        {/* ================= PATIENT RECOVERY ================= */}
+
+        <div className="recovery-card">
+
+          <div className="card-title">
+
+            <div>
+              <h2>💙 Patient Recovery Status</h2>
+              <p>Overall recovery of your patients</p>
+            </div>
+
+            <span className="date-select">
+              This Month ⌄
+            </span>
+
+          </div>
+
+          <div className="recovery-content">
+
+            <div className="progress-circle">
+
+              <div>
+                <strong>82%</strong>
+                <small>Recovery</small>
+              </div>
+
+            </div>
+
+            <div className="recovery-info">
+
+              <div className="progress-row">
+                <span>Physical Recovery</span>
+                <strong>86%</strong>
+              </div>
+
+              <div className="progress-bar">
+                <div style={{ width: "86%" }}></div>
+              </div>
+
+              <div className="progress-row">
+                <span>Medication</span>
+                <strong>91%</strong>
+              </div>
+
+              <div className="progress-bar">
+                <div style={{ width: "91%" }}></div>
+              </div>
+
+              <div className="progress-row">
+                <span>Daily Activity</span>
+                <strong>74%</strong>
+              </div>
+
+              <div className="progress-bar">
+                <div style={{ width: "74%" }}></div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
       </div>
+
+
+      {/* ================= TODAY'S OVERVIEW ================= */}
+
+      <div className="dashboard-card">
+
+        <div className="card-title">
+
+          <div>
+            <h2>📊 Today's Overview</h2>
+            <p>Your practice summary for today</p>
+          </div>
+
+        </div>
+
+        <div className="health-cards compact">
+
+          <div className="health-card patients">
+
+            <div className="health-icon">
+              👥
+            </div>
+
+            <span>Total Patients</span>
+
+            <h3>35</h3>
+
+            <label>✓ Active</label>
+
+          </div>
+
+          <div className="health-card appointments">
+
+            <div className="health-icon">
+              📅
+            </div>
+
+            <span>Today's Appointments</span>
+
+            <h3>8</h3>
+
+            <label>✓ Scheduled</label>
+
+          </div>
+
+          <div className="health-card recovery">
+
+            <div className="health-icon">
+              📈
+            </div>
+
+            <span>Avg. Recovery</span>
+
+            <h3>82%</h3>
+
+            <label>✓ Improving</label>
+
+          </div>
+
+          <div className="health-card reports">
+
+            <div className="health-icon">
+              📄
+            </div>
+
+            <span>Pending Reports</span>
+
+            <h3>6</h3>
+
+            <label>⚠ Review</label>
+
+          </div>
+
+        </div>
+      </div>
+
+
+      {/* ================= MIDDLE SECTION ================= */}
+
+      <div className="middle-grid">
+
+        <div className="dashboard-card">
+
+          <div className="card-title">
+
+            <div>
+              <h2>👥 Recent Patients</h2>
+              <p>Recently viewed patients</p>
+            </div>
+
+          </div>
+
+          <div className="record-list">
+
+            <div className="record-item">
+
+              <div className="record-icon">
+                AK
+              </div>
+
+              <div>
+                <strong>Aarav Kumar</strong>
+                <p>Cardiology • Recovery 78%</p>
+              </div>
+
+              <span>→</span>
+
+            </div>
+
+            <div className="record-item">
+
+              <div className="record-icon">
+                PS
+              </div>
+
+              <div>
+                <strong>Priya Sharma</strong>
+                <p>General • Recovery 85%</p>
+              </div>
+
+              <span>→</span>
+
+            </div>
+
+            <div className="record-item">
+
+              <div className="record-icon">
+                RM
+              </div>
+
+              <div>
+                <strong>Rohan Mehta</strong>
+                <p>Diabetes • Recovery 65%</p>
+              </div>
+
+              <span>→</span>
+
+            </div>
+
+          </div>
+        </div>
+
+
+        {/* AI */}
+
+        <div className="dashboard-card ai-card">
+
+          <div className="card-title">
+
+            <div>
+              <h2>🤖 AI Patient Insights</h2>
+              <p>Smart health analysis</p>
+            </div>
+
+          </div>
+
+          <div className="ai-message">
+
+            <strong>💙 AI Recommendation</strong>
+
+            <p>
+              5 patients may require additional monitoring
+              based on their recent health records.
+            </p>
+
+            <div className="ai-warning">
+              ⚠ Review recommended patients.
+            </div>
+
+            <button className="ai-button">
+              View Analysis →
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+
+
+      {/* ================= LOWER SECTION ================= */}
+
+      <div className="lower-grid">
+
+        {/* MEDICATION */}
+
+        <div className="dashboard-card">
+
+          <div className="card-title">
+
+            <div>
+              <h2>💊 Medication Alerts</h2>
+              <p>Patient medication updates</p>
+            </div>
+
+          </div>
+
+          <div className="medicine-item">
+
+            <div className="medicine-icon">
+              💊
+            </div>
+
+            <div>
+              <strong>Aarav Kumar</strong>
+              <p>Medication adherence: 92%</p>
+            </div>
+
+            <span className="taken">
+              Good
+            </span>
+
+          </div>
+
+          <div className="medicine-item">
+
+            <div className="medicine-icon">
+              💊
+            </div>
+
+            <div>
+              <strong>Rohan Mehta</strong>
+              <p>Missed medication</p>
+            </div>
+
+            <span className="pending">
+              Review
+            </span>
+
+          </div>
+
+        </div>
+
+
+        {/* APPOINTMENTS */}
+
+        <div className="dashboard-card">
+
+          <div className="card-title">
+
+            <div>
+              <h2>📅 Upcoming Appointments</h2>
+              <p>Today's schedule</p>
+            </div>
+
+          </div>
+
+          <div className="appointment">
+
+            <div className="appointment-date">
+              <strong>10</strong>
+              <span>AM</span>
+            </div>
+
+            <div>
+              <strong>Aarav Kumar</strong>
+              <p>Cardiology Follow-up</p>
+            </div>
+
+            <span className="appointment-status">
+              Upcoming
+            </span>
+
+          </div>
+
+          <div className="appointment">
+
+            <div className="appointment-date">
+              <strong>12</strong>
+              <span>PM</span>
+            </div>
+
+            <div>
+              <strong>Priya Sharma</strong>
+              <p>General Checkup</p>
+            </div>
+
+            <span className="appointment-status">
+              Scheduled
+            </span>
+
+          </div>
+
+        </div>
+
+
+        {/* ALERTS */}
+
+        <div className="dashboard-card">
+
+          <div className="card-title">
+
+            <div>
+              <h2>🔔 Alerts</h2>
+              <p>Important updates</p>
+            </div>
+
+          </div>
+
+          <div className="alert-item warning">
+
+            <span>⚠️</span>
+
+            <div>
+              <strong>5 Patients</strong>
+              <p>Need monitoring</p>
+            </div>
+
+          </div>
+
+          <div className="alert-item info">
+
+            <span>📄</span>
+
+            <div>
+              <strong>6 Reports</strong>
+              <p>Pending review</p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
-
-
-    {/* LOWER SECTION */}
-
-    <div className="lower-grid">
-
-      {/* MEDICATION */}
-
-      <div className="dashboard-card">
-
-        <div className="card-title">
-
-          <div>
-            <h2>💊 Medication Alerts</h2>
-            <p>Patient medication updates</p>
-          </div>
-
-        </div>
-
-        <div className="medicine-item">
-
-          <div className="medicine-icon">
-            💊
-          </div>
-
-          <div>
-            <strong>Aarav Kumar</strong>
-            <p>Medication adherence: 92%</p>
-          </div>
-
-          <span className="taken">
-            Good
-          </span>
-
-        </div>
-
-        <div className="medicine-item">
-
-          <div className="medicine-icon">
-            💊
-          </div>
-
-          <div>
-            <strong>Rohan Mehta</strong>
-            <p>Missed medication</p>
-          </div>
-
-          <span className="pending">
-            Review
-          </span>
-
-        </div>
-
-      </div>
-
-
-      {/* APPOINTMENTS */}
-
-      <div className="dashboard-card">
-
-        <div className="card-title">
-
-          <div>
-            <h2>📅 Upcoming Appointments</h2>
-            <p>Today's schedule</p>
-          </div>
-
-        </div>
-
-        <div className="appointment">
-
-          <div className="appointment-date">
-            <strong>10</strong>
-            <span>AM</span>
-          </div>
-
-          <div>
-            <strong>Aarav Kumar</strong>
-            <p>Cardiology Follow-up</p>
-          </div>
-
-          <span className="appointment-status">
-            Upcoming
-          </span>
-
-        </div>
-
-        <div className="appointment">
-
-          <div className="appointment-date">
-            <strong>12</strong>
-            <span>PM</span>
-          </div>
-
-          <div>
-            <strong>Priya Sharma</strong>
-            <p>General Checkup</p>
-          </div>
-
-          <span className="appointment-status">
-            Scheduled
-          </span>
-
-        </div>
-
-      </div>
-
-
-      {/* ALERTS */}
-
-      <div className="dashboard-card">
-
-        <div className="card-title">
-
-          <div>
-            <h2>🔔 Alerts</h2>
-            <p>Important updates</p>
-          </div>
-
-        </div>
-
-        <div className="alert-item warning">
-
-          <span>⚠️</span>
-
-          <div>
-            <strong>5 Patients</strong>
-            <p>Need monitoring</p>
-          </div>
-
-        </div>
-
-        <div className="alert-item info">
-
-          <span>📄</span>
-
-          <div>
-            <strong>6 Reports</strong>
-            <p>Pending review</p>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-);
+  );
+};
 
 
 /* ================= MAIN COMPONENT ================= */
 
 const Doctor = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
+
 
   const [activeMenu, setActiveMenu] = useState("Dashboard");
 
   const [darkMode, setDarkMode] = useState(false);
 
+  /* ================= DOCTOR DATA ================= */
+
+  const [doctor, setDoctor] = useState({
+    id: "",
+    name: "",
+    email: "",
+    phone: "",
+    specialization: "",
+    experience: "",
+    qualification: "",
+    hospitalClinic: "",
+  });
+
+  /* ================= LOAD DOCTOR PROFILE ================= */
+
+  useEffect(() => {
+
+    const savedUser = localStorage.getItem("user");
+
+    if (!savedUser) {
+      return;
+    }
+
+    let user;
+
+    try {
+      user = JSON.parse(savedUser);
+    } catch (error) {
+      console.error("Invalid user data:", error);
+      return;
+    }
+
+    if (user.role !== "doctor") {
+      return;
+    }
+
+    /*
+      Pehle localStorage ka available data show kar do.
+      Isse dashboard immediately updated information
+      dikha sakta hai.
+    */
+
+    setDoctor((previousDoctor) => ({
+      ...previousDoctor,
+      ...user,
+    }));
+
+    /*
+      Backend se latest doctor profile load karo.
+    */
+
+    fetch(`http://127.0.0.1:5000/api/doctor/profile/${user.id}`)
+      .then((response) => {
+
+        if (!response.ok) {
+          throw new Error(
+            `Profile request failed: ${response.status}`
+          );
+        }
+
+        return response.json();
+      })
+
+      .then((data) => {
+
+        if (!data.message) {
+
+          setDoctor((previousDoctor) => ({
+            ...previousDoctor,
+            ...data,
+          }));
+
+          /*
+            Latest profile ko localStorage me bhi rakhenge.
+            Isse dashboard ke dusre parts ko bhi updated data
+            mil sakta hai.
+          */
+
+          const updatedUser = {
+            ...user,
+            ...data,
+          };
+
+          localStorage.setItem(
+            "user",
+            JSON.stringify(updatedUser)
+          );
+        }
+
+      })
+
+      .catch((error) => {
+        console.error(
+          "Doctor profile load error:",
+          error
+        );
+      });
+
+  }, []);
+
+
+  /* ================= PAGE RENDER ================= */
 
   const renderPage = () => {
 
@@ -963,17 +1093,31 @@ const Doctor = () => {
         return <Alerts />;
 
       case "Settings":
-        return (
-          <Settings
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
-          />
-        );
+        return <DoctorSettings/>;
 
       default:
-        return <DashboardHome />;
+        return (
+          <DashboardHome
+            doctor={doctor}
+          />
+        );
     }
   };
+
+
+  /* ================= HEADER DOCTOR DATA ================= */
+
+  const headerDoctorName =
+    doctor?.name || "Doctor";
+
+  const headerDoctorInitials = headerDoctorName
+    .replace(/^Dr\.\s*/i, "")
+    .split(" ")
+    .filter(Boolean)
+    .map((name) => name[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
 
 
   return (
@@ -1050,7 +1194,8 @@ const Doctor = () => {
 
         <div className="sidebar-bottom">
 
-          <button className="logout-button">
+          <button className="logout-button"
+           onClick={handleLogout}>
 
             <span>🚪</span>
 
@@ -1114,13 +1259,13 @@ const Doctor = () => {
             <div className="patient-header">
 
               <div className="patient-small-avatar doctor-small-avatar">
-                AS
+                {headerDoctorInitials}
               </div>
 
               <div>
 
                 <strong>
-                  Dr. Arjun Sharma
+                  {headerDoctorName}
                 </strong>
 
                 <small>

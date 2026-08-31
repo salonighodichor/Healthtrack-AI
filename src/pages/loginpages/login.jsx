@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE } from "../../api";
 import "./Login.css";
 
 function Login() {
@@ -11,9 +12,7 @@ function Login() {
   });
 
   const [role, setRole] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
-
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleChange = (e) => {
@@ -25,7 +24,6 @@ function Login() {
     }));
   };
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -35,31 +33,64 @@ function Login() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          role: role.toLowerCase(),
-        }),
-      });
+      const response = await fetch(
+        `${API_BASE}/api/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            role: role.toLowerCase(),
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
-        alert(`${role} Login Successful!`);
-        // navigate("/dashboard");
+
+        // Patient ka ID save karo
+        // Save logged-in user information
+localStorage.setItem("userId", data.user.id);
+localStorage.setItem("userName", data.user.name);
+localStorage.setItem("userRole", data.user.role);
+
+alert(`${role} Login Successful!`);
+
+if (data.user.role === "patient") {
+  navigate("/patient");
+} else if (data.user.role === "doctor") {
+  navigate("/doctor");
+} else if (data.user.role === "caretaker") {
+  navigate("/caretaker");
+}
+
+        
+        if (data.user.role === "patient") {
+          navigate("/patient");
+        } else if (data.user.role === "doctor") {
+          navigate("/doctor");
+        } else if (data.user.role === "caretaker") {
+          navigate("/caretaker");
+        }
+
       } else {
         alert(data.message);
       }
+
     } catch (error) {
-      alert("Backend se connect nahi ho paya. Check karo server chal raha hai ya nahi.");
+      alert(
+        "Unable to connect to the backend. Please check if the server is running."
+
+      );
+
       console.error(error);
     }
   };
 
-  
   return (
     <div className="login-page">
 
@@ -151,12 +182,12 @@ function Login() {
             </label>
 
 
-            {/* FIXED FORGOT PASSWORD */}
-
             <button
               type="button"
               className="forgot-password"
-              onClick={() => navigate("/forgot-password")}
+              onClick={() =>
+                navigate("/forgot-password")
+              }
             >
               Forgot Password?
             </button>
@@ -182,6 +213,7 @@ function Login() {
                 Patient
               </button>
 
+
               <button
                 type="button"
                 className={`role-btn ${
@@ -191,6 +223,7 @@ function Login() {
               >
                 Doctor
               </button>
+
 
               <button
                 type="button"
@@ -226,7 +259,7 @@ function Login() {
             <button
               type="button"
               className="create-account-link"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/create-account")}
             >
               Create Account
             </button>
