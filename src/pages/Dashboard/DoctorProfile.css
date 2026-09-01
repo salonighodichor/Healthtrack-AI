@@ -1,0 +1,198 @@
+/* Main Container */
+.doctor-profile-container {
+  min-height: 100vh;
+  padding: 30px 50px;
+  background-color: #f5f8fc;
+  font-family: Arial, sans-serif;
+}
+
+/* Header */
+.doctor-profile-header {
+  margin-bottom: 20px;
+}
+
+.doctor-profile-header h1 {
+  font-size: 28px;
+  margin: 0 0 15px 0;
+  color: #1e293b;
+}
+
+.doctor-profile-header h2 {
+  font-size: 22px;
+  margin: 0 0 5px 0;
+  color: #0f172a;
+}
+
+.doctor-profile-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 15px;
+}
+
+/* Profile Cards */
+.profile-card {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 20px 25px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.profile-card h3 {
+  margin: 0 0 16px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 18px;
+  color: #1e293b;
+}
+
+/* Information - Vertical Layout */
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-details span {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.profile-details p {
+  margin: 0;
+  font-size: 15px;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+/* Statistics */
+.profile-statistics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.stat-box {
+  padding: 15px;
+  text-align: center;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.stat-box h4 {
+  margin: 0;
+  font-size: 24px;
+  color: #2563eb;
+}
+
+.stat-box p {
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* Buttons */
+.profile-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.profile-actions button,
+.back-btn {
+  border: none;
+  border-radius: 7px;
+  padding: 10px 18px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.edit-btn {
+  background-color: #2563eb;
+  color: white;
+}
+
+.save-btn {
+  background-color: #16a34a;
+  color: white;
+}
+
+.back-btn {
+  margin-top: 12px;
+  background-color: #e2e8f0;
+  color: #1e293b;
+}
+
+.profile-actions button:hover,
+.back-btn:hover {
+  opacity: 0.88;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+
+  .doctor-profile-container {
+    padding: 20px;
+  }
+
+  .profile-card {
+    padding: 18px;
+  }
+
+  .profile-statistics {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-actions {
+    flex-direction: column;
+  }
+
+  .profile-actions button,
+  .back-btn {
+    width: 100%;
+  }
+}
+
+/* Edit Profile Inputs */
+
+.profile-details input {
+  width: 100%;
+  max-width: 500px;
+  box-sizing: border-box;
+  padding: 9px 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 15px;
+  color: #1e293b;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.profile-details input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* Cancel Button */
+
+.cancel-btn {
+  background-color: #e2e8f0;
+  color: #1e293b;
+}
+
+.cancel-btn:hover {
+  opacity: 0.88;
+}
+
+.profile-message {
+  margin: 0 0 15px 0;
+  padding: 10px 14px;
+  background-color: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 6px;
+  font-size: 14px;
+}

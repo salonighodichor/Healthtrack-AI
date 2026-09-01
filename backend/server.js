@@ -580,6 +580,10 @@ app.post("/api/appointments", (req, res) => {
   };
   appointments.push(appointment);
   createNotification(Number(user_id), "Appointment Requested", `${title} has been requested for ${date} at ${time}.`, "info");
+  // Notify doctor of new appointment request
+  if (doctorId) {
+    createNotification(Number(doctorId), "New Appointment Request", `Patient has requested an appointment for ${date} at ${time}.`, "warning", "appointment");
+  }
   return res.status(201).json({ message: "Appointment created", appointment });
 });
 
@@ -607,9 +611,17 @@ app.put("/api/appointments/:id/status", (req, res) => {
   appointment.status = status;
   if (status === "scheduled" || status === "upcoming") {
     createNotification(Number(appointment.user_id), "Appointment Confirmed", `${appointment.title} is confirmed for ${appointment.date} at ${appointment.time}.`, "success");
+    // Notify doctor of confirmation
+    if (appointment.doctorId) {
+      createNotification(Number(appointment.doctorId), "Appointment Confirmed", `You confirmed appointment for ${appointment.date} at ${appointment.time}.`, "success", "appointment");
+    }
   }
   if (status === "cancelled") {
     createNotification(Number(appointment.user_id), "Appointment Cancelled", `${appointment.title} was cancelled.`, "warning");
+    // Notify doctor of cancellation
+    if (appointment.doctorId) {
+      createNotification(Number(appointment.doctorId), "Appointment Cancelled", `Appointment for ${appointment.date} at ${appointment.time} was cancelled.`, "warning", "appointment");
+    }
   }
   return res.json({ message: "Appointment updated", appointment });
 });
@@ -721,7 +733,174 @@ app.get("/api/dashboard-progress/:userId", (req, res) => {
 });
 
 app.get("/api/doctors", (req, res) => {
-  return res.json({ doctors });
+  // Add ratings to doctors based on their recovery metrics
+  const doctorsWithRatings = doctors.map((doctor) => {
+    const doctorSummary = getOrComputeDoctorSummary(doctor.id);
+    const overallRecovery = doctorSummary?.metrics?.overall || 0;
+    // Convert recovery percentage to 5-star rating: 0% = 1 star, 100% = 5 stars
+    const rating = Math.round((overallRecovery / 100) * 4) + 1;
+    return {
+      ...doctor,
+      rating: Math.min(5, Math.max(1, rating)), // Ensure rating is between 1 and 5
+      recoveryScore: overallRecovery // Also include raw recovery score
+    };
+  });
+  return res.json({ doctors: doctorsWithRatings });
+});
+
+app.get("/api/doctor/:doctorId/profile", (req, res) => {
+  const doctor = getDoctorById(req.params.doctorId);
+  if (!doctor) return res.status(404).json({ message: "Doctor not found" });
+
+  return res.json({
+    id: doctor.id,
+    name: doctor.name,
+    email: doctor.email,
+    phone: doctor.phone || "",
+    medicalRegistrationNo: doctor.medicalRegistrationNo || doctor.medical_registration_no || "",
+    specialization: doctor.specialization || "",
+    qualification: doctor.qualification || "",
+    hospitalClinic: doctor.hospitalClinic || doctor.hospital_clinic || "",
+    experience: doctor.experience || "",
+    address: doctor.address || "",
+    role: doctor.role || "doctor",
+  });
+});
+
+app.put("/api/doctor/:doctorId/profile", (req, res) => {
+  const doctor = getDoctorById(req.params.doctorId);
+  if (!doctor) return res.status(404).json({ message: "Doctor not found" });
+
+  const { name, email, phone, medicalRegistrationNo, specialization, qualification, hospitalClinic, experience, address } = req.body || {};
+
+  if (name !== undefined) doctor.name = name;
+  if (email !== undefined) doctor.email = email;
+  if (phone !== undefined) doctor.phone = phone;
+  if (medicalRegistrationNo !== undefined) doctor.medicalRegistrationNo = medicalRegistrationNo;
+  if (specialization !== undefined) doctor.specialization = specialization;
+  if (qualification !== undefined) doctor.qualification = qualification;
+  if (hospitalClinic !== undefined) doctor.hospitalClinic = hospitalClinic;
+  if (experience !== undefined) doctor.experience = experience;
+  if (address !== undefined) doctor.address = address;
+
+  return res.json({ message: "Doctor profile updated", doctor: { id: doctor.id, name: doctor.name, email: doctor.email, phone: doctor.phone, medicalRegistrationNo: doctor.medicalRegistrationNo, specialization: doctor.specialization, qualification: doctor.qualification, hospitalClinic: doctor.hospitalClinic, experience: doctor.experience, address: doctor.address } });
+});
+
+app.get("/api/doctor/:doctorId/summary", (req, res) => {
+  const doctor = getDoctorById(req.params.doctorId);
+  if (!doctor) return res.status(404).json({ message: "Doctor not found" });
+
+  const patientIds = Array.isArray(doctor.patients) ? doctor.patients : [];
+  const patientSummaries = patientIds
+    .map((patientId) => {
+      const patient = getPatientById(patientId);
+      if (!patient) return null;
+      const recovery = computeRecoveryMetrics(patientId);
+      const patientAlerts = notifications.filter((alert) => Number(alert.user_id) === Number(patientId));
+      return {
+        id: patient.id,
+        name: patient.name,
+        age: patient.age,
+        email: patient.email,
+        type: patient.recoveryType || "General",
+        recovery,
+        alerts: patientAlerts,
+      };
+    })
+    .filter(Boolean);
+
+  const metrics = patientSummaries.length
+    ? patientSummaries.reduce(
+        (acc, item) => ({
+          physicalRecovery: acc.physicalRecovery + item.recovery.physicalRecovery,
+          medicationRecovery: acc.medicationRecovery + item.recovery.medicationRecovery,
+          dailyActivity: acc.dailyActivity + item.recovery.dailyActivity,
+          overall: acc.overall + item.recovery.overall,
+        }),
+        { physicalRecovery: 0, medicationRecovery: 0, dailyActivity: 0, overall: 0 }
+      )
+    : { physicalRecovery: 0, medicationRecovery: 0, dailyActivity: 0, overall: 0 };
+
+  const count = Math.max(patientSummaries.length, 1);
+  const overallRecovery = Math.round(metrics.overall / count);
+  const physicalRecovery = Math.round(metrics.physicalRecovery / count);
+  const medicationRecovery = Math.round(metrics.medicationRecovery / count);
+  const dailyActivity = Math.round(metrics.dailyActivity / count);
+
+  const improvingPatients = patientSummaries.filter((patient) => patient.recovery.overall >= 70 && patient.recovery.overall < 85).length;
+  const needMonitoring = patientSummaries.filter((patient) => patient.recovery.overall >= 40 && patient.recovery.overall < 70).length;
+  const excellentRecovery = patientSummaries.filter((patient) => patient.recovery.overall >= 85).length;
+
+  const totalAppointments = appointments.filter((appointment) => patientIds.includes(Number(appointment.user_id)) && ["upcoming", "scheduled", "pending"].includes(String(appointment.status).toLowerCase())).length;
+  const pendingReports = notifications.filter((alert) => patientIds.includes(Number(alert.user_id)) && !alert.read).length;
+  const doctorAppointments = patientIds.flatMap((patientId) => {
+    const patient = getPatientById(patientId);
+    return appointments
+      .filter((appointment) => Number(appointment.user_id) === Number(patientId))
+      .map((appointment) => ({ ...appointment, patientName: patient ? patient.name : "Unknown patient" }));
+  });
+  const doctorRecords = patientIds.flatMap((patientId) => {
+    const patient = getPatientById(patientId);
+    const latest = getLatestHealthRecord(patientId);
+    return [{
+      id: patientId,
+      patientName: patient ? patient.name : "Unknown patient",
+      title: patient ? `${patient.name} - Latest vitals` : "Latest vitals",
+      subtitle: latest.has_data ? `Latest update: ${latest.recorded_at}` : "No recent vitals recorded",
+      type: "Vitals",
+    }];
+  });
+
+  return res.json({
+    doctor: { id: doctor.id, name: doctor.name, specialization: doctor.specialization },
+    overview: {
+      totalPatients: patientSummaries.length,
+      todaysAppointments: totalAppointments,
+      averageRecovery: overallRecovery,
+      pendingReports,
+    },
+    metrics: {
+      overall: overallRecovery,
+      physicalRecovery,
+      medicationRecovery,
+      dailyActivity,
+      improvingPatients,
+      needMonitoring,
+      excellentRecovery,
+    },
+    patients: patientSummaries.map((patient) => ({
+      id: patient.id,
+      name: patient.name,
+      age: patient.age,
+      condition: patient.type,
+      recovery: patient.recovery.overall,
+      status: patient.recovery.overall >= 85 ? "Excellent" : patient.recovery.overall >= 70 ? "Improving" : patient.recovery.overall >= 40 ? "Monitoring" : "Critical",
+      alerts: patient.alerts.slice(0, 3),
+    })),
+    appointments: doctorAppointments,
+    healthRecords: doctorRecords,
+  });
+});
+
+app.get("/api/doctor/:doctorId/alerts", (req, res) => {
+  const doctor = getDoctorById(req.params.doctorId);
+  if (!doctor) return res.status(404).json({ message: "Doctor not found" });
+
+  const patientIds = Array.isArray(doctor.patients) ? doctor.patients : [];
+  const alerts = notifications
+    .filter((alert) => Number(alert.user_id) === Number(doctor.id) || patientIds.some((patientId) => Number(alert.user_id) === Number(patientId)))
+    .map((alert) => {
+      const patientId = patientIds.find((id) => Number(id) === Number(alert.user_id));
+      const patient = patientId ? getPatientById(patientId) : null;
+      return {
+        ...alert,
+        patientId: patientId || null,
+        patientName: patient ? patient.name : "Doctor notification",
+      };
+    });
+
+  alerts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  return res.json({ alerts });
 });
 
 app.get("/api/patient/:patientId/settings", (req, res) => {
@@ -800,7 +979,23 @@ app.get("/api/dashboard/:userId", (req, res) => {
 app.get("/api/doctor/:doctorId/patients", (req, res) => {
   const doctor = getDoctorById(req.params.doctorId);
   if (!doctor) return res.status(404).json({ message: "Doctor not found" });
-  const patientList = users.filter((user) => user.role === "patient" && (doctor.patients || []).includes(user.id)).map((patient) => ({ id: patient.id, name: patient.name, age: patient.age, recovery_type: patient.recoveryType, email: patient.email }));
+
+  const patientList = users
+    .filter((user) => user.role === "patient" && (doctor.patients || []).includes(user.id))
+    .map((patient) => {
+      const recovery = computeRecoveryMetrics(patient.id);
+      const status = recovery.overall >= 85 ? "Excellent" : recovery.overall >= 70 ? "Improving" : recovery.overall >= 40 ? "Monitoring" : "Critical";
+      return {
+        id: patient.id,
+        name: patient.name,
+        age: patient.age,
+        recovery_type: patient.recoveryType,
+        email: patient.email,
+        recovery: recovery.overall,
+        status,
+      };
+    });
+
   return res.json({ patients: patientList });
 });
 

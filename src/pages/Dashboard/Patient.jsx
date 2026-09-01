@@ -2497,6 +2497,11 @@ const DoctorConnectionCard = ({ patientData }) => {
                  <strong>{doctor.name}</strong>
                  <p>{doctor.specialization}</p>
                  <small>{doctor.hospitalClinic}</small>
+                 {doctor.rating && (
+                   <div style={{ marginTop: "4px", fontSize: "12px", color: "#666" }}>
+                     ⭐ {doctor.rating.toFixed(1)} ({doctor.recoveryScore || 0}% recovery)
+                   </div>
+                 )}
                </div>
              </div>
 

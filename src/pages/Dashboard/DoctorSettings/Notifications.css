@@ -1,0 +1,176 @@
+.notifications-container {
+  min-height: 100vh;
+  padding: 40px;
+  background-color: #f5f8fc;
+  font-family: Arial, sans-serif;
+}
+
+/* Header */
+
+.notifications-header {
+  margin-bottom: 30px;
+}
+
+.notifications-header h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  color: #1e293b;
+}
+
+.notifications-header p {
+  margin: 0;
+  font-size: 15px;
+  color: #64748b;
+}
+
+/* Main Card */
+
+.notifications-card {
+  max-width: 800px;
+  background: white;
+  border-radius: 12px;
+  padding: 10px 25px 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+}
+
+/* Notification Item */
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 5px;
+  border-bottom: 1px solid #e2e8f0;
+  gap: 30px;
+}
+
+.notification-item:last-of-type {
+  border-bottom: none;
+}
+
+.notification-item h3 {
+  margin: 0 0 6px;
+  font-size: 17px;
+  color: #1e293b;
+  text-align: left;
+}
+
+.notification-item p {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* Toggle Switch */
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+  margin-left: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #cbd5e1;
+  border-radius: 30px;
+  transition: 0.3s;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  top: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.switch input:checked + .slider {
+  background-color: #2563eb;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(22px);
+}
+
+/* Save Button */
+
+.save-notifications-btn {
+  margin-top: 25px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background-color: #2563eb;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.save-notifications-btn:hover {
+  background-color: #1d4ed8;
+}
+
+/* Responsive */
+
+@media (max-width: 600px) {
+  .notifications-container {
+    padding: 20px;
+  }
+
+  .notifications-card {
+    padding: 10px 18px 20px;
+  }
+
+  .notification-item h3 {
+    font-size: 15px;
+  }
+
+  .notification-item p {
+    font-size: 13px;
+  }
+}
+
+.back-settings-btn {
+  display: block;
+  background: none;
+  border: none;
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 15px;
+  padding: 0;
+  text-align: left;
+}
+
+.back-settings-btn:hover {
+  color: #000;
+}
+
+.back-settings-btn {
+  background: none;
+  border: none;
+  color: black;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 15px;
+  display: block;
+}

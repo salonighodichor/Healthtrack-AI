@@ -52,23 +52,16 @@ function Login() {
 
       if (response.ok) {
 
-        // Patient ka ID save karo
-        // Save logged-in user information
-localStorage.setItem("userId", data.user.id);
-localStorage.setItem("userName", data.user.name);
-localStorage.setItem("userRole", data.user.role);
+        // Save logged-in user information (individual keys, used by Patient/Caretaker dashboards)
+        localStorage.setItem("userId", data.user.id);
+        localStorage.setItem("userName", data.user.name);
+        localStorage.setItem("userRole", data.user.role);
 
-alert(`${role} Login Successful!`);
+        // Also save as a single JSON object (used by Doctor dashboard)
+        localStorage.setItem("user", JSON.stringify(data.user));
 
-if (data.user.role === "patient") {
-  navigate("/patient");
-} else if (data.user.role === "doctor") {
-  navigate("/doctor");
-} else if (data.user.role === "caretaker") {
-  navigate("/caretaker");
-}
+        alert(`${role} Login Successful!`);
 
-        
         if (data.user.role === "patient") {
           navigate("/patient");
         } else if (data.user.role === "doctor") {
@@ -84,7 +77,6 @@ if (data.user.role === "patient") {
     } catch (error) {
       alert(
         "Unable to connect to the backend. Please check if the server is running."
-
       );
 
       console.error(error);
@@ -93,11 +85,9 @@ if (data.user.role === "patient") {
 
   return (
     <div className="login-page">
-
       <div className="login-card">
 
         {/* Header */}
-
         <h1>HealTrack AI</h1>
 
         <p className="tagline">
@@ -110,13 +100,10 @@ if (data.user.role === "patient") {
           Login to your account
         </p>
 
-
         <form onSubmit={handleSubmit}>
 
           {/* Email / Phone */}
-
           <div className="input-group">
-
             <label>Email / Phone Number</label>
 
             <input
@@ -127,18 +114,13 @@ if (data.user.role === "patient") {
               placeholder="Enter Email or Phone Number"
               required
             />
-
           </div>
 
-
           {/* Password */}
-
           <div className="input-group">
-
             <label>Password</label>
 
             <div className="password-wrapper">
-
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
@@ -157,18 +139,13 @@ if (data.user.role === "patient") {
               >
                 {showPassword ? "🙈" : "👁️"}
               </button>
-
             </div>
-
           </div>
 
-
           {/* Remember + Forgot */}
-
           <div className="login-options">
 
             <label className="remember-me">
-
               <input
                 type="checkbox"
                 checked={rememberMe}
@@ -178,9 +155,7 @@ if (data.user.role === "patient") {
               />
 
               <span>Remember me</span>
-
             </label>
-
 
             <button
               type="button"
@@ -194,9 +169,7 @@ if (data.user.role === "patient") {
 
           </div>
 
-
           {/* Role */}
-
           <div className="role-section">
 
             <label>Login as</label>
@@ -236,12 +209,9 @@ if (data.user.role === "patient") {
               </button>
 
             </div>
-
           </div>
 
-
           {/* Login Button */}
-
           <button
             type="submit"
             className="login-submit-btn"
@@ -249,9 +219,7 @@ if (data.user.role === "patient") {
             Login
           </button>
 
-
           {/* Create Account */}
-
           <p className="create-account-text">
 
             Don't have an account?{" "}
@@ -267,9 +235,7 @@ if (data.user.role === "patient") {
           </p>
 
         </form>
-
       </div>
-
     </div>
   );
 }
