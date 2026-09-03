@@ -1,7 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Home from "./pages/home/Home";
+<<<<<<< HEAD
 import Login from "./pages/loginpages/login";
+=======
+import Emergency from "./pages/home/Emergency";
+>>>>>>> 15b3f62 (Update home page and add emergency feature)
 import CreateAccount from "./pages/loginpages/CreateAccount";
 import Forgotpage from "./pages/loginpages/Forgotpage";
 
@@ -33,6 +37,7 @@ import Help from "./pages/Dashboard/DoctorSettings/Help";
 
 // Caretaker Dashboard
 import Caretaker from "./pages/Dashboard/Caretaker";
+
 
 function App() {
   return (
@@ -66,6 +71,27 @@ function App() {
           path="/caretaker-register"
           element={<CaretakerRegister />}
         />
+<<<<<<< HEAD
+=======
+<Route
+  path="/patient"
+  element={<Patient />}
+/>
+<Route
+  path="/doctor"
+  element={<Doctor />}
+/>
+<Route
+  path="/caretaker"
+  element={<Caretaker />}
+/> 
+<Route
+  path="/Emergency"
+  element={<Emergency />}
+/>
+
+      </Routes>
+>>>>>>> 15b3f62 (Update home page and add emergency feature)
 
         {/* ================= PATIENT ================= */}
 
