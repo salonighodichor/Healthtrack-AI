@@ -2,6 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_BASE } from "../../api";
 import "./Patient.css";
+import Phase1Hub from "./Phase1Hub";
+import Phase1Recovery from "./Phase1Recovery";
+import ChatPanel from "./ChatPanel";
+import Phase2Milestones from "./Phase2Milestones";
+import Phase2Journal from "./Phase2Journal";
+import Phase2MedicineChecker from "./Phase2MedicineChecker";
+import Phase5Wearable from "./Phase5Wearable";
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -21,6 +28,12 @@ const menuItems = [
   { name: "Appointments", icon: "📅" },
   { name: "Alerts", icon: "🔔" },
   { name: "Find a Doctor", icon: "👩‍⚕️" },
+  { name: "Chat", icon: "💬" },
+  { name: "Phase-1 Core", icon: "✨" },
+  { name: "Recovery Milestones", icon: "🏁" },
+  { name: "Health Journal", icon: "📓" },
+  { name: "Medicine Checker", icon: "⚗️" },
+  { name: "Smart Monitoring", icon: "⌚" },
 ];
 
 const PageHeader = ({ icon, title, subtitle }) => (
@@ -33,6 +46,25 @@ const PageHeader = ({ icon, title, subtitle }) => (
     </div>
   </div>
 );
+
+function getExpiryStatus(expiryDate) {
+  if (!expiryDate) return null;
+  const expiry = new Date(`${expiryDate}T00:00:00`);
+  if (Number.isNaN(expiry.getTime())) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const days = Math.floor((expiry - today) / 86400000);
+  if (days < 0) return "expired";
+  if (days <= 30) return "expiring-soon";
+  return "ok";
+}
+
+function formatExpiryDate(expiryDate) {
+  if (!expiryDate) return "";
+  const expiry = new Date(`${expiryDate}T00:00:00`);
+  if (Number.isNaN(expiry.getTime())) return expiryDate;
+  return expiry.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
 
 /* =====================================================
    HEALTH OVERVIEW
@@ -873,8 +905,14 @@ const Medicines = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showDoctorForm, setShowDoctorForm] = useState(false);
-  const [doctorForm, setDoctorForm] = useState({ patientId: "", name: "", dosage: "", frequency: "Once daily", timing: "morning" });
+  const [doctorForm, setDoctorForm] = useState({ patientId: "", name: "", dosage: "", frequency: "Once daily", timing: "morning", expiry_date: "" });
   const [submitting, setSubmitting] = useState(false);
+  const [scanFile, setScanFile] = useState(null);
+  const [scanPreview, setScanPreview] = useState(null);
+  const [scanning, setScanning] = useState(false);
+  const [scanResult, setScanResult] = useState(null);
+  const [scanError, setScanError] = useState("");
+  const [scannedMeds, setScannedMeds] = useState([]);
   const userId = localStorage.getItem("userId");
   const userRole = localStorage.getItem("userRole");
 
@@ -905,6 +943,67 @@ const Medicines = () => {
   useEffect(() => {
     loadMedicines();
   }, [userId]);
+
+  const loadScannedMeds = () => {
+    if (!userId) return;
+    fetch(`${API_BASE}/api/scanned-medicines/${userId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setScannedMeds(Array.isArray(data.scans) ? data.scans : []);
+      })
+      .catch((error) => {
+        console.error("Error fetching scanned medicines:", error);
+        setScannedMeds([]);
+      });
+  };
+
+  useEffect(() => {
+    loadScannedMeds();
+  }, [userId]);
+
+  const handleScanFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setScanFile(file);
+    setScanError("");
+    setScanResult(null);
+    const reader = new FileReader();
+    reader.onload = (ev) => setScanPreview(ev.target.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleScanMedicine = async () => {
+    if (!scanFile) {
+      setScanError("Please choose a medicine image first.");
+      return;
+    }
+    setScanning(true);
+    setScanError("");
+    setScanResult(null);
+    try {
+      const formData = new FormData();
+      formData.append("image", scanFile);
+      if (userId) formData.append("user_id", String(userId));
+      const response = await fetch(`${API_BASE}/api/scan-medicine`, {
+        method: "POST",
+        body: formData,
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || payload.message || "Scan failed");
+      setScanResult(payload);
+      setScanFile(null);
+      setScanPreview(null);
+      if (payload.saved) {
+        loadScannedMeds();
+        window.dispatchEvent(new Event("alertsUpdated"));
+      }
+    } catch (error) {
+      console.error("Error scanning medicine:", error);
+      setScanError(error.message || "Unable to scan the medicine right now.");
+    } finally {
+      setScanning(false);
+    }
+  };
 
   const updateStatus = (medicineId, nextStatus) => {
     fetch(`${API_BASE}/api/medicines/${medicineId}/status`, {
@@ -945,11 +1044,12 @@ const Medicines = () => {
           dosage: doctorForm.dosage,
           frequency: doctorForm.frequency,
           timing: doctorForm.timing,
+          expiry_date: doctorForm.expiry_date,
         }),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.message || "Unable to add medicine.");
-      setDoctorForm({ patientId: "", name: "", dosage: "", frequency: "Once daily", timing: "morning" });
+      setDoctorForm({ patientId: "", name: "", dosage: "", frequency: "Once daily", timing: "morning", expiry_date: "" });
       setShowDoctorForm(false);
       setError("");
       loadMedicines();
@@ -983,6 +1083,157 @@ const Medicines = () => {
         title="Medicines"
         subtitle="Today's medication schedule"
       />
+
+      <div className="dashboard-card" style={{ marginBottom: 18 }}>
+        <div className="card-title">
+          <div>
+            <h2>📷 Medicine Expiry Scanner</h2>
+            <p>Upload a medicine pack photo to detect the name and expiry date</p>
+          </div>
+        </div>
+
+        <div className="scanner-grid">
+          <label htmlFor="medicineScanInput" className="scan-upload-tile">
+            {scanPreview ? (
+              <img src={scanPreview} alt="Medicine preview" className="scan-preview" />
+            ) : (
+              <>
+                <span style={{ fontSize: 30 }}>📸</span>
+                <strong>Choose medicine image</strong>
+                <small>JPG or PNG of the medicine pack / label</small>
+              </>
+            )}
+          </label>
+
+          <div className="scanner-side">
+            <input
+              type="file"
+              id="medicineScanInput"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={handleScanFileChange}
+            />
+
+            <label>
+              <div style={{ fontSize: 11, marginBottom: 6 }}>Medicine photo</div>
+              <div
+                onClick={() => document.getElementById("medicineScanInput").click()}
+                style={{
+                  border: "2px dashed #b9d4d4",
+                  borderRadius: 10,
+                  padding: "22px 14px",
+                  textAlign: "center",
+                  cursor: "pointer",
+                  fontSize: 13,
+                  color: "#5f7a7d",
+                  background: "#f6fafa",
+                }}
+              >
+                {scanFile ? "✓ Click to choose a different image" : "Click to choose an image"}
+              </div>
+            </label>
+
+            <button className="primary-button" onClick={handleScanMedicine} disabled={scanning || !scanFile} style={{ marginTop: 12 }}>
+              {scanning ? "Scanning..." : "Scan Medicine"}
+            </button>
+
+            {scanError && <p style={{ color: "#d0453f", fontSize: 13, marginTop: 10 }}>{scanError}</p>}
+            {scanning && <p style={{ color: "#5f7a7d", fontSize: 13, marginTop: 10 }}>Reading the label with OCR... this may take a few seconds.</p>}
+
+            {scanResult && (
+              <div className="scan-result" style={{ marginTop: 16 }}>
+                <div className="scan-result-row" style={{ borderBottom: "none", paddingBottom: 4 }}>
+                  <span>Result {scanResult.saved ? "• saved" : ""}</span>
+                  <strong>
+                    {scanResult.status === "Expired" && <span className="expiry-badge expired">Expired</span>}
+                    {scanResult.status === "Expiring Soon" && <span className="expiry-badge expiring-soon">Expiring Soon</span>}
+                    {scanResult.status === "Not Detected" && <span className="expiry-badge not-detected">Not Detected</span>}
+                    {scanResult.saved && scanResult.status !== "Expired" && scanResult.status !== "Expiring Soon" && (
+                      <span className="expiry-badge active">Active</span>
+                    )}
+                  </strong>
+                </div>
+                <div className="scan-result-row">
+                  <span>Medicine name</span>
+                  <strong>{scanResult.medicineName || "Not detected"}</strong>
+                </div>
+                <div className="scan-result-row">
+                  <span>Expiry date</span>
+                  <strong>{scanResult.expiryDate ? formatExpiryDate(scanResult.expiryDate) : "Not detected"}</strong>
+                </div>
+                {scanResult.purpose && (
+                  <div className="scan-result-row">
+                    <span>Purpose / Use</span>
+                    <strong>{scanResult.purpose}</strong>
+                  </div>
+                )}
+                {!scanResult.saved && (
+                  <div style={{ marginTop: 10 }}>
+                    <div className="scan-fail-message">
+                      {scanResult.reason || scanResult.message || scanResult.error || "The medicine could not be detected from the image."}
+                    </div>
+                  </div>
+                )}
+                {scanResult.preprocessedImage && (
+                  <div className="scan-raw-text" style={{ marginTop: 10 }}>
+                    <strong>Processed image (what OCR analyzed)</strong>
+                    <img
+                      src={scanResult.preprocessedImage}
+                      alt="Processed"
+                      style={{ width: "100%", borderRadius: 6, marginTop: 6 }}
+                    />
+                  </div>
+                )}
+                {scanResult.rawText && (
+                  <div className="scan-raw-text" style={{ marginTop: 10 }}>
+                    <strong>OCR extracted text (debug)</strong>
+                    <pre>{scanResult.rawText}</pre>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="dashboard-card" style={{ marginBottom: 18 }}>
+        <div className="card-title">
+          <div>
+            <h2>🕘 Recent Scans</h2>
+            <p>Medicines detected from uploaded photos</p>
+          </div>
+        </div>
+
+        <div className="medicine-list large-list">
+          {scannedMeds.length === 0 ? (
+            <p style={{ color: "#7c9496" }}>No scanned medicines yet.</p>
+          ) : (
+            scannedMeds.map((scan) => {
+              const scanStatus = getExpiryStatus(scan.expiryDate);
+              return (
+                <div className={`medicine-item${scanStatus ? ` expiry-${scanStatus}` : ""}`} key={scan.id}>
+                  <div className="medicine-icon">📸</div>
+                  <div style={{ flex: 1 }}>
+                    <strong>
+                      {scan.medicineName || "Unknown medicine"}
+                      {scanStatus === "expired" && <span className="expiry-badge expired">Expired</span>}
+                      {scanStatus === "expiring-soon" && <span className="expiry-badge expiring-soon">Expiring Soon</span>}
+                      {scanStatus === "ok" && <span className="expiry-badge active">Active</span>}
+                    </strong>
+                    <small style={{ display: "block", marginTop: 4 }}>
+                      {scan.expiryDate
+                        ? `📅 Exp: ${formatExpiryDate(scan.expiryDate)}`
+                        : "Expiry not detected"}
+                      {scan.purpose ? ` • ${scan.purpose}` : ""}
+                    </small>
+                  </div>
+                  <span>✓</span>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
 
       {userRole === "doctor" && (
         <div className="dashboard-card" style={{ marginBottom: 18 }}>
@@ -1058,6 +1309,16 @@ const Medicines = () => {
               </label>
             </div>
 
+            <label style={{ maxWidth: 240 }}>
+              <div style={{ fontSize: 11, marginBottom: 6 }}>Expiry date (optional)</div>
+              <input
+                type="date"
+                value={doctorForm.expiry_date}
+                onChange={(e) => setDoctorForm({ ...doctorForm, expiry_date: e.target.value })}
+                style={{ width: "100%", padding: 10, borderRadius: 8, border: "1px solid #d7e8e7" }}
+              />
+            </label>
+
             <button className="primary-button" onClick={handleDoctorAddMedicine} disabled={submitting} style={{ width: "fit-content" }}>
               {submitting ? "Saving..." : "Add Medicine"}
             </button>
@@ -1077,16 +1338,30 @@ const Medicines = () => {
               const isTaken = ["taken", "done", "completed", "complete"].includes(normalized);
               const isMissed = normalized === "missed";
               const isPending = !isTaken && !isMissed;
+              const expiryStatus = getExpiryStatus(medicine.expiry_date);
 
               return (
-                <div className="medicine-item" key={medicine.id ?? medicine.name}>
+                <div className={`medicine-item${expiryStatus ? ` expiry-${expiryStatus}` : ""}`} key={medicine.id ?? medicine.name}>
                   <div className="medicine-icon">💊</div>
 
                   <div style={{ flex: 1 }}>
-                    <strong>{medicine.name}</strong>
+                    <strong>
+                      {medicine.name}
+                      {expiryStatus === "expired" && (
+                        <span className="expiry-badge expired">Expired</span>
+                      )}
+                      {expiryStatus === "expiring-soon" && (
+                        <span className="expiry-badge expiring-soon">Expiring Soon</span>
+                      )}
+                    </strong>
                     <small style={{ display: "block", marginTop: 4 }}>
                       {medicine.dosage} • {medicine.frequency} • {medicine.timing}
                     </small>
+                    {medicine.expiry_date && (
+                      <small style={{ display: "block", marginTop: 3 }}>
+                        📅 Exp: {formatExpiryDate(medicine.expiry_date)}
+                      </small>
+                    )}
                   </div>
 
                   {userRole !== "doctor" && (
@@ -1142,11 +1417,35 @@ const Appointments = () => {
   const userId = localStorage.getItem("userId");
   const userRole = localStorage.getItem("userRole");
 
-  const doctorOptions = [
+  const fallbackDoctorOptions = [
     { id: 101, name: "Dr. Ravi Verma", department: "Cardiology", location: "City Care Hospital" },
     { id: 102, name: "Dr. Meera Shah", department: "Orthopedics", location: "Apollo Recovery Center" },
     { id: 103, name: "Dr. Aditi Nair", department: "Internal Medicine", location: "MediWell Hospital" },
   ];
+
+  const [doctorOptions, setDoctorOptions] = useState(fallbackDoctorOptions);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/doctors`)
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to fetch doctors");
+        return response.json();
+      })
+      .then((data) => {
+        const list = Array.isArray(data.doctors) ? data.doctors : [];
+        if (list.length === 0) throw new Error("No doctors found");
+        setDoctorOptions(list.map((d) => ({
+          id: d.id,
+          name: d.name,
+          department: d.specialization || "General",
+          location: d.hospitalClinic || d.hospital_clinic || "-",
+        })));
+      })
+      .catch((error) => {
+        console.error("Error fetching doctors:", error);
+        setDoctorOptions(fallbackDoctorOptions);
+      });
+  }, []);
 
   const timeSlots = ["09:00 AM", "10:30 AM", "12:00 PM", "02:00 PM", "03:30 PM", "05:00 PM"];
 
@@ -2410,6 +2709,10 @@ const RecoveryHub = ({ patientData }) => (
 
     <RecoveryPhotosCard />
 
+    <Phase1Recovery
+      userId={Number(patientData?.id || localStorage.getItem("userId"))}
+    />
+
   </div>
 );
 
@@ -2601,7 +2904,16 @@ const DashboardHome = ({
   const [dailyActivityTotal, setDailyActivityTotal] =
     useState(0);
 
+  const [healthReading, setHealthReading] = useState(null);
+
   const userId = localStorage.getItem("userId");
+
+  const statusLabel = (status) => {
+    if (status === "high") return "⚠️ High";
+    if (status === "low") return "⚠️ Low";
+    if (status === "normal") return "✓ Normal";
+    return "— No data";
+  };
 
   /* ================= DAILY ACTIVITY ================= */
 
@@ -2649,6 +2961,19 @@ const DashboardHome = ({
         handleActivityUpdate
       );
     };
+  }, [userId]);
+
+  /* ================= HEALTH READING ================= */
+
+  useEffect(() => {
+    if (!userId) return;
+
+    fetch(`${API_BASE}/api/health-record/${userId}/latest`)
+      .then((response) => response.json())
+      .then((data) => setHealthReading(data))
+      .catch((error) => {
+        console.error("Error fetching health reading:", error);
+      });
   }, [userId]);
 
   /* ================= DASHBOARD PROGRESS ================= */
@@ -2983,7 +3308,6 @@ const DashboardHome = ({
 
       <DailyActivityCard />
 
-
       {/* HEALTH OVERVIEW */}
 
       <div className="dashboard-card">
@@ -3008,10 +3332,10 @@ const DashboardHome = ({
             <span>Blood Sugar</span>
 
             <h3>
-              80 <small>mg/dL</small>
+              {healthReading?.has_data ? healthReading.blood_sugar.value : "—"} <small>mg/dL</small>
             </h3>
 
-            <label>✓ Normal</label>
+            <label>{statusLabel(healthReading?.blood_sugar?.status)}</label>
 
           </div>
 
@@ -3026,10 +3350,10 @@ const DashboardHome = ({
             <span>Heart Rate</span>
 
             <h3>
-              98 <small>BPM</small>
+              {healthReading?.has_data ? healthReading.heart_rate.value : "—"} <small>BPM</small>
             </h3>
 
-            <label>✓ Normal</label>
+            <label>{statusLabel(healthReading?.heart_rate?.status)}</label>
 
           </div>
 
@@ -3044,10 +3368,10 @@ const DashboardHome = ({
             <span>Blood Pressure</span>
 
             <h3>
-              90 <small>/ 72 mmHg</small>
+              {healthReading?.has_data ? healthReading.blood_pressure.systolic : "—"} <small>/ {healthReading?.has_data ? healthReading.blood_pressure.diastolic : "—"} mmHg</small>
             </h3>
 
-            <label>✓ Normal</label>
+            <label>{statusLabel(healthReading?.blood_pressure?.status)}</label>
 
           </div>
 
@@ -3062,10 +3386,10 @@ const DashboardHome = ({
             <span>Hemoglobin</span>
 
             <h3>
-              14 <small>g/dL</small>
+              {healthReading?.has_data ? healthReading.hemoglobin.value : "—"} <small>g/dL</small>
             </h3>
 
-            <label>✓ Normal</label>
+            <label>{statusLabel(healthReading?.hemoglobin?.status)}</label>
 
           </div>
 
@@ -3173,7 +3497,9 @@ const Patient = () => {
 
   const handleLogout = () => {
 
-    localStorage.removeItem("userId");
+    ["userId", "userRole", "userName", "userEmail", "user",
+     "aiPreferences", "healthPreferences", "language", "healtrack-theme"]
+      .forEach((key) => localStorage.removeItem(key));
 
     navigate("/login");
   };
@@ -3220,6 +3546,37 @@ const Patient = () => {
           <div className="page-stack">
             <PageHeader icon="👩‍⚕️" title="Find a Doctor" subtitle="Search and connect with a healthcare specialist" />
             <DoctorConnectionCard patientData={patientData} />
+          </div>
+        );
+
+      case "Phase-1 Core":
+        return <Phase1Hub />;
+
+      case "Recovery Milestones":
+        return (
+          <Phase2Milestones userId={Number(patientData?.id || localStorage.getItem("userId"))} />
+        );
+
+      case "Health Journal":
+        return (
+          <Phase2Journal userId={Number(patientData?.id || localStorage.getItem("userId"))} />
+        );
+
+      case "Medicine Checker":
+        return (
+          <Phase2MedicineChecker userId={Number(patientData?.id || localStorage.getItem("userId"))} />
+        );
+
+      case "Smart Monitoring":
+        return (
+          <Phase5Wearable userId={Number(patientData?.id || localStorage.getItem("userId"))} />
+        );
+
+      case "Chat":
+        return (
+          <div className="page-stack">
+            <PageHeader icon="💬" title="Chat" subtitle="Message your connected doctors" />
+            <ChatPanel userId={Number(patientData.id)} side="patient" />
           </div>
         );
 

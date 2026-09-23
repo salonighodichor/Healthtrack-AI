@@ -1,0 +1,305 @@
+/* =========================================================
+   Phase-5 — Smart Health Monitoring
+   Styles for the wearable simulator, live vitals dashboard
+   and abnormal-vitals alert feed. Matches the Phase-1/2 idiom.
+   ========================================================= */
+
+.p5-card {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  padding: 18px 20px 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.dark-mode .p5-card {
+  background: var(--dark-card-bg, #1f2430);
+  border-color: #33394a;
+}
+
+.p5-card-head {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.p5-card-head > span {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.p5-card-head h3 {
+  margin: 0 0 2px;
+  font-size: 17px;
+}
+
+.p5-card-head p {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.dark-mode .p5-card-head p {
+  color: #9aa3b2;
+}
+
+.p5-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 10px 0 2px;
+}
+
+.p5-state-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.p5-state-chip.running {
+  background: #e5f7ef;
+  color: #1e7e34;
+}
+
+.p5-state-chip.stopped {
+  background: #eef1f5;
+  color: #6b7280;
+}
+
+.dark-mode .p5-state-chip.running {
+  background: #16352b;
+  color: #4cc38a;
+}
+
+.dark-mode .p5-state-chip.stopped {
+  background: #2c3140;
+  color: #a6b0c3;
+}
+
+.p5-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.p5-state-chip.running .p5-dot {
+  animation: p5-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes p5-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.75); }
+}
+
+.p5-select {
+  padding: 9px 11px;
+  border: 1px solid #d7dce5;
+  border-radius: 8px;
+  font-size: 13px;
+  background: #fff;
+  color: #111827;
+}
+
+.dark-mode .p5-select {
+  background: #12151d;
+  border-color: #33394a;
+  color: #e6e9f0;
+}
+
+/* ---------- live vitals cards ---------- */
+
+.p5-vitals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.p5-vital {
+  position: relative;
+  text-align: center;
+  background: #f8fafc;
+  border: 1px solid #eef1f5;
+  border-radius: 12px;
+  padding: 14px 12px;
+}
+
+.dark-mode .p5-vital {
+  background: #1a1f2b;
+  border-color: #2c3140;
+}
+
+.p5-vital-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.p5-vital-label {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.dark-mode .p5-vital-label {
+  color: #9aa3b2;
+}
+
+.p5-vital-value {
+  display: block;
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.15;
+  margin-top: 2px;
+}
+
+.dark-mode .p5-vital-value {
+  color: #e6e9f0;
+}
+
+.p5-vital-value small {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8a93a4;
+}
+
+.p5-vital-unit {
+  display: block;
+  font-size: 12px;
+  color: #8a93a4;
+}
+
+/* status accents */
+.p5-vital.ok { border-left: 4px solid #22a06b; }
+.p5-vital.warn { border-left: 4px solid #e7a600; }
+.p5-vital.bad { border-left: 4px solid #d0453f; }
+
+.p5-vital.bad .p5-vital-value { color: #d0453f; }
+.p5-vital.warn .p5-vital-value { color: #c07c00; }
+.dark-mode .p5-vital.bad .p5-vital-value { color: #f28b86; }
+.dark-mode .p5-vital.warn .p5-vital-value { color: #e7b96a; }
+
+.p5-live-badge {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #22a06b;
+}
+
+/* ---------- chart ---------- */
+
+.p5-chart {
+  margin-top: 6px;
+}
+
+.p5-chart .recharts-cartesian-axis-tick text,
+.p5-chart .recharts-legend-item-text {
+  font-size: 11px;
+}
+
+/* ---------- alert feed ---------- */
+
+.p5-alert {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border: 1px solid #f5c6c0;
+  background: #fdecea;
+  border-radius: 10px;
+  padding: 11px 14px;
+  margin-bottom: 10px;
+}
+
+.dark-mode .p5-alert {
+  background: #2a1e20;
+  border-color: #4a2d2c;
+}
+
+.p5-alert-icon {
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.p5-alert-body strong {
+  font-size: 14px;
+  color: #c0392b;
+}
+
+.dark-mode .p5-alert-body strong {
+  color: #f28b86;
+}
+
+.p5-alert-body p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #7d4f4b;
+}
+
+.dark-mode .p5-alert-body p {
+  color: #b9a09e;
+}
+
+.p5-alert-time {
+  margin-left: auto;
+  font-size: 11px;
+  color: #a4876f;
+  white-space: nowrap;
+}
+
+/* ---------- misc ---------- */
+
+.p5-empty {
+  color: #8a93a4;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.p5-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.p5-form label,
+.p5-form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.dark-mode .p5-form label,
+.dark-mode .p5-form-grid label {
+  color: #c3cadd;
+}
+
+.p5-form input,
+.p5-form select {
+  padding: 9px 11px;
+  border: 1px solid #d7dce5;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+  color: #111827;
+}
+
+.dark-mode .p5-form input,
+.dark-mode .p5-form select {
+  background: #12151d;
+  border-color: #33394a;
+  color: #e6e9f0;
+}

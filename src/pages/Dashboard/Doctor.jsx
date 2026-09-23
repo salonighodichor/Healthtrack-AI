@@ -4,6 +4,10 @@ import { API_BASE } from "../../api";
 import { getRecoveryStatus, interpretRecoveryMetrics, getAlertIcon, getAlertClass } from "../../utils/doctorMetrics";
 import "./Doctor.css";
 import DoctorSettings from "./DoctorSettings/DoctorSettings";
+import ChatPanel from "./ChatPanel";
+import Phase2Milestones from "./Phase2Milestones";
+import Phase2Journal from "./Phase2Journal";
+import Phase2MedicineChecker from "./Phase2MedicineChecker";
 
 const menuItems = [
   { name: "Dashboard", icon: "🏠" },
@@ -11,8 +15,12 @@ const menuItems = [
   { name: "Patient Recovery Status", icon: "📈" },
   { name: "Appointments", icon: "📅" },
   { name: "Health Records", icon: "📄" },
+  { name: "Patient Messages", icon: "💬" },
   { name: "AI Analysis", icon: "🤖" },
   { name: "Alerts", icon: "🔔" },
+  { name: "Recovery Milestones", icon: "🏁" },
+  { name: "Patient Journals", icon: "📓" },
+  { name: "Medicine Checker", icon: "⚗️" },
   { name: "Settings", icon: "⚙️" },
 ];
 
@@ -65,6 +73,7 @@ function Doctor() {
   ]);
   const [aiChatInput, setAiChatInput] = useState("");
   const [aiChatLoading, setAiChatLoading] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -210,6 +219,15 @@ function Doctor() {
     navigate("/login");
   };
 
+  useEffect(() => {
+    if (!showLogoutConfirm) return;
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setShowLogoutConfirm(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [showLogoutConfirm]);
+
   const handleAppointmentStatusChange = async (appointmentId, newStatus) => {
     try {
       const response = await fetch(`${API_BASE}/api/appointments/${appointmentId}/status`, {
@@ -286,9 +304,8 @@ function Doctor() {
   const healthRecords = doctorSummary?.healthRecords || [];
 
   const renderDashboard = () => {
-    // Filter critical/unread alerts for the banner
-    const criticalAlerts = (alerts || []).filter(a => !a.read || a.type === "warning" || a.type === "alert");
-    
+    const pendingAlertsCount = alerts.filter((alert) => !alert.read).length;
+
     return (
     <div className="page-stack">
       <div className="welcome-section">
@@ -302,54 +319,6 @@ function Doctor() {
           📊 View Summary
         </button>
       </div>
-
-      {criticalAlerts.length > 0 && (
-        <div style={{
-          backgroundColor: "#fff3cd",
-          border: "1px solid #ffc107",
-          borderRadius: "8px",
-          padding: "16px",
-          marginBottom: "16px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "12px"
-        }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-              <span style={{ fontSize: "20px" }}>⚠️</span>
-              <strong style={{ fontSize: "14px" }}>
-                {criticalAlerts.length} Alert{criticalAlerts.length > 1 ? "s" : ""} Pending
-              </strong>
-            </div>
-            <p style={{ fontSize: "13px", margin: 0, color: "#666" }}>
-              {criticalAlerts.slice(0, 2).map(a => a.message).join(" • ")}
-              {criticalAlerts.length > 2 && ` and ${criticalAlerts.length - 2} more...`}
-            </p>
-          </div>
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-            <button
-              className="primary-button"
-              onClick={() => setActiveView("Alerts")}
-              style={{ padding: "6px 12px", fontSize: "12px", whiteSpace: "nowrap" }}
-            >
-              View All
-            </button>
-            <button
-              onClick={() => setAlerts(alerts.map(a => ({ ...a, read: true })))}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "16px",
-                padding: "4px"
-              }}
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
 
       <div className="top-grid">
         <div className="profile-card">
@@ -447,101 +416,42 @@ function Doctor() {
             <h3>{overview.todaysAppointments}</h3>
             <label>✓ Scheduled</label>
           </div>
-          <div className="health-card recovery">
-            <div className="health-icon">📈</div>
-            <span>Avg. Recovery</span>
-            <h3>{overview.averageRecovery}%</h3>
-            <label>✓ Improving</label>
-          </div>
           <div className="health-card reports">
-            <div className="health-icon">📄</div>
-            <span>Pending Reports</span>
-            <h3>{overview.pendingReports}</h3>
+            <div className="health-icon">🔔</div>
+            <span>Pending Alerts</span>
+            <h3>{pendingAlertsCount}</h3>
             <label>⚠ Review</label>
           </div>
         </div>
       </div>
 
-      <div className="middle-grid">
-        <div className="dashboard-card">
-          <div className="card-title">
-            <div>
-              <h2>👥 Recent Patients</h2>
-              <p>Recently viewed patients</p>
-            </div>
+      <div className="dashboard-card">
+        <div className="card-title">
+          <div>
+            <h2>👥 Recent Patients</h2>
+            <p>Recently viewed patients</p>
           </div>
-          <div className="record-list">
-            {recentPatients.map((patient) => (
-              <div className="record-item" key={patient.id} onClick={() => setSelectedPatient(patient)} style={{ cursor: "pointer" }}>
-                <div className="record-icon">{getInitials(patient.name)}</div>
-                <div>
-                  <strong>{patient.name}</strong>
-                  <p>{patient.condition || patient.recovery_type || "General"} • Recovery {patient.recovery || 0}%</p>
-                </div>
-                <span>→</span>
-              </div>
-            ))}
-          </div>
+          <button
+            className="outline-button"
+            onClick={() => setActiveView("Patient List")}
+            style={{ marginTop: 0, padding: "6px 12px", fontSize: "12px", whiteSpace: "nowrap" }}
+          >
+            View All →
+          </button>
         </div>
-
-        <div className="dashboard-card ai-card">
-          <div className="card-title">
-            <div>
-              <h2>🤖 AI Patient Insights</h2>
-              <p>Smart health analysis</p>
-            </div>
-          </div>
-          <div className="ai-message">
-            <strong>💙 AI Recommendation</strong>
-            <p>
-              {Math.max(metrics.needMonitoring, 0)} patients may require additional monitoring based on their recent health records.
-            </p>
-            <div className="ai-warning">⚠ Review recommended patients.</div>
-            <button className="ai-button" onClick={() => setActiveView("AI Analysis")}>View Analysis →</button>
-          </div>
-        </div>
-      </div>
-
-      <div className="lower-grid">
-        <div className="dashboard-card">
-          <div className="card-title">
-            <div>
-              <h2>💊 Medication Alerts</h2>
-              <p>Patient medication updates</p>
-            </div>
-          </div>
-          {alerts.slice(0, 2).map((alert) => (
-            <div className="medicine-item" key={alert.id}>
-              <div className="medicine-icon">💊</div>
+        <div className="record-list">
+          {recentPatients.length > 0 ? recentPatients.map((patient) => (
+            <div className="record-item" key={patient.id} onClick={() => setSelectedPatient(patient)} style={{ cursor: "pointer" }}>
+              <div className="record-icon">{getInitials(patient.name)}</div>
               <div>
-                <strong>{alert.patientName || "Patient"}</strong>
-                <p>{alert.title}</p>
+                <strong>{patient.name}</strong>
+                <p>{patient.condition || patient.recovery_type || "General"} • Recovery {patient.recovery || 0}%</p>
               </div>
-              <span className={alert.type === "warning" ? "pending" : "taken"}>{alert.type === "warning" ? "Review" : "Good"}</span>
+              <span>→</span>
             </div>
-          ))}
-        </div>
-
-        <div className="dashboard-card">
-          <div className="card-title">
-            <div>
-              <h2>📅 Upcoming Appointments</h2>
-              <p>Today&apos;s schedule</p>
-            </div>
-          </div>
-          {(appointments || []).slice(0, 2).map((appointment) => (
-            <div className="appointment" key={appointment.id}>
-              <div className="appointment-date">
-                <strong>{new Date(`${appointment.date}T00:00:00`).getDate()}</strong>
-                <span>{new Date(`${appointment.date}T00:00:00`).toLocaleString("en-US", { month: "short" }).toUpperCase()}</span>
-              </div>
-              <div>
-                <strong>{appointment.patientName || "Patient"}</strong>
-                <p>{appointment.title}</p>
-              </div>
-              <span className="appointment-status">{appointment.status || "Upcoming"}</span>
-            </div>
-          ))}
+          )) : (
+            <p>No patients yet.</p>
+          )}
         </div>
       </div>
     </div>
@@ -983,10 +893,33 @@ function Doctor() {
         return renderAppointments();
       case "Health Records":
         return renderHealthRecords();
+      case "Patient Messages":
+        return (
+          <div className="page-stack">
+            <PageHeader icon="💬" title="Patient Messages" subtitle="Chat with your connected patients" />
+            <ChatPanel userId={Number(doctor?.id || localStorage.getItem("userId") || 101)} side="doctor" />
+          </div>
+        );
       case "AI Analysis":
         return renderAIAnalysis();
       case "Alerts":
         return renderAlerts();
+      case "Recovery Milestones":
+        return (
+          <Phase2Milestones
+            isDoctor
+            doctorId={Number(doctor?.id || localStorage.getItem("userId") || 101)}
+          />
+        );
+      case "Patient Journals":
+        return (
+          <Phase2Journal
+            isDoctor
+            doctorId={Number(doctor?.id || localStorage.getItem("userId") || 101)}
+          />
+        );
+      case "Medicine Checker":
+        return <Phase2MedicineChecker />;
       case "Settings":
         return <DoctorSettings />;
       default:
@@ -1025,7 +958,7 @@ function Doctor() {
         </div>
 
         <div className="sidebar-bottom">
-          <button className="logout-button" onClick={handleLogout}>
+          <button className="logout-button" onClick={() => setShowLogoutConfirm(true)}>
             <span className="menu-icon">⎋</span>
             Logout
           </button>
@@ -1108,7 +1041,7 @@ function Doctor() {
                 {profileMenuOpen && (
                   <div className="profile-menu">
                     <button onClick={() => navigate("/doctor-profile")}>View/Edit Profile</button>
-                    <button onClick={handleLogout}>Logout</button>
+                    <button onClick={() => { setProfileMenuOpen(false); setShowLogoutConfirm(true); }}>Logout</button>
                   </div>
                 )}
               </div>
@@ -1118,6 +1051,40 @@ function Doctor() {
 
         <main className="content-area">{renderContent()}</main>
       </div>
+
+      {showLogoutConfirm && (
+        <div
+          className="logout-confirm-overlay"
+          onClick={() => setShowLogoutConfirm(false)}
+        >
+          <div
+            className="logout-confirm-box"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="logout-confirm-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="logout-confirm-title">Confirm Logout</h2>
+            <p>Are you sure you want to log out of your account?</p>
+            <div className="logout-confirm-actions">
+              <button
+                className="outline-button"
+                type="button"
+                onClick={() => setShowLogoutConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="primary-button"
+                type="button"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

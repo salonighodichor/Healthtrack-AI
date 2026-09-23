@@ -29,3 +29,5 @@ backend/venv/
 backend/__pycache__/
 backend/instance/
 *.pyc
+# Database files (empty/stale DBs must never be committed)
+*.db
