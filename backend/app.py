@@ -592,10 +592,10 @@ def login():
             "id": user.id,
             "name": user.name,
             "email": user.email,
-            "role": user.role
+            "role": user.role,
+            "patient_id": user.patient_id,
         }
     }), 200
-
 
 # =====================================================
 # DOCTOR PROFILE

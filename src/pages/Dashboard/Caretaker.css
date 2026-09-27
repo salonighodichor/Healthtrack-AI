@@ -1125,3 +1125,175 @@ button, input {
     font-size: 20px;
   }
 }
+/* your existing CSS */
+...
+...
+...your last existing CSS rule
+
+
+/* ================= SETTINGS UI ================= */
+
+.settings-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+/* rest of the Settings CSS... */
+/* ================= SETTINGS UI ================= */
+
+.settings-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e8e2f5;
+  background: #ffffff;
+}
+
+.settings-item:last-child {
+  border-bottom: none;
+}
+
+.settings-item-icon {
+  width: 45px;
+  height: 45px;
+  min-width: 45px;
+  border-radius: 12px;
+  background: #f0ebff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.settings-item-content {
+  flex: 1;
+}
+
+.settings-item-content h2 {
+  color: #302a48;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.settings-item-content p {
+  color: #858093;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* Settings buttons */
+
+.settings-item .caretaker-outline-button {
+  width: auto;
+  min-width: 100px;
+  margin-top: 0;
+  padding: 0 16px;
+}
+
+/* Language dropdown */
+
+.settings-language-select {
+  height: 40px;
+  min-width: 120px;
+  padding: 0 12px;
+  border: 1px solid #d8d0ef;
+  border-radius: 9px;
+  background: #faf9ff;
+  color: #5d4aaa;
+  font-size: 11px;
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Dark mode */
+
+.dark-mode .settings-item {
+  background: #201d2d;
+  border-color: #352f49;
+}
+
+.dark-mode .settings-item-icon {
+  background: #2d2745;
+}
+
+.dark-mode .settings-item-content h2 {
+  color: #eeeaff;
+}
+
+.dark-mode .settings-item-content p {
+  color: #9992a9;
+}
+
+.dark-mode .settings-language-select {
+  background: #242034;
+  border-color: #514775;
+  color: #b09eff;
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  .settings-item {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 18px;
+  }
+
+  .settings-item-content {
+    min-width: calc(100% - 63px);
+  }
+
+  .settings-item .caretaker-outline-button,
+  .settings-language-select {
+    margin-left: 63px;
+  }
+}
+/* ================= SETTINGS ACTION BUTTON ================= */
+
+.settings-action-button {
+  height: 40px;
+  min-width: 100px;
+  padding: 0 16px;
+  border: 1px solid #d8d0ef;
+  border-radius: 9px;
+  background: #faf9ff;
+  color: #684bd4;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.settings-action-button:hover {
+  background: #eeeaff;
+  border-color: #8062ed;
+  transform: translateY(-1px);
+}
+
+.dark-mode .settings-action-button {
+  background: #242034;
+  border-color: #514775;
+  color: #b09eff;
+}
+
+.dark-mode .settings-action-button:hover {
+  background: #2d2744;
+  border-color: #8062ed;
+}
