@@ -1540,3 +1540,58 @@ input {
   width: calc(50% - 10px);
   justify-self: center;
 }
+
+/* =====================================================
+   LOGOUT CONFIRM MODAL
+===================================================== */
+
+.doctor-dashboard .logout-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 33, 48, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.doctor-dashboard .logout-confirm-box {
+  width: 380px;
+  max-width: 90%;
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.doctor-dashboard .logout-confirm-box h2 {
+  color: #0f4c6e;
+  font-size: 19px;
+  margin-bottom: 10px;
+}
+
+.doctor-dashboard .logout-confirm-box p {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+
+.doctor-dashboard .logout-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.dark-mode .doctor-dashboard .logout-confirm-box {
+  background: #1b344a;
+  border: 1px solid #2c475d;
+}
+
+.dark-mode .doctor-dashboard .logout-confirm-box h2 {
+  color: #eaf2f8;
+}
+
+.dark-mode .doctor-dashboard .logout-confirm-box p {
+  color: #a8c1d4;
+}

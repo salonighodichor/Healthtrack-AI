@@ -236,11 +236,17 @@ class Medicine(db.Model):
         nullable=False
     )
 
+    dosage = db.Column(db.String(50), default="")
+
+    frequency = db.Column(db.String(50), default="Once daily")
+
+    timing = db.Column(db.String(50), default="morning")
+
     instruction = db.Column(
         db.String(200)
     )
 
-    # taken / pending
+    # taken / pending / missed
     status = db.Column(
         db.String(20),
         default="pending"
@@ -249,6 +255,11 @@ class Medicine(db.Model):
     date = db.Column(
         db.Date,
         nullable=False
+    )
+
+    # Expiry date - ISO format YYYY-MM-DD (optional)
+    expiry_date = db.Column(
+        db.String(10)
     )
 
 
@@ -288,6 +299,16 @@ class Appointment(db.Model):
     # Additional appointment fields
     doctor_name = db.Column(
         db.String(200)
+    )
+
+    doctor_id = db.Column(db.Integer)
+
+    department = db.Column(
+        db.String(50)
+    )
+
+    reason = db.Column(
+        db.Text
     )
 
     location = db.Column(
@@ -371,6 +392,17 @@ class Alert(db.Model):
         db.String(300)
     )
 
+    is_read = db.Column(
+        db.Boolean,
+        default=False
+    )
+
+    # alert source: system / wearable / etc.
+    source = db.Column(
+        db.String(30),
+        default="system"
+    )
+
     created_at = db.Column(
         db.DateTime,
         server_default=db.func.now()
@@ -402,6 +434,553 @@ class DoctorPatient(db.Model):
     )
 
     connected_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+class Message(db.Model):
+    """
+    Patient <-> Doctor direct chat message.
+
+    A row is one message in a two-party conversation. Threads are
+    implicit: the (sender, receiver) pair defines the conversation key,
+    and ordering within a thread is by created_at (oldest first).
+
+    read_at IS NULL  -> unread
+    read_at set      -> read by the receiver
+    """
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    sender_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    receiver_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    message = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    read_at = db.Column(
+        db.DateTime
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+
+class PatientMedicine(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    medicine_name = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    generic_name = db.Column(
+        db.String(150)
+    )
+
+    mfg_date = db.Column(
+        db.String(50)
+    )
+
+    expiry_date = db.Column(
+        db.String(50)
+    )
+
+    image_path = db.Column(
+        db.String(300)
+    )
+
+    status = db.Column(
+        db.String(50),
+        default="Safe"
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+
+# ---------------- Daily Health Check-in ----------------
+class DailyCheckin(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    checkin_date = db.Column(
+        db.Date,
+        nullable=False
+    )
+
+    pain_level = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    sleep_hours = db.Column(
+        db.Float
+    )
+
+    sleep_quality = db.Column(
+        db.String(30)
+    )
+
+    activity_level = db.Column(
+        db.String(30)
+    )
+
+    symptoms = db.Column(
+        db.Text
+    )
+
+    temperature = db.Column(
+        db.Float
+    )
+
+    systolic = db.Column(
+        db.Integer
+    )
+
+    diastolic = db.Column(
+        db.Integer
+    )
+
+    spo2 = db.Column(
+        db.Integer
+    )
+
+    notes = db.Column(
+        db.Text
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+
+# ---------------- Recovery Plans ----------------
+class RecoveryPlan(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    doctor_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    patient_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    title = db.Column(
+        db.String(200),
+        nullable=False
+    )
+
+    description = db.Column(
+        db.Text
+    )
+
+    start_date = db.Column(
+        db.Date
+    )
+
+    end_date = db.Column(
+        db.Date
+    )
+
+    status = db.Column(
+        db.String(30),
+        default="active"
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+
+class RecoveryPlanActivity(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    plan_id = db.Column(
+        db.Integer,
+        db.ForeignKey("recovery_plan.id"),
+        nullable=False
+    )
+
+    name = db.Column(
+        db.String(200),
+        nullable=False
+    )
+
+    description = db.Column(
+        db.Text
+    )
+
+    frequency = db.Column(
+        db.String(50),
+        default="Daily"
+    )
+
+    duration_min = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    status = db.Column(
+        db.String(30),
+        default="pending"
+    )
+
+    due_date = db.Column(
+        db.Date
+    )
+
+
+class RecoveryPlanGoal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    plan_id = db.Column(
+        db.Integer,
+        db.ForeignKey("recovery_plan.id"),
+        nullable=False
+    )
+
+    name = db.Column(
+        db.String(200),
+        nullable=False
+    )
+
+    target_value = db.Column(
+        db.Float,
+        default=0
+    )
+
+    instruction = db.Column(
+        db.Text
+    )
+
+    achieved = db.Column(
+        db.Boolean,
+        default=False
+    )
+
+
+# ---------------- Health Score Snapshots ----------------
+class HealthScoreSnapshot(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    snapshot_date = db.Column(
+        db.Date,
+        nullable=False
+    )
+
+    score = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    components = db.Column(
+        db.Text
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+
+# ---------------- Gamification ----------------
+class GamificationState(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False,
+        unique=True
+    )
+
+    points = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    level = db.Column(
+        db.Integer,
+        default=1
+    )
+
+    streak = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    last_streak_date = db.Column(
+        db.Date
+    )
+
+    updated_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+
+class Badge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    name = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    description = db.Column(
+        db.String(300)
+    )
+
+    icon = db.Column(
+        db.String(50),
+        default="🏅"
+    )
+
+    earned_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+
+# ---------------- Phase-2: Recovery Milestones ----------------
+class RecoveryMilestone(db.Model):
+    """
+    Doctor-defined recovery checkpoints for a patient. Status flow:
+    pending -> in_progress -> completed.
+    """
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    patient_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    doctor_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id")
+    )
+
+    title = db.Column(
+        db.String(200),
+        nullable=False
+    )
+
+    description = db.Column(db.Text)
+
+    category = db.Column(db.String(50))
+
+    due_date = db.Column(db.Date)
+
+    # pending / in_progress / completed
+    status = db.Column(
+        db.String(20),
+        default="pending"
+    )
+
+    order_index = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+
+# ---------------- Phase-2: Health Journal ----------------
+class HealthJournal(db.Model):
+    """
+    One daily journal entry per user. Mood + symptoms + free notes.
+    """
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    entry_date = db.Column(
+        db.Date,
+        nullable=False
+    )
+
+    mood = db.Column(db.String(30))
+
+    # 1 (very low) .. 5 (great)
+    mood_score = db.Column(db.Integer)
+
+    sleep_hours = db.Column(db.Float)
+
+    # comma separated symptom names (also free text allowed)
+    symptoms = db.Column(db.Text)
+
+    notes = db.Column(db.Text)
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+
+# ---------------- Phase-2: Medication Interaction Rules ----------------
+class MedicineInteractionRule(db.Model):
+    """
+    Static medicine-pair interaction rules used by the fully
+    independent Medication Interaction Checker module.
+    """
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    medicine_a = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    medicine_b = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    # mild / moderate / severe
+    severity = db.Column(
+        db.String(20),
+        default="moderate"
+    )
+
+    warning = db.Column(db.Text)
+
+    recommendation = db.Column(db.Text)
+
+
+# ---------------- Phase-5: Wearable / Smart Monitoring ----------------
+class WearableSimulator(db.Model):
+    """
+    Per-user simulated wearable state. The simulator lazily generates
+    readings on each poll (no background threads, no hardware) while
+    `running` is True.
+    """
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False,
+        unique=True
+    )
+
+    running = db.Column(
+        db.Boolean,
+        default=True
+    )
+
+    interval_seconds = db.Column(
+        db.Integer,
+        default=3
+    )
+
+    # Cumulative daily step counter (resets when the date rolls over)
+    last_steps = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    step_date = db.Column(db.Date)
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+
+class WearableReading(db.Model):
+    """
+    One synthetic vital snapshot from the simulated device.
+    """
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("user.id"),
+        nullable=False
+    )
+
+    device = db.Column(
+        db.String(100),
+        default="HealTrack Band"
+    )
+
+    heart_rate = db.Column(db.Float)
+
+    spo2 = db.Column(db.Float)
+
+    # Cumulative steps for the current day
+    steps = db.Column(db.Integer)
+
+    sleep_hours = db.Column(db.Float)
+
+    sleep_quality = db.Column(db.String(30))
+
+    activity_level = db.Column(db.String(30))
+
+    calories = db.Column(db.Integer)
+
+    recorded_at = db.Column(
         db.DateTime,
         server_default=db.func.now()
     )

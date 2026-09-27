@@ -1,0 +1,634 @@
+/* =========================================================
+   Phase-2 — Advanced Recovery Monitoring
+   Shared styles for Recovery Milestones, Health Journal and
+   Medication Interaction Checker. Uses the same card idiom as
+   the Phase-1 panels so the dashboard stays consistent.
+   ========================================================= */
+
+.p2-card {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  padding: 18px 20px 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.dark-mode .p2-card {
+  background: var(--dark-card-bg, #1f2430);
+  border-color: #33394a;
+}
+
+.p2-card-head {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.p2-card-head > span {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.p2-card-head h3 {
+  margin: 0 0 2px;
+  font-size: 17px;
+}
+
+.p2-card-head p {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.dark-mode .p2-card-head p {
+  color: #9aa3b2;
+}
+
+.p2-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 10px 0 14px;
+}
+
+.p2-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.p2-form label,
+.p2-form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.dark-mode .p2-form label,
+.dark-mode .p2-form-grid label {
+  color: #c3cadd;
+}
+
+.p2-form input,
+.p2-form select,
+.p2-form textarea,
+.p2-form-grid input,
+.p2-form-grid select,
+.p2-form-grid textarea {
+  padding: 9px 11px;
+  border: 1px solid #d7dce5;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+  color: #111827;
+}
+
+.dark-mode .p2-form input,
+.dark-mode .p2-form select,
+.dark-mode .p2-form textarea,
+.dark-mode .p2-form-grid input,
+.dark-mode .p2-form-grid select,
+.dark-mode .p2-form-grid textarea {
+  background: #12151d;
+  border-color: #33394a;
+  color: #e6e9f0;
+}
+
+.p2-form input:focus,
+.p2-form select:focus,
+.p2-form textarea:focus {
+  outline: none;
+  border-color: #4f8ef7;
+  box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.15);
+}
+
+.p2-error {
+  color: #c0392b;
+  background: #fdecea;
+  border: 1px solid #f5c6c0;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.p2-success {
+  color: #1e7e34;
+  background: #e9f9ee;
+  border: 1px solid #bfe6c9;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.p2-empty {
+  color: #8a93a4;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* ---------- milestone timeline ---------- */
+
+.p2-timeline {
+  position: relative;
+  margin: 6px 0 4px;
+  padding-left: 6px;
+}
+
+.p2-timeline-item {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  padding: 0 0 20px 26px;
+}
+
+.p2-timeline-item::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 22px;
+  bottom: 0;
+  width: 2px;
+  background: #e2e8f0;
+}
+
+.dark-mode .p2-timeline-item::before {
+  background: #2c3140;
+}
+
+.p2-timeline-item:last-child::before {
+  display: none;
+}
+
+.p2-timeline-dot {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  border: 3px solid #f1f5f9;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.06);
+}
+
+.dark-mode .p2-timeline-dot {
+  border-color: #1f2430;
+}
+
+.p2-timeline-item.status-in_progress .p2-timeline-dot {
+  background: #3a6ff0;
+}
+
+.p2-timeline-item.status-completed .p2-timeline-dot {
+  background: #22a06b;
+}
+
+.p2-timeline-item.status-pending .p2-timeline-dot {
+  background: #cbd5e1;
+}
+
+.p2-timeline-body {
+  flex: 1;
+  background: #f8fafc;
+  border: 1px solid #eef1f5;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.dark-mode .p2-timeline-body {
+  background: #1a1f2b;
+  border-color: #2c3140;
+}
+
+.p2-timeline-body h4 {
+  margin: 0 0 3px;
+  font-size: 15px;
+}
+
+.p2-timeline-body p {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: #5b6572;
+}
+
+.dark-mode .p2-timeline-body p {
+  color: #a6b0c3;
+}
+
+.p2-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: #8a93a4;
+  margin-top: 6px;
+}
+
+.p2-badge {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.p2-badge.pending {
+  background: #eef1f5;
+  color: #6b7280;
+}
+
+.p2-badge.in_progress {
+  background: #e7efff;
+  color: #2b6de0;
+}
+
+.p2-badge.completed {
+  background: #e5f7ef;
+  color: #1e7e34;
+}
+
+.dark-mode .p2-badge.pending {
+  background: #2c3140;
+  color: #a6b0c3;
+}
+
+.dark-mode .p2-badge.in_progress {
+  background: #1c2b4e;
+  color: #7dabf7;
+}
+
+.dark-mode .p2-badge.completed {
+  background: #16352b;
+  color: #4cc38a;
+}
+
+.p2-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.p2-actions button {
+  border: 1px solid #dfe5ef;
+  background: #fff;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.dark-mode .p2-actions button {
+  background: #1c2230;
+  border-color: #33394a;
+  color: #e6e9f0;
+}
+
+.p2-actions button:hover {
+  border-color: #4f8ef7;
+  color: #2b6de0;
+}
+
+/* ---------- summary strip ---------- */
+
+.p2-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.p2-summary-chip {
+  flex: 1 1 110px;
+  text-align: center;
+  background: #f8fafc;
+  border: 1px solid #eef1f5;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.dark-mode .p2-summary-chip {
+  background: #1a1f2b;
+  border-color: #2c3140;
+}
+
+.p2-summary-chip strong {
+  display: block;
+  font-size: 22px;
+  line-height: 1.1;
+  color: #2b6de0;
+}
+
+.dark-mode .p2-summary-chip strong {
+  color: #7dabf7;
+}
+
+.p2-summary-chip span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.dark-mode .p2-summary-chip span {
+  color: #9aa3b2;
+}
+
+/* ---------- journal ---------- */
+
+.p2-mood-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.p2-mood-btn {
+  cursor: pointer;
+  border: 2px solid #e2e8f0;
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  text-align: center;
+  min-width: 64px;
+}
+
+.dark-mode .p2-mood-btn {
+  background: #12151d;
+  border-color: #33394a;
+  color: #e6e9f0;
+}
+
+.p2-mood-btn .p2-mood-emoji {
+  font-size: 22px;
+  display: block;
+}
+
+.p2-mood-btn.selected {
+  border-color: #4f8ef7;
+  background: #eef4ff;
+}
+
+.dark-mode .p2-mood-btn.selected {
+  background: #1c2b4e;
+}
+
+.p2-symptom-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.p2-symptom-chip {
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.dark-mode .p2-symptom-chip {
+  background: #12151d;
+  border-color: #33394a;
+  color: #e6e9f0;
+}
+
+.p2-symptom-chip.selected {
+  background: #eef4ff;
+  border-color: #4f8ef7;
+  color: #2b6de0;
+}
+
+.dark-mode .p2-symptom-chip.selected {
+  background: #1c2b4e;
+  color: #7dabf7;
+}
+
+.p2-journal-list {
+  margin-top: 6px;
+}
+
+.p2-journal-entry {
+  background: #f8fafc;
+  border: 1px solid #eef1f5;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.dark-mode .p2-journal-entry {
+  background: #1a1f2b;
+  border-color: #2c3140;
+}
+
+.p2-journal-entry-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.p2-journal-entry-head strong {
+  font-size: 14px;
+}
+
+.p2-journal-entry-head span {
+  font-size: 12px;
+  color: #8a93a4;
+}
+
+.p2-tag {
+  display: inline-block;
+  background: #eef4ff;
+  color: #2b6de0;
+  border-radius: 12px;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  margin: 3px 4px 0 0;
+}
+
+.dark-mode .p2-tag {
+  background: #1c2b4e;
+  color: #7dabf7;
+}
+
+/* ---------- interaction checker ---------- */
+
+.p2-med-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.p2-med-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #dfe5ef;
+  background: #f7f9fc;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.dark-mode .p2-med-chip {
+  background: #1c2230;
+  border-color: #33394a;
+  color: #e6e9f0;
+}
+
+.p2-med-chip.selected {
+  background: #eef4ff;
+  border-color: #4f8ef7;
+  color: #2b6de0;
+}
+
+.dark-mode .p2-med-chip.selected {
+  background: #1c2b4e;
+  color: #7dabf7;
+}
+
+.p2-med-chip button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  color: inherit;
+  padding: 0;
+}
+
+.p2-findings {
+  margin-top: 8px;
+}
+
+.p2-finding {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  border: 1px solid #f2e6c2;
+  background: #fff9e8;
+}
+
+.p2-finding.severe {
+  border-color: #f5c6c0;
+  background: #fdecea;
+}
+
+.p2-finding.moderate {
+  border-color: #f6e3b4;
+  background: #fff8e6;
+}
+
+.p2-finding.mild {
+  border-color: #d8e5f8;
+  background: #eef4ff;
+}
+
+.dark-mode .p2-finding {
+  border-color: #403a4d;
+  background: #232a38;
+}
+
+.p2-finding-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.p2-finding-body strong {
+  font-size: 14px;
+}
+
+.p2-finding-body p {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.dark-mode .p2-finding-body p {
+  color: #a6b0c3;
+}
+
+.p2-finding-severity {
+  display: inline-block;
+  border-radius: 12px;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+  background: #e7efff;
+  color: #2b6de0;
+  margin-left: 8px;
+}
+
+.p2-severity-severe {
+  background: #fbe3e1;
+  color: #c0392b;
+}
+
+.p2-severity-moderate {
+  background: #f8ecd0;
+  color: #9a6d00;
+}
+
+.p2-severity-mild {
+  background: #eef4ff;
+  color: #2b6de0;
+}
+
+.p2-safe-box {
+  background: #e9f9ee;
+  border: 1px solid #bfe6c9;
+  color: #1e7e34;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.dark-mode .p2-safe-box {
+  background: #16352b;
+  border-color: #2a6144;
+  color: #4cc38a;
+}
+
+/* ---------- patient selector (doctor view) ---------- */
+
+.p2-selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.p2-selector select {
+  flex: 1 1 220px;
+  padding: 9px 11px;
+  border: 1px solid #d7dce5;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+  color: #111827;
+}
+
+.dark-mode .p2-selector select {
+  background: #12151d;
+  border-color: #33394a;
+  color: #e6e9f0;
+}

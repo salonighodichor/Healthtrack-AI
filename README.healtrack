@@ -1,0 +1,1436 @@
+# HealTrack AI
+
+A role-based healthcare management and recovery-support platform connecting patients, doctors, and caretakers through personalized recovery planning, real-time communication, live audio messaging, and AI-assisted exercise posture analysis.
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Setup and Installation](#setup-and-installation)
+- [Database Models](#database-models)
+- [API Endpoints](#api-endpoints)
+- [Real-Time Chat and Audio Messaging](#real-time-chat-and-audio-messaging)
+- [User Roles and Workflows](#user-roles-and-workflows)
+- [Implementation Phases](#implementation-phases)
+- [Seed Data](#seed-data)
+- [Running the Application](#running-the-application)
+
+---
+
+## Overview
+
+HealTrack AI is a post-discharge healthcare coordination platform. Doctors create personalized recovery plans for patients. Patients track daily tasks, medicines, and vitals. Caretakers monitor progress. After an appointment is confirmed, patient and doctor can communicate in real-time through text chat and voice messages directly within the platform. The platform also includes real-time exercise posture analysis using MediaPipe Pose detection running entirely in the browser.
+
+The core workflow is:
+
+```
+Patient searches for doctor
+  -> Books appointment
+    -> Doctor confirms appointment
+      -> Patient and doctor communicate via chat
+        -> Doctor creates recovery plan
+          -> System generates daily tasks
+            -> Patient completes tasks
+              -> Progress updates and alerts trigger
+                -> Doctor monitors and adjusts plan
+```
+
+---
+
+## Tech Stack
+
+| Layer              | Technology                                       |
+|--------------------|--------------------------------------------------|
+| Frontend           | React 19, React Router 7                         |
+| Build Tool         | Vite 8                                           |
+| Styling            | CSS (custom, component-scoped)                   |
+| Backend            | Python Flask                                     |
+| Real-Time Server   | Flask-SocketIO                                   |
+| ORM                | SQLAlchemy                                       |
+| Database           | SQLite                                           |
+| Authentication     | JWT (flask-jwt-extended), bcrypt                 |
+| Pose Detection     | MediaPipe Pose (WebAssembly, browser-side)       |
+| Camera Integration | @mediapipe/camera_utils                          |
+| Visualization      | @mediapipe/drawing_utils                         |
+| Audio Recording    | MediaRecorder API (browser-native)               |
+| Audio Playback     | HTML5 Audio API (browser-native)                 |
+| Real-Time Transport| Socket.IO (WebSocket with fallback)              |
+| OCR (optional)     | pytesseract, Pillow, pdf2image                   |
+| ML (optional)      | scikit-learn, pandas, numpy                      |
+
+---
+
+## Features
+
+### Core Features
+
+- **Three user roles**: Patient, Doctor, Caretaker with dedicated dashboards
+- **JWT authentication** with role-based access control and bcrypt password hashing
+- **Doctor search and filtering** by name, specialization, and hospital
+- **Appointment booking** with confirmation workflow
+- **Recovery plan creation** by doctor with automatic daily task generation
+- **Medicine tracking** with dosage, frequency, timing, and taken/pending/missed status
+- **Health vitals tracking** with normal/abnormal detection and auto-alerts
+- **Daily patient check-in** with feeling, pain, activity, sleep, temperature, BP, SpO2, symptoms
+- **Recovery progress** with overall score, weekly trends, and streaks
+- **Alert system** auto-generated for abnormal vitals, missed medicines, pending tasks
+- **File upload** for lab reports, prescriptions, discharge summaries (PDF, JPG, PNG)
+- **AI chat assistant** with rule-based contextual responses
+
+### Real-Time Communication
+
+- **Socket.IO real-time messaging** between patient and doctor after appointment confirmation
+- **Text chat** with instant message delivery and read receipts
+- **Voice messages** using browser MicroRecorder API for audio recording
+- **Audio playback** with play/pause controls and duration display in chat
+- **Message history** persisted in database, loadable on page refresh
+- **Online status** indicator showing when doctor/patient is connected
+- **Unread message count** badge on dashboard
+- **Chat accessible from** patient appointments page and doctor patient detail page
+
+### Advanced Features
+
+- **Real-time exercise posture analysis** using MediaPipe Pose in the browser
+- **33 body landmark detection** with angle calculation for joint positions
+- **Form scoring** comparing detected angles against correct form thresholds
+- **Rep counting** with state machine detection (top/bottom positions)
+- **Exercise history and trend tracking** visible to doctor
+- **Supported exercises** — squats, push-ups, planks, bicep curls, standing posture
+
+### Optional Features
+
+- **Gamification** — points, badges, and streaks for patient engagement
+- **Doctor-patient messaging** with real-time notifications
+- **Health score trends** with interactive line charts
+- **Medication interaction checker** for basic drug conflict warnings
+- **Recovery milestones** with visual timeline
+- **Health journal** for daily notes and symptom tracking
+- **Emergency SOS button** for critical alerts
+- **Lab report OCR** for extracting values from uploaded reports
+- **Wearable device simulation** for step count and sleep tracking
+
+---
+
+## Project Structure
+
+```
+healtrack-ai/
+|
+|-- backend/
+|   |-- app.py                    # Flask application, all API routes
+|   |-- socket_handler.py         # Socket.IO event handlers
+|   |-- models.py                 # SQLAlchemy database models
+|   |-- seed.py                   # Seed data for demo
+|   |-- healtrack.db              # SQLite database (auto-created)
+|   |-- uploads/
+|   |   |-- recovery_photos/      # Recovery photo uploads
+|   |   |-- health_records/       # Lab report and document uploads
+|   |   |-- voice_messages/       # Audio message file storage
+|   |-- venv/                     # Python virtual environment
+|
+|-- src/
+|   |-- main.jsx                  # React entry point
+|   |-- App.jsx                   # Route definitions
+|   |-- index.css                 # Global styles
+|   |-- App.css                   # App-level styles
+|   |-- api.js                    # API_BASE constant and authFetch helper
+|   |-- socket.js                 # Socket.IO client connection
+|   |
+|   |-- components/               # Shared reusable components
+|   |   |-- Layout.jsx            # Sidebar + header layout wrapper
+|   |   |-- PageHeader.jsx        # Reusable page header
+|   |   |-- Modal.jsx             # Reusable modal overlay
+|   |   |-- LoadingSpinner.jsx    # Loading state component
+|   |   |-- StatCard.jsx          # Dashboard statistics card
+|   |   |-- AlertBadge.jsx        # Notification badge
+|   |   |-- ChatBox.jsx           # Shared chat component (text + audio)
+|   |   |-- AudioRecorder.jsx     # Microphone recording component
+|   |   |-- AudioMessage.jsx      # Audio playback bubble component
+|   |
+|   |-- pages/
+|   |   |-- home/                 # Landing page
+|   |   |   |-- Home.jsx
+|   |   |   |-- Header.jsx
+|   |   |   |-- Hero.jsx
+|   |   |   |-- Services.jsx
+|   |   |   |-- Timeline.jsx
+|   |   |   |-- Modules.jsx
+|   |   |   |-- AIModule.jsx
+|   |   |   |-- FooterCTA.jsx
+|   |   |   |-- Footer.jsx
+|   |   |   |-- home.css
+|   |   |
+|   |   |-- auth/                 # Authentication pages
+|   |   |   |-- Login.jsx
+|   |   |   |-- CreateAccount.jsx
+|   |   |   |-- PatientRegister.jsx
+|   |   |   |-- DoctorRegister.jsx
+|   |   |   |-- CaretakerRegister.jsx
+|   |   |   |-- ForgotPage.jsx
+|   |   |   |-- auth.css
+|   |   |
+|   |   |-- patient/              # Patient dashboard
+|   |   |   |-- Dashboard.jsx         # Main layout with sidebar
+|   |   |   |-- DashboardHome.jsx     # Overview stats
+|   |   |   |-- HealthOverview.jsx    # Latest vitals
+|   |   |   |-- Recovery.jsx          # Recovery plan + tasks
+|   |   |   |-- Medicines.jsx         # Medicine schedule
+|   |   |   |-- Appointments.jsx      # Appointments + open chat
+|   |   |   |-- FindDoctor.jsx        # Search doctors
+|   |   |   |-- BookAppointment.jsx   # Booking form
+|   |   |   |-- HealthRecords.jsx     # Documents upload/download
+|   |   |   |-- AIAnalysis.jsx        # AI health score
+|   |   |   |-- AIChat.jsx            # AI chat assistant
+|   |   |   |-- PatientChat.jsx       # Real-time chat with doctor
+|   |   |   |-- Alerts.jsx            # Notifications
+|   |   |   |-- DailyCheckIn.jsx      # Daily wellness check-in
+|   |   |   |-- ExerciseSession.jsx   # Pose camera + exercise
+|   |   |   |-- PoseCamera.jsx        # MediaPipe webcam
+|   |   |   |-- ExerciseHistory.jsx   # Past sessions
+|   |   |   |-- Settings.jsx          # Settings
+|   |   |   |-- patient.css
+|   |   |
+|   |   |-- doctor/               # Doctor dashboard
+|   |   |   |-- Dashboard.jsx         # Overview stats
+|   |   |   |-- PatientList.jsx       # All patients
+|   |   |   |-- PatientDetail.jsx     # Patient full view
+|   |   |   |-- RecoveryPlan.jsx      # Create/edit plan
+|   |   |   |-- Appointments.jsx      # Manage appointments
+|   |   |   |-- HealthRecords.jsx     # View patient records
+|   |   |   |-- PatientExercise.jsx   # Patient exercise data
+|   |   |   |-- AIAnalysis.jsx        # Patient AI insights
+|   |   |   |-- DoctorChat.jsx        # Real-time chat with patient
+|   |   |   |-- Alerts.jsx            # Notifications
+|   |   |   |-- Profile.jsx           # Edit profile
+|   |   |   |-- Settings.jsx          # Settings
+|   |   |   |-- doctor.css
+|   |   |
+|   |   |-- caretaker/            # Caretaker dashboard
+|   |   |   |-- Dashboard.jsx
+|   |   |   |-- Vitals.jsx
+|   |   |   |-- Medicines.jsx
+|   |   |   |-- Tasks.jsx
+|   |   |   |-- Appointments.jsx
+|   |   |   |-- Alerts.jsx
+|   |   |   |-- caretaker.css
+|   |   |
+|   |   |-- settings/             # Shared settings pages
+|   |       |-- SettingsPage.jsx
+|   |       |-- SecurityPage.jsx
+|   |       |-- NotificationsPage.jsx
+|   |       |-- HealthPreferencesPage.jsx
+|   |       |-- AIPreferencesPage.jsx
+|   |       |-- ConnectedDevicesPage.jsx
+|   |       |-- LanguagePage.jsx
+|   |       |-- HelpSupportPage.jsx
+|   |
+|   |-- utils/
+|       |-- doctorMetrics.js
+|
+|-- public/
+|   |-- favicon.svg
+|
+|-- index.html
+|-- package.json
+|-- vite.config.js
+|-- eslint.config.js
+```
+
+---
+
+## Setup and Installation
+
+### Prerequisites
+
+- Python 3.9 or higher
+- Node.js 18 or higher
+- npm
+
+### Backend Setup
+
+```bash
+# Navigate to project root
+cd healtrack-ai
+
+# Create Python virtual environment
+cd backend
+python -m venv venv
+
+# Activate virtual environment
+# Windows:
+venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
+
+# Install Python dependencies
+pip install flask flask-cors flask-sqlalchemy flask-jwt-extended bcrypt flask-socketio
+
+# Optional: for lab report OCR
+pip install pytesseract pdf2image Pillow
+
+# Optional: for ML predictions
+pip install scikit-learn pandas numpy
+
+cd ..
+```
+
+### Frontend Setup
+
+```bash
+# From project root
+npm install
+
+# Install MediaPipe packages for pose analysis
+npm install @mediapipe/pose @mediapipe/camera_utils @mediapipe/drawing_utils
+
+# Install Socket.IO client for real-time chat
+npm install socket.io-client
+```
+
+### Database
+
+The SQLite database is created automatically on first run. Seed data is inserted automatically by the `ensure_seed_data()` function in `app.py`.
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the project root:
+
+```
+VITE_API_BASE=http://127.0.0.1:5000
+VITE_SOCKET_URL=http://127.0.0.1:5000
+JWT_SECRET_KEY=your-secret-key-change-in-production
+```
+
+---
+
+## Database Models
+
+### User
+
+| Field                  | Type         | Description                           |
+|------------------------|--------------|---------------------------------------|
+| id                     | Integer (PK) | Auto-incremented ID                   |
+| name                   | String(100)  | Full name                             |
+| email                  | String(100)  | Unique email address                  |
+| phone                  | String(15)   | Phone number                          |
+| password               | String(200)  | bcrypt hashed password                |
+| role                   | String(20)   | "patient", "doctor", or "caretaker"   |
+| dob                    | String(20)   | Date of birth (patient)               |
+| age                    | String(5)    | Age (patient)                         |
+| gender                 | String(20)   | Gender (patient)                      |
+| recovery_type          | String(50)   | Type of recovery (patient)            |
+| emergency_contact      | String(15)   | Emergency contact number              |
+| height                 | Float        | Height in cm                          |
+| weight                 | Float        | Weight in kg                          |
+| blood_group            | String(10)   | Blood group                           |
+| address                | Text         | Address                               |
+| medical_conditions     | Text         | Known medical conditions              |
+| allergies              | Text         | Known allergies                       |
+| current_medications    | Text         | Current medications                   |
+| previous_surgery       | Text         | Surgical history                      |
+| medical_history        | Text         | General medical history               |
+| medical_registration_no| String(50)   | Doctor registration number            |
+| specialization         | String(50)   | Doctor specialization                 |
+| qualification          | String(100)  | Doctor qualification                  |
+| hospital_clinic        | String(100)  | Doctor hospital or clinic             |
+| experience             | String(20)   | Doctor years of experience            |
+| relationship           | String(30)   | Caretaker relationship to patient     |
+| patient_id             | Integer      | Linked patient ID (caretaker)         |
+
+### HealthRecord
+
+| Field        | Type         | Description                          |
+|--------------|--------------|--------------------------------------|
+| id           | Integer (PK) | Record ID                            |
+| user_id      | Integer (FK) | Patient user ID                      |
+| blood_sugar  | Float        | Blood sugar in mg/dL                 |
+| heart_rate   | Float        | Heart rate in BPM                    |
+| systolic     | Integer      | Systolic BP in mmHg                  |
+| diastolic    | Integer      | Diastolic BP in mmHg                 |
+| hemoglobin   | Float        | Hemoglobin in g/dL                   |
+| recorded_at  | DateTime     | Timestamp of recording               |
+
+### RecoveryPlan
+
+| Field                   | Type         | Description                         |
+|-------------------------|--------------|-------------------------------------|
+| id                      | Integer (PK) | Plan ID                             |
+| patient_id              | Integer (FK) | Patient user ID                     |
+| doctor_id               | Integer (FK) | Doctor user ID                      |
+| recovery_goal           | Text         | Goal description                    |
+| start_date              | Date         | Plan start date                     |
+| duration_days           | Integer      | Plan duration in days               |
+| follow_up_date          | Date         | Follow-up appointment date          |
+| medicine_ids            | Text         | JSON list of medicine IDs           |
+| medicine_instructions   | Text         | Instructions for medicines          |
+| activities              | Text         | JSON list of activities             |
+| required_measurements   | Text         | JSON list of measurements           |
+| symptoms_to_monitor     | Text         | JSON list of symptoms               |
+| follow_up_instructions  | Text         | Follow-up instructions              |
+| active                  | Boolean      | Whether plan is currently active    |
+| created_at              | DateTime     | Creation timestamp                  |
+| updated_at              | DateTime     | Last update timestamp               |
+
+### RecoveryTask
+
+| Field    | Type         | Description                         |
+|----------|--------------|-------------------------------------|
+| id       | Integer (PK) | Task ID                             |
+| user_id  | Integer (FK) | Patient user ID                     |
+| date     | Date         | Task date                           |
+| name     | String(200)  | Task description                    |
+| tag      | String(50)   | Category tag                        |
+| status   | String(20)   | "pending", "done", or "missed"      |
+| meta     | String(200)  | Metadata (plan reference marker)    |
+
+### Medicine
+
+| Field         | Type         | Description                         |
+|---------------|--------------|-------------------------------------|
+| id            | Integer (PK) | Medicine ID                         |
+| user_id       | Integer (FK) | Patient user ID                     |
+| doctor_id     | Integer (FK) | Prescribing doctor ID               |
+| name          | String(150)  | Medicine name                       |
+| dosage        | String(50)   | Dosage (e.g., "75mg")               |
+| frequency     | String(50)   | Frequency (e.g., "Once daily")      |
+| timing        | String(50)   | Timing (e.g., "morning")            |
+| instruction   | String(200)  | Usage instructions                  |
+| status        | String(20)   | "pending", "taken", or "missed"     |
+| date          | Date         | Scheduled date                      |
+| duration_days | Integer      | Duration in days                    |
+| start_date    | Date         | Start date                          |
+| end_date      | Date         | End date                            |
+
+### Appointment
+
+| Field            | Type         | Description                         |
+|------------------|--------------|-------------------------------------|
+| id               | Integer (PK) | Appointment ID                      |
+| user_id          | Integer (FK) | Patient user ID                     |
+| doctor_id        | Integer (FK) | Doctor user ID                      |
+| title            | String(200)  | Appointment title                   |
+| subtitle         | String(200)  | Subtitle or department              |
+| date             | Date         | Appointment date                    |
+| time             | String(50)   | Appointment time                    |
+| status           | String(50)   | "Pending", "Confirmed", "Cancelled" |
+| doctor_name      | String(200)  | Doctor name                         |
+| location         | String(200)  | Appointment location                |
+| appointment_type | String(50)   | Type of appointment                 |
+| reason           | Text         | Reason for visit                    |
+| duration_minutes | Integer      | Duration in minutes                 |
+
+### ChatMessage (New)
+
+| Field          | Type         | Description                         |
+|----------------|--------------|-------------------------------------|
+| id             | Integer (PK) | Message ID                          |
+| sender_id      | Integer (FK) | Sender user ID                      |
+| receiver_id    | Integer (FK) | Receiver user ID                    |
+| appointment_id | Integer (FK) | Linked appointment ID               |
+| message_type   | String(20)   | "text" or "audio"                   |
+| content        | Text         | Text message content                |
+| audio_path     | String(300)  | Path to audio file (for voice msg)  |
+| audio_duration | Float        | Audio duration in seconds           |
+| is_read        | Boolean      | Whether message has been read       |
+| created_at     | DateTime     | Message timestamp                   |
+
+### VoiceMessage (New)
+
+| Field        | Type         | Description                         |
+|--------------|--------------|-------------------------------------|
+| id           | Integer (PK) | Voice message ID                    |
+| message_id   | Integer (FK) | Linked ChatMessage ID               |
+| file_path    | String(300)  | Path to audio file                  |
+| file_size    | Integer      | File size in bytes                  |
+| duration     | Float        | Duration in seconds                 |
+| mime_type    | String(50)   | Audio format (audio/webm, audio/mp4)|
+| uploaded_at  | DateTime     | Upload timestamp                    |
+
+### DailyCheckIn
+
+| Field         | Type         | Description                         |
+|---------------|--------------|-------------------------------------|
+| id            | Integer (PK) | Check-in ID                         |
+| patient_id    | Integer (FK) | Patient user ID                     |
+| date          | Date         | Check-in date (unique per patient)  |
+| feeling       | String(30)   | "good", "okay", or "not_well"       |
+| pain_level    | Integer      | Pain level 0-10                     |
+| activity      | String(30)   | "low", "moderate", or "good"        |
+| sleep_hours   | Float        | Hours of sleep                      |
+| temperature   | Float        | Body temperature                    |
+| blood_pressure| String(20)   | Blood pressure reading              |
+| spo2          | Integer      | Blood oxygen saturation             |
+| symptoms      | Text         | Reported symptoms                   |
+
+### Alert
+
+| Field      | Type         | Description                         |
+|------------|--------------|-------------------------------------|
+| id         | Integer (PK) | Alert ID                            |
+| user_id    | Integer (FK) | User ID                             |
+| type       | String(50)   | "warning", "info", or "success"     |
+| title      | String(200)  | Alert title                         |
+| message    | String(300)  | Alert message                       |
+| is_read    | Boolean      | Whether alert has been read         |
+| created_at | DateTime     | Creation timestamp                  |
+
+### ExerciseSession
+
+| Field          | Type         | Description                         |
+|----------------|--------------|-------------------------------------|
+| id             | Integer (PK) | Session ID                          |
+| patient_id     | Integer (FK) | Patient user ID                     |
+| exercise_type  | String(50)   | Exercise name                       |
+| session_date   | DateTime     | Session timestamp                   |
+| total_reps     | Integer      | Total repetitions performed         |
+| correct_reps   | Integer      | Reps with good form                 |
+| form_score     | Float        | Average form score 0-100            |
+| analysis_result| Text         | JSON analysis details               |
+
+### ExerciseFrame
+
+| Field       | Type         | Description                         |
+|-------------|--------------|-------------------------------------|
+| id          | Integer (PK) | Frame ID                            |
+| session_id  | Integer (FK) | Exercise session ID                 |
+| rep_number  | Integer      | Repetition number                   |
+| angles      | Text         | JSON joint angles                   |
+| form_score  | Float        | Form score for this rep             |
+| issues      | Text         | JSON list of form issues            |
+| recorded_at | DateTime     | Recording timestamp                 |
+
+### Other Models
+
+- **UserSettings** — user preferences
+- **DailyActivity** — daily activity tracking
+- **RecoveryPhoto** — recovery photo uploads
+- **HealthRecordFile** — uploaded health record files
+- **Document** — document metadata
+- **DoctorPatient** — doctor-patient relationship
+
+---
+
+## API Endpoints
+
+### Authentication
+
+| Method | Endpoint               | Description                    |
+|--------|------------------------|--------------------------------|
+| POST   | /api/register/patient  | Register a new patient         |
+| POST   | /api/register/doctor   | Register a new doctor          |
+| POST   | /api/register/caretaker| Register a new caretaker       |
+| POST   | /api/login             | Login and receive JWT token    |
+
+### Patient
+
+| Method | Endpoint                                  | Description                    |
+|--------|-------------------------------------------|--------------------------------|
+| GET    | /api/patient/:id                          | Get patient profile            |
+| PUT    | /api/patient/:id                          | Update patient details         |
+| DELETE | /api/patient/:id                          | Delete patient account         |
+| GET    | /api/patient/:id/daily-checkin            | Get today's check-in           |
+| POST   | /api/patient/:id/daily-checkin            | Save daily check-in            |
+| GET    | /api/patient/:id/settings                 | Get patient settings           |
+| PUT    | /api/patient/:id/settings                 | Update patient settings        |
+| PUT    | /api/patient/:id/password                 | Change password                |
+
+### Health Records
+
+| Method | Endpoint                                  | Description                    |
+|--------|-------------------------------------------|--------------------------------|
+| POST   | /api/health-record                        | Add vital signs record         |
+| GET    | /api/health-record/:userId                | Get all health records         |
+| GET    | /api/health-record/:userId/latest         | Get latest record with status  |
+| GET    | /api/health-record/:userId/trends         | Get vital sign trends          |
+| GET    | /api/health-records/:userId/files         | List uploaded files            |
+| POST   | /api/health-records/files/:userId/:type   | Upload health record file      |
+| GET    | /api/health-records/files/:fileId/download| Download a file                |
+| DELETE | /api/health-records/files/:fileId         | Delete a file                  |
+
+### Recovery
+
+| Method | Endpoint                                                      | Description                    |
+|--------|---------------------------------------------------------------|--------------------------------|
+| GET    | /api/recovery-tasks/:userId                                   | Get all recovery tasks         |
+| POST   | /api/recovery-tasks                                           | Create a recovery task         |
+| PUT    | /api/recovery-tasks/:taskId                                   | Update a recovery task         |
+| DELETE | /api/recovery-tasks/:taskId                                   | Delete a recovery task         |
+| GET    | /api/recovery-progress/:userId                                | Get recovery progress stats    |
+| GET    | /api/patient/:id/recovery-plan                                | Get patient's active plan      |
+| POST   | /api/doctor/:doctorId/patients/:patientId/recovery-plan       | Create recovery plan           |
+| GET    | /api/doctor/:doctorId/patients/:patientId/recovery-plan       | Get recovery plan              |
+| PUT    | /api/doctor/:doctorId/patients/:patientId/recovery-plan       | Update recovery plan           |
+| PUT    | /api/doctor/:doctorId/patients/:patientId/recovery-plan/status| Toggle plan active/inactive    |
+| GET    | /api/dashboard-progress/:userId                               | Get dashboard progress stats   |
+
+### Medicines
+
+| Method | Endpoint                    | Description                    |
+|--------|-----------------------------|--------------------------------|
+| GET    | /api/medicines/:userId      | Get medicines for a patient    |
+| POST   | /api/medicines              | Add a new medicine             |
+| PUT    | /api/medicines/:medId       | Update medicine                |
+| PUT    | /api/medicines/:medId/status| Update medicine status         |
+| PUT    | /api/medicines/:medId/taken | Mark medicine as taken         |
+| GET    | /api/medicines/schedule/:id | Get today's medicine schedule  |
+
+### Appointments
+
+| Method | Endpoint                        | Description                    |
+|--------|---------------------------------|--------------------------------|
+| GET    | /api/appointments/:userId       | Get patient appointments       |
+| POST   | /api/appointments               | Create an appointment          |
+| PUT    | /api/appointments/:apptId       | Update an appointment          |
+| PUT    | /api/appointments/:apptId/status| Update appointment status      |
+| DELETE | /api/appointments/:apptId       | Cancel an appointment          |
+| GET    | /api/appointments/doctor/:docId | Get doctor's appointments      |
+
+### Doctor
+
+| Method | Endpoint                                          | Description                    |
+|--------|---------------------------------------------------|--------------------------------|
+| GET    | /api/doctors                                      | List all doctors (with search) |
+| GET    | /api/doctor/profile/:id                           | Get doctor profile             |
+| PUT    | /api/doctor/profile/:id                           | Update doctor profile          |
+| GET    | /api/doctor/:id/summary                           | Dashboard summary data         |
+| GET    | /api/doctor/:id/patients                          | List doctor's patients         |
+| GET    | /api/doctor/:id/patient-vitals/:patientId         | View patient vitals            |
+| GET    | /api/doctor/:id/patients/:patientId/overview      | Patient detail overview        |
+| GET    | /api/doctor/:id/alerts                            | Doctor alerts                  |
+
+### Caretaker
+
+| Method | Endpoint                          | Description                    |
+|--------|-----------------------------------|--------------------------------|
+| GET    | /api/caretaker/:id/patient        | Get linked patient and doctor  |
+
+### Alerts
+
+| Method | Endpoint                    | Description                    |
+|--------|-----------------------------|--------------------------------|
+| GET    | /api/alerts/:userId         | Get all alerts                 |
+| POST   | /api/alerts                 | Create an alert                |
+| PUT    | /api/alerts/:alertId/read   | Mark alert as read             |
+| DELETE | /api/alerts/:alertId        | Delete an alert                |
+
+### Chat and Messaging
+
+| Method | Endpoint                              | Description                    |
+|--------|---------------------------------------|--------------------------------|
+| GET    | /api/chat/history/:user1/:user2      | Get chat history between users |
+| GET    | /api/chat/contacts/:userId            | Get list of chat contacts      |
+| PUT    | /api/chat/read/:messageId             | Mark message as read           |
+| GET    | /api/chat/unread/:userId              | Get unread message count       |
+| POST   | /api/chat/voice-upload                | Upload voice message audio     |
+| GET    | /api/chat/voice/:filename             | Stream audio message file      |
+
+### AI and Chat Assistant
+
+| Method | Endpoint                    | Description                    |
+|--------|-----------------------------|--------------------------------|
+| GET    | /api/ai-analysis/:userId    | Get AI health analysis         |
+| POST   | /api/chat/ai                | Chat with AI assistant         |
+
+### Pose Analysis
+
+| Method | Endpoint                     | Description                    |
+|--------|------------------------------|--------------------------------|
+| POST   | /api/pose/analyze            | Analyze exercise frame         |
+| GET    | /api/pose/sessions/:patientId| Get exercise sessions          |
+| GET    | /api/pose/trends/:patientId  | Get exercise score trends      |
+
+### Daily Activities and Reminders
+
+| Method | Endpoint                          | Description                    |
+|--------|-----------------------------------|--------------------------------|
+| GET    | /api/daily-activities/:userId     | Get today's activities         |
+| POST   | /api/daily-activities             | Create a daily activity        |
+| PUT    | /api/daily-activities/:activityId | Update activity status         |
+| GET    | /api/check-reminders/:userId      | Check pending reminders        |
+
+---
+
+## Real-Time Chat and Audio Messaging
+
+### How It Works
+
+After a patient books an appointment and the doctor confirms it, both parties can communicate in real-time through the platform. The chat is linked to the confirmed appointment.
+
+```
+Patient books appointment
+  -> Doctor confirms
+    -> "Chat with Dr. X" button appears on patient's appointment card
+    -> "Chat with Patient Y" button appears on doctor's appointment list
+    -> Both can send text messages and voice messages
+    -> Messages appear instantly via Socket.IO
+```
+
+### Architecture
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    BROWSER (Patient or Doctor)                │
+│                                                              │
+│  ┌─────────────┐  ┌──────────────┐  ┌──────────────────┐   │
+│  │ ChatBox UI  │  │AudioRecorder │  │  AudioMessage     │   │
+│  │ (text input)│  │(Microphone)  │  │  (playback)       │   │
+│  └──────┬──────┘  └──────┬───────┘  └────────┬─────────┘   │
+│         │                │                     │              │
+│         ▼                ▼                     ▼              │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │              Socket.IO Client                        │    │
+│  │  emit("send_message", {...})                         │    │
+│  │  on("new_message", callback)                         │    │
+│  │  emit("start_recording")                             │    │
+│  │  emit("stop_recording")                              │    │
+│  └──────────────────────────┬──────────────────────────┘    │
+└─────────────────────────────┼────────────────────────────────┘
+                              │
+                    WebSocket connection
+                              │
+                              ▼
+┌──────────────────────────────────────────────────────────────┐
+│              FLASK-SOCKETIO SERVER                           │
+│                                                              │
+│  @socketio.on("send_message")                                │
+│    -> Save to ChatMessage table                               │
+│    -> emit("new_message") to receiver's room                 │
+│                                                              │
+│  @socketio.on("start_recording")                             │
+│    -> Notify sender that recording started                   │
+│                                                              │
+│  @socketio.on("stop_recording")                              │
+│    -> Receive audio blob                                     │
+│    -> Save to uploads/voice_messages/                        │
+│    -> Create VoiceMessage record                             │
+│    -> emit("new_message") with audio_path to receiver        │
+│                                                              │
+│  @socketio.on("join_room")                                   │
+│    -> Add user to appointment chat room                      │
+│                                                              │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### Socket.IO Events
+
+| Event | Direction | Payload | Description |
+|-------|-----------|---------|-------------|
+| join_room | Client -> Server | { appointment_id, user_id } | Join a chat room |
+| user_joined | Server -> Client | { user_id, name } | Notify others in room |
+| send_message | Client -> Server | { sender_id, receiver_id, appointment_id, message_type, content } | Send text or audio message |
+| new_message | Server -> Client | { id, sender_id, sender_name, message_type, content, audio_path, audio_duration, created_at } | Receive new message |
+| start_recording | Client -> Server | { user_id, appointment_id } | Audio recording started |
+| recording_started | Server -> Client | { user_id } | Notify other user |
+| stop_recording | Client -> Server | { user_id, appointment_id, audio_blob } | Stop and send audio |
+| voice_uploaded | Server -> Client | { message_id, audio_path, audio_duration } | Audio saved confirmation |
+| typing | Client -> Server | { user_id } | User is typing |
+| user_typing | Server -> Client | { user_id, name } | Show typing indicator |
+| mark_read | Client -> Server | { message_id } | Mark message as read |
+| message_read | Server -> Client | { message_id } | Read receipt confirmation |
+
+### Frontend Components
+
+#### ChatBox Component
+
+```jsx
+// Shared between patient and doctor dashboards
+// Receives: appointmentId, otherUserId, otherUserName
+
+import { useState, useEffect, useRef } from "react";
+import { io } from "socket.io-client";
+import AudioRecorder from "./AudioRecorder";
+import AudioMessage from "./AudioMessage";
+
+function ChatBox({ appointmentId, currentUserId, otherUserId, otherUserName }) {
+  const [messages, setMessages] = useState([]);
+  const [inputText, setInputText] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
+  const socketRef = useRef(null);
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    // Connect to Socket.IO server
+    socketRef.current = io(SOCKET_URL, {
+      auth: { token: localStorage.getItem("token") }
+    });
+
+    // Join the appointment chat room
+    socketRef.current.emit("join_room", {
+      appointment_id: appointmentId,
+      user_id: currentUserId
+    });
+
+    // Listen for new messages
+    socketRef.current.on("new_message", (msg) => {
+      setMessages(prev => [...prev, msg]);
+    });
+
+    // Listen for typing indicator
+    socketRef.current.on("user_typing", () => setIsTyping(true));
+    socketRef.current.on("user_stop_typing", () => setIsTyping(false));
+
+    // Listen for online status
+    socketRef.current.on("user_online", () => setIsOnline(true));
+    socketRef.current.on("user_offline", () => setIsOnline(false));
+
+    // Load existing chat history
+    loadHistory();
+
+    return () => socketRef.current?.disconnect();
+  }, [appointmentId]);
+
+  const loadHistory = async () => {
+    const res = await authFetch(
+      `${API_BASE}/api/chat/history/${currentUserId}/${otherUserId}?appointment=${appointmentId}`
+    );
+    const data = await res.json();
+    setMessages(data.messages);
+  };
+
+  const sendTextMessage = () => {
+    if (!inputText.trim()) return;
+    socketRef.current.emit("send_message", {
+      sender_id: currentUserId,
+      receiver_id: otherUserId,
+      appointment_id: appointmentId,
+      message_type: "text",
+      content: inputText
+    });
+    setInputText("");
+  };
+
+  const sendVoiceMessage = async (audioBlob, duration) => {
+    // Upload audio file first
+    const formData = new FormData();
+    formData.append("audio", audioBlob, "voice.webm");
+    formData.append("sender_id", currentUserId);
+    formData.append("receiver_id", otherUserId);
+    formData.append("appointment_id", appointmentId);
+    formData.append("duration", duration);
+
+    const res = await authFetch(`${API_BASE}/api/chat/voice-upload`, {
+      method: "POST",
+      headers: {},  // Let browser set Content-Type for FormData
+      body: formData
+    });
+    const data = await res.json();
+
+    // Send message via socket with audio path
+    socketRef.current.emit("send_message", {
+      sender_id: currentUserId,
+      receiver_id: otherUserId,
+      appointment_id: appointmentId,
+      message_type: "audio",
+      audio_path: data.audio_path,
+      audio_duration: duration
+    });
+  };
+
+  return (
+    <div className="chat-box">
+      <div className="chat-header">
+        <span className="chat-name">{otherUserName}</span>
+        <span className={`online-status ${isOnline ? "online" : "offline"}`}>
+          {isOnline ? "Online" : "Offline"}
+        </span>
+      </div>
+
+      <div className="chat-messages">
+        {messages.map((msg) => (
+          <div key={msg.id} className={`chat-bubble ${msg.sender_id === currentUserId ? "sent" : "received"}`}>
+            {msg.message_type === "text" ? (
+              <span className="text-message">{msg.content}</span>
+            ) : (
+              <AudioMessage
+                audioSrc={`${API_BASE}/api/chat/voice/${msg.audio_path}`}
+                duration={msg.audio_duration}
+                isSent={msg.sender_id === currentUserId}
+              />
+            )}
+            <span className="message-time">
+              {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            </span>
+          </div>
+        ))}
+        {isTyping && <div className="typing-indicator">{otherUserName} is typing...</div>}
+        <div ref={messagesEndRef} />
+      </div>
+
+      <div className="chat-input">
+        <input
+          value={inputText}
+          onChange={(e) => {
+            setInputText(e.target.value);
+            socketRef.current.emit("typing", { user_id: currentUserId });
+          }}
+          onKeyPress={(e) => e.key === "Enter" && sendTextMessage()}
+          placeholder="Type a message..."
+        />
+        <AudioRecorder onRecordingComplete={sendVoiceMessage} />
+        <button onClick={sendTextMessage}>Send</button>
+      </div>
+    </div>
+  );
+}
+```
+
+#### AudioRecorder Component
+
+```jsx
+// Records audio from microphone using MediaRecorder API
+// Returns audio blob and duration when recording stops
+
+import { useState, useRef } from "react";
+
+function AudioRecorder({ onRecordingComplete }) {
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const timerRef = useRef(null);
+
+  const startRecording = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType: "audio/webm;codecs=opus"
+    });
+
+    mediaRecorderRef.current = mediaRecorder;
+    audioChunksRef.current = [];
+
+    mediaRecorder.ondataavailable = (event) => {
+      audioChunksRef.current.push(event.data);
+    };
+
+    mediaRecorder.onstop = () => {
+      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+      const duration = recordingTime;
+      onRecordingComplete(audioBlob, duration);
+      stream.getTracks().forEach(track => track.stop());
+      setRecordingTime(0);
+    };
+
+    mediaRecorder.start();
+    setIsRecording(true);
+
+    // Start timer
+    timerRef.current = setInterval(() => {
+      setRecordingTime(prev => prev + 1);
+    }, 1000);
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    setIsRecording(false);
+    clearInterval(timerRef.current);
+  };
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  return (
+    <div className="audio-recorder">
+      {isRecording ? (
+        <div className="recording-active">
+          <span className="recording-dot" />
+          <span className="recording-time">{formatTime(recordingTime)}</span>
+          <button onClick={stopRecording} className="stop-btn">Stop</button>
+        </div>
+      ) : (
+        <button onClick={startRecording} className="mic-btn" title="Record voice message">
+          Mic
+        </button>
+      )}
+    </div>
+  );
+}
+```
+
+#### AudioMessage Component
+
+```jsx
+// Plays back audio messages with play/pause controls
+
+import { useState, useRef } from "react";
+
+function AudioMessage({ audioSrc, duration, isSent }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const audioRef = useRef(null);
+
+  const togglePlay = () => {
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const formatDuration = (sec) => {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  return (
+    <div className={`audio-message ${isSent ? "sent" : "received"}`}>
+      <audio
+        ref={audioRef}
+        src={audioSrc}
+        onTimeUpdate={() => {
+          const pct = (audioRef.current.currentTime / audioRef.current.duration) * 100;
+          setProgress(pct);
+        }}
+        onEnded={() => setIsPlaying(false)}
+      />
+      <button onClick={togglePlay} className="play-btn">
+        {isPlaying ? "Pause" : "Play"}
+      </button>
+      <div className="audio-progress-bar">
+        <div className="audio-progress-fill" style={{ width: `${progress}%` }} />
+      </div>
+      <span className="audio-duration">{formatDuration(duration)}</span>
+    </div>
+  );
+}
+```
+
+### Backend Socket Handler
+
+```python
+# backend/socket_handler.py
+
+from flask_socketio import SocketIO, emit, join_room, leave_room
+from models import db, ChatMessage, VoiceMessage
+import os
+import base64
+
+socketio = SocketIO(cors_allowed_origins="*", max_http_buffer_size=10 * 1024 * 1024)
+
+def init_socketio(app):
+    socketio.init_app(app)
+
+# Track online users
+online_users = {}
+
+@socketio.on("connect")
+def handle_connect():
+    user_id = None  # Extract from auth token
+    print(f"Client connected: {user_id}")
+
+@socketio.on("disconnect")
+def handle_disconnect():
+    user_id = None  # Extract from auth token
+    if user_id in online_users:
+        del online_users[user_id]
+
+@socketio.on("join_room")
+def handle_join_room(data):
+    appointment_id = data["appointment_id"]
+    user_id = data["user_id"]
+    room = f"appointment_{appointment_id}"
+    join_room(room)
+    online_users[user_id] = {"room": room, "sid": None}
+    emit("user_joined", {"user_id": user_id}, room=room, include_self=False)
+
+@socketio.on("leave_room")
+def handle_leave_room(data):
+    room = f"appointment_{data['appointment_id']}"
+    leave_room(room)
+
+@socketio.on("send_message")
+def handle_send_message(data):
+    sender_id = data["sender_id"]
+    receiver_id = data["receiver_id"]
+    appointment_id = data["appointment_id"]
+    message_type = data.get("message_type", "text")
+    content = data.get("content", "")
+    audio_path = data.get("audio_path", None)
+    audio_duration = data.get("audio_duration", None)
+
+    # Save message to database
+    msg = ChatMessage(
+        sender_id=sender_id,
+        receiver_id=receiver_id,
+        appointment_id=appointment_id,
+        message_type=message_type,
+        content=content,
+        audio_path=audio_path,
+        audio_duration=audio_duration,
+        is_read=False
+    )
+    db.session.add(msg)
+    db.session.commit()
+
+    # Emit to the chat room
+    room = f"appointment_{appointment_id}"
+    emit("new_message", {
+        "id": msg.id,
+        "sender_id": sender_id,
+        "receiver_id": receiver_id,
+        "message_type": message_type,
+        "content": content,
+        "audio_path": audio_path,
+        "audio_duration": audio_duration,
+        "created_at": msg.created_at.isoformat()
+    }, room=room, include_self=False)
+
+@socketio.on("typing")
+def handle_typing(data):
+    room = data.get("room")
+    emit("user_typing", {"user_id": data["user_id"]}, room=room, include_self=False)
+
+@socketio.on("stop_typing")
+def handle_stop_typing(data):
+    room = data.get("room")
+    emit("user_stop_typing", {"user_id": data["user_id"]}, room=room, include_self=False)
+
+@socketio.on("mark_read")
+def handle_mark_read(data):
+    message_id = data["message_id"]
+    msg = ChatMessage.query.get(message_id)
+    if msg:
+        msg.is_read = True
+        db.session.commit()
+        emit("message_read", {"message_id": message_id}, room=data.get("room"))
+```
+
+### Voice Message Upload Endpoint
+
+```python
+# In backend/app.py
+
+import os
+from werkzeug.utils import secure_filename
+
+VOICE_FOLDER = "uploads/voice_messages"
+os.makedirs(VOICE_FOLDER, exist_ok=True)
+
+@app.route("/api/chat/voice-upload", methods=["POST"])
+def upload_voice_message():
+    if "audio" not in request.files:
+        return jsonify({"message": "No audio file"}), 400
+
+    audio = request.files["audio"]
+    sender_id = request.form.get("sender_id")
+    receiver_id = request.form.get("receiver_id")
+    appointment_id = request.form.get("appointment_id")
+    duration = request.form.get("duration", 0)
+
+    filename = f"voice_{sender_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.webm"
+    filepath = os.path.join(VOICE_FOLDER, filename)
+    audio.save(filepath)
+
+    file_size = os.path.getsize(filepath)
+
+    return jsonify({
+        "audio_path": filename,
+        "audio_duration": float(duration),
+        "file_size": file_size
+    }), 201
+
+
+@app.route("/api/chat/voice/<filename>")
+def serve_voice_message(filename):
+    return send_from_directory(VOICE_FOLDER, filename)
+```
+
+### Chat History Endpoint
+
+```python
+@app.route("/api/chat/history/<int:user1_id>/<int:user2_id>")
+def get_chat_history(user1_id, user2_id):
+    appointment_id = request.args.get("appointment")
+
+    query = ChatMessage.query.filter(
+        ((ChatMessage.sender_id == user1_id) & (ChatMessage.receiver_id == user2_id)) |
+        ((ChatMessage.sender_id == user2_id) & (ChatMessage.receiver_id == user1_id))
+    )
+
+    if appointment_id:
+        query = query.filter_by(appointment_id=int(appointment_id))
+
+    messages = query.order_by(ChatMessage.created_at.asc()).all()
+
+    return jsonify({
+        "messages": [
+            {
+                "id": m.id,
+                "sender_id": m.sender_id,
+                "receiver_id": m.receiver_id,
+                "message_type": m.message_type,
+                "content": m.content,
+                "audio_path": m.audio_path,
+                "audio_duration": m.audio_duration,
+                "is_read": m.is_read,
+                "created_at": m.created_at.isoformat()
+            }
+            for m in messages
+        ]
+    })
+
+
+@app.route("/api/chat/unread/<int:user_id>")
+def get_unread_count(user_id):
+    count = ChatMessage.query.filter_by(
+        receiver_id=user_id, is_read=False
+    ).count()
+    return jsonify({"unread_count": count})
+```
+
+---
+
+## User Roles and Workflows
+
+### Patient Workflow
+
+1. Register with personal and medical details
+2. Login to patient dashboard
+3. Search for doctors by name or specialization
+4. Book an appointment with a doctor
+5. Wait for doctor to confirm
+6. Once confirmed, open chat with doctor
+7. Send text messages or voice messages to doctor
+8. Receive real-time replies from doctor
+9. Complete daily check-in
+10. View recovery plan created by doctor
+11. Complete daily recovery tasks
+12. Track medicine schedule
+13. Upload health records and lab reports
+14. Use exercise session with real-time pose feedback
+15. Chat with AI assistant about health status
+16. View alerts and notifications
+
+### Doctor Workflow
+
+1. Register with medical credentials
+2. Login to doctor dashboard
+3. View patient list with recovery scores
+4. Receive appointment requests
+5. Confirm or decline appointments
+6. Once appointment confirmed, open chat with patient
+7. Receive real-time text and voice messages from patient
+8. Reply with text or voice messages
+9. Select a patient to view detailed information
+10. Create or edit personalized recovery plan
+11. Prescribe medicines with dosage and schedule
+12. View patient exercise form analysis
+13. Monitor patient progress over time
+
+### Caretaker Workflow
+
+1. Register and link to a patient
+2. Login to caretaker dashboard
+3. View patient vitals, medicines, and tasks (read-only)
+4. View upcoming appointments
+5. Monitor alerts and notifications
+
+---
+
+## Implementation Phases
+
+### Phase 0: Fix Existing Bugs (Days 1-3)
+
+- Remove conflicting backend/server.js
+- Fix medicine and appointment data shape mismatches (wrap in {medicines: [...]} and {appointments: [...]})
+- Add missing endpoints (medicine status, appointment status, notification read/delete)
+- Fix hardcoded vitals on dashboard home (fetch from API)
+- Fix patient logout to clear all localStorage keys
+- Fetch doctor list from API instead of hardcoded values
+
+### Phase 1: Authentication and Security (Days 4-6)
+
+- Add bcrypt password hashing to User model
+- Add JWT token authentication with flask-jwt-extended
+- Create authFetch helper in src/api.js with token injection
+- Add protected route wrappers on frontend
+- Add role-based route guards (patient cannot access /doctor, etc.)
+
+### Phase 2: Core Data Flow (Days 7-14)
+
+- Build doctor search page with name and specialization filters
+- Add search query parameters to /api/doctors endpoint
+- Build appointment booking form (patient selects doctor, date, time, reason)
+- Add doctor_id field to Appointment model and migration
+- Build doctor appointment management (confirm/decline)
+- Add dosage, frequency, timing fields to Medicine model
+- Create database migration for new Medicine columns
+- Build medicine schedule endpoint and patient medicine tracking UI
+- Seed additional doctor and patient data
+
+### Phase 3: Recovery Plan End-to-End (Days 15-20)
+
+- Build /api/doctor/:id/summary endpoint (patient list with recovery scores)
+- Build /api/doctor/:id/patients/:id/overview endpoint (single patient detail)
+- Verify recovery plan creation and daily task generation flow
+- Build doctor dashboard with real data from API
+- Build patient detail view for doctor
+- Verify patient can view recovery plan and mark tasks done
+- Verify recovery progress updates correctly
+
+### Phase 4: Real-Time Chat and Audio Messaging (Days 21-28)
+
+- Install Flask-SocketIO on backend
+- Install socket.io-client on frontend
+- Add ChatMessage and VoiceMessage models to database
+- Create backend/socket_handler.py with Socket.IO event handlers
+- Build voice message upload endpoint (save audio files to uploads/voice_messages/)
+- Build voice message streaming endpoint
+- Build chat history endpoint
+- Build unread message count endpoint
+- Create ChatBox.jsx shared component (text input, message list, typing indicator)
+- Create AudioRecorder.jsx component (MediaRecorder API, recording timer, stop button)
+- Create AudioMessage.jsx component (audio playback, play/pause, progress bar, duration)
+- Add "Chat with Doctor" button to patient appointment card (visible after confirmation)
+- Add "Chat with Patient" button to doctor appointment list
+- Build PatientChat.jsx page (embeds ChatBox with doctor context)
+- Build DoctorChat.jsx page (embeds ChatBox with patient context)
+- Add online/offline status indicators
+- Add typing indicator (shows when other user is typing)
+- Add unread message count badge on dashboard
+- Test real-time message delivery between two browser tabs
+- Test voice message recording, upload, and playback
+- Test message persistence across page refresh
+
+### Phase 5: Vitals, Alerts, and Dashboard (Days 29-33)
+
+- Add vitals trend endpoint (/api/health-record/:userId/trends)
+- Add smart alert generation on vitals submission (check abnormal values)
+- Add smart alert generation on medicine status changes
+- Add smart alert generation on missed recovery tasks
+- Build vitals trend visualization (line charts)
+- Build doctor dashboard overview with real statistics
+- Split Patient.jsx into separate component files
+- Split Doctor.jsx into separate component files
+- Create shared components (Layout, Modal, StatCard, AlertBadge)
+
+### Phase 6: AI Features (Days 34-37)
+
+- Build /api/chat/ai endpoint with rule-based responses
+- Build AI chat UI component for patient dashboard
+- Build AI analysis view for doctor (patient health score and insights)
+- Test AI responses for medicine, recovery, vitals, appointment queries
+
+### Phase 7: Daily Check-In and File Upload (Days 38-41)
+
+- Verify existing daily check-in flow works end-to-end
+- Fix file upload to use FormData instead of base64
+- Verify file download endpoint works
+- Build health records page with upload and download functionality
+- Add file type validation (PDF, JPG, JPEG, PNG only)
+
+### Phase 8: Real-Time Pose Analysis (Days 42-50)
+
+- Install MediaPipe npm packages (@mediapipe/pose, camera_utils, drawing_utils)
+- Add ExerciseSession and ExerciseFrame models to database
+- Build pose analysis backend endpoints (/api/pose/analyze, sessions, trends)
+- Build PoseCamera.jsx component with webcam integration
+- Implement angle calculation for squats, push-ups, planks
+- Build rep detection state machine (top/bottom position detection)
+- Build exercise session UI with live form score and rep count
+- Build exercise history view for patient
+- Build doctor view of patient exercise data
+- Tune form thresholds based on real testing
+
+### Phase 9: Gamification and Engagement (Days 51-55)
+
+- Add Achievement, PatientAchievement, PointsLog, PatientLevel models
+- Implement points system (check-in, medicine, tasks, exercise, streaks)
+- Implement badge system (first check-in, streak master, medicine hero, etc.)
+- Build achievement display on patient dashboard
+- Build weekly leaderboard (optional, anonymized)
+- Build progress visualization (XP bar, level display)
+
+### Phase 10: Additional Features (Days 56-62)
+
+- Build medication interaction checker (basic drug conflict warnings)
+- Build recovery milestones with visual timeline
+- Build health journal / symptom diary for patients
+- Build doctor availability and slot booking system
+- Build emergency SOS button
+- Build health education content section
+- Add wearable device simulation (step count, sleep tracking)
+
+### Phase 11: Polish and Testing (Days 63-70)
+
+- Create comprehensive seed data (5 patients, 5 doctors, 30 days history, chat messages)
+- Test all end-to-end scenarios for all three roles
+- Test real-time chat with audio between patient and doctor
+- Test voice message recording and playback
+- Verify responsive design on mobile and desktop
+- Fix any remaining UI/UX issues
+- Verify all API endpoints return correct data
+- Test error handling (network failures, invalid inputs)
+
+---
+
+## Seed Data
+
+The application auto-seeds the following data on first run:
+
+| Role      | Name             | Email                  | Password    |
+|-----------|------------------|------------------------|-------------|
+| Patient   | Rani Kumar       | rani@gmail.com         | 123456      |
+| Doctor    | Dr. Ravi Verma   | ravi@healtrack.ai      | doctor123   |
+| Caretaker | Asha Kapoor      | asha@healtrack.ai      | caretaker123|
+
+Additional doctors are seeded for search and appointment booking.
+
+---
+
+## Running the Application
+
+### Start Backend
+
+```bash
+cd backend
+# Activate virtual environment first
+# Windows:
+venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
+
+python app.py
+```
+
+Backend runs at http://localhost:5000 (Flask + Socket.IO)
+
+### Start Frontend
+
+```bash
+# From project root
+npm run dev
+```
+
+Frontend runs at http://localhost:5173
+
+### Test Real-Time Chat
+
+1. Open http://localhost:5173 in Chrome (Patient login: rani@gmail.com / 123456)
+2. Open http://localhost:5173 in Firefox (Doctor login: ravi@healtrack.ai / doctor123)
+3. Patient books appointment with doctor
+4. Doctor confirms appointment
+5. Both see "Chat" button on the appointment card
+6. Both open chat and send messages
+7. Messages appear instantly in real-time
+8. Patient clicks mic button to record voice message
+9. Doctor sees voice message with play button and duration
+10. Doctor clicks play to hear the voice message
+11. Doctor replies with text or voice
+
+---
+
+## License
+
+This project is built as an academic final year project.

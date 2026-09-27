@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Home from "./pages/home/Home";
 import Login from "./pages/loginpages/login";
+import Emergency from "./pages/home/Emergency";
 import CreateAccount from "./pages/loginpages/CreateAccount";
 import Forgotpage from "./pages/loginpages/Forgotpage";
 
@@ -34,6 +35,7 @@ import Help from "./pages/Dashboard/DoctorSettings/Help";
 // Caretaker Dashboard
 import Caretaker from "./pages/Dashboard/Caretaker";
 
+
 function App() {
   return (
     <BrowserRouter>
@@ -65,6 +67,12 @@ function App() {
         <Route
           path="/caretaker-register"
           element={<CaretakerRegister />}
+        />
+
+        {/* Emergency */}
+        <Route
+          path="/Emergency"
+          element={<Emergency />}
         />
 
         {/* ================= PATIENT ================= */}

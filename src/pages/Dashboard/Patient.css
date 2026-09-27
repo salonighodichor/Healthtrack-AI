@@ -2418,3 +2418,240 @@ select {
   border-color: #55a875;
   box-shadow: 0 0 0 3px rgba(85, 168, 117, 0.12);
 }
+
+/* =====================================================
+   MEDICINE SCANNER (Expiry Scanner in Medicines module)
+===================================================== */
+
+.patient-dashboard .scanner-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.patient-dashboard .scan-upload-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 190px;
+  border: 2px dashed #bfd9d8;
+  border-radius: 12px;
+  background: #f4fbfa;
+  color: #5f7a7d;
+  cursor: pointer;
+  text-align: center;
+  padding: 16px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.patient-dashboard .scan-upload-tile:hover {
+  border-color: #5aa7a0;
+  background: #ecf8f6;
+}
+
+.patient-dashboard .scan-upload-tile small {
+  font-size: 11px;
+  color: #8aa4a6;
+}
+
+.patient-dashboard .scan-preview {
+  max-width: 100%;
+  max-height: 190px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.patient-dashboard .scanner-side {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.patient-dashboard .scan-result {
+  background: #f2f9f8;
+  border: 1px solid #d7e8e7;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.patient-dashboard .scan-result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px dashed #d7e8e7;
+}
+
+.patient-dashboard .scan-result-row span {
+  font-size: 12px;
+  color: #7c9496;
+}
+
+.patient-dashboard .scan-result-row strong {
+  font-size: 13px;
+  color: #24404b;
+  text-align: right;
+}
+
+.patient-dashboard.dark-mode .scan-upload-tile {
+  border-color: #3d5a5f;
+  background: #182b31;
+  color: #9db6b9;
+}
+
+.patient-dashboard.dark-mode .scan-upload-tile:hover {
+  border-color: #5aa7a0;
+  background: #1e343b;
+}
+
+.patient-dashboard.dark-mode .scan-upload-tile small {
+  color: #5f7a7d;
+}
+
+.patient-dashboard.dark-mode .scan-result {
+  background: #182b31;
+  border-color: #3d5a5f;
+}
+
+.patient-dashboard.dark-mode .scan-result-row {
+  border-bottom-color: #3d5a5f;
+}
+
+.patient-dashboard.dark-mode .scan-result-row span {
+  color: #8aa4a6;
+}
+
+.patient-dashboard.dark-mode .scan-result-row strong {
+  color: #eaf7f7;
+}
+
+.patient-dashboard .expiry-badge.not-detected {
+  background: #eef1f2;
+  color: #7c9496;
+}
+
+.patient-dashboard.dark-mode .expiry-badge.not-detected {
+  background: #24363c;
+  color: #8aa4a6;
+}
+
+.patient-dashboard .scan-fail-message {
+  background: #fff6e5;
+  border: 1px solid #f0d6a0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #8a6d1f;
+  line-height: 1.5;
+}
+
+.patient-dashboard.dark-mode .scan-fail-message {
+  background: #33291a;
+  border-color: #6b562e;
+  color: #e6cf9a;
+}
+
+.patient-dashboard .scan-raw-text {
+  background: #f4f7f8;
+  border: 1px solid #d7e0e3;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 10px;
+}
+
+.patient-dashboard .scan-raw-text strong {
+  font-size: 11px;
+  color: #5f7a7d;
+  display: block;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.patient-dashboard .scan-raw-text pre {
+  margin: 0;
+  font-size: 11px;
+  color: #24404b;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: Consolas, Menlo, monospace;
+}
+
+.patient-dashboard.dark-mode .scan-raw-text {
+  background: #10232a;
+  border-color: #3d5a5f;
+}
+
+.patient-dashboard.dark-mode .scan-raw-text strong {
+  color: #8aa4a6;
+}
+
+.patient-dashboard.dark-mode .scan-raw-text pre {
+  color: #d7e8e7;
+}
+
+@media (max-width: 760px) {
+  .patient-dashboard .scanner-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Expiry badges on the Medicines page ---- */
+
+.patient-dashboard .expiry-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 9px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.patient-dashboard .expiry-badge.expiring-soon {
+  background: #ffedc9;
+  color: #b98a1d;
+}
+
+.patient-dashboard .expiry-badge.expired {
+  background: #fde9e9;
+  color: #d0453f;
+}
+
+.patient-dashboard .expiry-badge.active {
+  background: #e3f4ec;
+  color: #2e8b57;
+}
+
+/* ---- Row highlight for expiring / expired medicines ---- */
+
+.patient-dashboard .medicine-item.expiry-expiring-soon {
+  background: #fff6e5;
+  border-color: #f0d6a0;
+}
+
+.patient-dashboard .medicine-item.expiry-expired {
+  background: #fdecec;
+  border-color: #f0c4c4;
+}
+
+/* ---- Dark mode ---- */
+
+.patient-dashboard.dark-mode .medicine-item.expiry-expiring-soon {
+  background: #3a3120;
+  border-color: #6a5a33;
+}
+
+.patient-dashboard.dark-mode .medicine-item.expiry-expired {
+  background: #3a2222;
+  border-color: #6a3333;
+}
+
+.patient-dashboard.dark-mode .expiry-badge.active {
+  background: #1d3a2c;
+  color: #7fd4a8;
+}
