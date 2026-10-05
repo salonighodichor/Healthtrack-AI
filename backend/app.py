@@ -5387,13 +5387,29 @@ def get_wearable_alerts(user_id):
 
 
 # =====================================================
-# START SERVER
+# DATABASE INITIALIZATION
 # =====================================================
 
-if __name__ == "__main__":
+def init_database():
+    """Create tables, apply lightweight column migrations and seed base data.
+
+    Idempotent, so it is safe to run on every process start. This MUST run at
+    import time (not under an `if __name__ == "__main__"` guard) because a
+    WSGI server such as Gunicorn imports this module as `app`, so the guard
+    would never fire and the deployed database would have no tables at all.
+    """
     with app.app_context():
         db.create_all()
         migrate_schema()
         ensure_seed_data()
 
+
+init_database()
+
+
+# =====================================================
+# START SERVER
+# =====================================================
+
+if __name__ == "__main__":
     app.run(debug=True, port=5000)

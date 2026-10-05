@@ -23,11 +23,17 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment variables (never commit real .env files)
+.env
+.env.*
+!.env.example
+
 # Backend
 venv/
 backend/venv/
 backend/__pycache__/
 backend/instance/
+backend/uploads/
 *.pyc
 # Database files (empty/stale DBs must never be committed)
 *.db
