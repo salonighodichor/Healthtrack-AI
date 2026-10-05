@@ -697,8 +697,23 @@ button, input {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 12px 0;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
   border-bottom: 1px solid #f3f4ff;
+}
+
+/* Keep the icon in a fixed-width column so every alert lines up */
+.caretaker-alert > span:first-child {
+  flex: 0 0 20px;
+  width: 20px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.caretaker-alert > div {
+  flex: 1;
+  min-width: 0;
 }
 
 .dark-mode .caretaker-alert {
@@ -1124,4 +1139,104 @@ button, input {
   .health-big-card strong {
     font-size: 20px;
   }
+}
+
+/* AI Insights tab */
+.caretaker-insight-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.caretaker-insight-metrics .caretaker-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.caretaker-insight-metrics .caretaker-card strong {
+  font-size: 22px;
+  color: #667eea;
+}
+
+.caretaker-insight-metrics .caretaker-card span {
+  font-size: 12px;
+  color: #9690a2;
+}
+
+.dark-mode .caretaker-insight-metrics .caretaker-card span {
+  color: #9ca3af;
+}
+
+.caretaker-chart-card .recharts-wrapper {
+  margin-top: 12px;
+}
+
+@media (max-width: 768px) {
+  .caretaker-insight-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* =========================================================
+   LOGOUT CONFIRMATION MODAL
+========================================================= */
+.caretaker-dashboard .logout-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(31, 41, 55, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.caretaker-dashboard .logout-confirm-box {
+  width: 380px;
+  max-width: 90%;
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.caretaker-dashboard .logout-confirm-box h2 {
+  color: #1f2937;
+  font-size: 19px;
+  margin-bottom: 10px;
+}
+
+.caretaker-dashboard .logout-confirm-box p {
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+
+.caretaker-dashboard .logout-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Keep the action buttons compact inside the modal */
+.caretaker-dashboard .logout-confirm-actions .caretaker-outline-button,
+.caretaker-dashboard .logout-confirm-actions .caretaker-ai-button {
+  width: auto;
+  padding: 10px 20px;
+}
+
+.dark-mode .caretaker-dashboard .logout-confirm-box {
+  background: #2d3748;
+}
+
+.dark-mode .caretaker-dashboard .logout-confirm-box h2 {
+  color: #f3f4ff;
+}
+
+.dark-mode .caretaker-dashboard .logout-confirm-box p {
+  color: #9ca3af;
 }

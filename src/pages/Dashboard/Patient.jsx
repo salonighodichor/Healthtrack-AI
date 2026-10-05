@@ -149,6 +149,15 @@ const HealthOverview = () => {
     return "";
   };
 
+  const healthStatusClass = (value) => {
+    const v = String(value || "").toLowerCase();
+    if (!v) return "";
+    if (v === "critical") return "status-critical";
+    if (v === "high" || v === "low" || v === "needs attention" || v === "fair") return "status-warning";
+    if (v === "normal" || v === "good" || v === "excellent" || v === "stable") return "status-ok";
+    return "";
+  };
+
   if (loading) {
     return (
       <div className="page-stack">
@@ -320,6 +329,29 @@ const HealthOverview = () => {
         </div>
       </div>
 
+      {hasData && reading?.alerts?.length > 0 && (
+        <div className="dashboard-card">
+          <div className="card-title">
+            <div>
+              <h2>🔔 Health Alerts</h2>
+              <p>Generated from your latest readings</p>
+            </div>
+          </div>
+
+          <div className="alert-list">
+            {reading.alerts.map((alert, index) => (
+              <div className={`alert-item ${alert.type}`} key={index}>
+                <span>{alert.type === "warning" ? "⚠️" : "✅"}</span>
+                <div>
+                  <strong>{alert.title}</strong>
+                  <p>{alert.message}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {!hasData && (
         <p style={{ color: "#888" }}>
         No health readings added yet.
@@ -331,37 +363,37 @@ const HealthOverview = () => {
           <div className="card-title">
             <div>
               <h2>📊 Health Summary</h2>
-              <p>Quick view of your current health</p>
+              <p>Computed from your latest readings</p>
             </div>
           </div>
 
           <div className="summary-list">
             <div>
               <span>Overall Health</span>
-              <strong className="status-good">
-                {hasData ? "Good" : "No data"}
+              <strong className={healthStatusClass(reading?.overall_health)}>
+                {hasData ? reading.overall_health || "—" : "No data"}
               </strong>
             </div>
 
             <div>
               <span>Heart Status</span>
-              <strong>
-                {reading?.heart_rate?.status === "normal"
-                  ? "Stable"
-                  : reading?.heart_rate?.status
-                  ? "Needs attention"
-                  : "—"}
+              <strong className={healthStatusClass(reading?.heart_status)}>
+                {hasData ? reading.heart_status || "—" : "No data"}
               </strong>
             </div>
 
             <div>
               <span>Recovery Status</span>
-              <strong>78%</strong>
+              <strong>
+                {hasData && reading.recovery_percent != null
+                  ? `${reading.recovery_percent}%`
+                  : "—"}
+              </strong>
             </div>
 
             <div>
               <span>Last Checkup</span>
-              <strong>{reading?.recorded_at || "—"}</strong>
+              <strong>{hasData ? reading.last_checkup || "—" : "—"}</strong>
             </div>
           </div>
         </div>
@@ -370,15 +402,18 @@ const HealthOverview = () => {
           <div className="card-title">
             <div>
               <h2>💡 Health Tips</h2>
-              <p>Simple daily reminders</p>
+              <p>Based on your latest readings</p>
             </div>
           </div>
 
           <div className="tip-list">
-            <div>🚶 Stay active with light daily movement.</div>
-            <div>💧 Keep yourself hydrated.</div>
-            <div>🥗 Follow your recommended meal plan.</div>
-            <div>😴 Maintain a regular sleep schedule.</div>
+            {hasData && reading?.health_tips?.length ? (
+              reading.health_tips.map((tip, index) => (
+                <div key={index}>💡 {tip}</div>
+              ))
+            ) : (
+              <div>No health tips available yet.</div>
+            )}
           </div>
         </div>
       </div>

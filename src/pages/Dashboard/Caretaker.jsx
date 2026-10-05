@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
 import { API_BASE } from "../../api";
 import "./Caretaker.css";
 
@@ -15,9 +24,12 @@ function Caretaker() {
   const [appointments, setAppointments] = useState([]);
   const [recoveryTasks, setRecoveryTasks] = useState([]);
   const [alerts, setAlerts] = useState([]);
+  const [insights, setInsights] = useState(null);
+  const [insightsError, setInsightsError] = useState("");
   const [activeTab, setActiveTab] = useState("dashboard");
   const [loading, setLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
@@ -84,6 +96,19 @@ function Caretaker() {
       const alertRes = await fetch(`${API_BASE}/api/alerts/${patId}`);
       const alertData = await alertRes.json();
       setAlerts(Array.isArray(alertData) ? alertData : alertData.alerts || []);
+
+      // Caretaker AI Insights — derived server-side from this patient's data only
+      try {
+        const insightRes = await fetch(
+          `${API_BASE}/api/caretaker/${caretakerId}/insights?days=7`
+        );
+        if (insightRes.ok) {
+          setInsights(await insightRes.json());
+          setInsightsError("");
+        }
+      } catch (insightErr) {
+        setInsightsError("Unable to load AI insights right now.");
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -96,15 +121,101 @@ function Caretaker() {
     navigate("/login");
   };
 
+  // Escape closes the logout confirmation without logging out
+  useEffect(() => {
+    if (!showLogoutConfirm) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") setShowLogoutConfirm(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showLogoutConfirm]);
+
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
 
+  // DB stores task status as "done" or "pending" (older rows use "completed").
+  const isTaskDone = (task) =>
+    String(task.status || "").toLowerCase() === "done" ||
+    String(task.status || "").toLowerCase() === "completed";
+
   const getRecoveryProgress = () => {
     if (recoveryTasks.length === 0) return 0;
-    const completed = recoveryTasks.filter((t) => t.status === "completed").length;
+    const completed = recoveryTasks.filter(isTaskDone).length;
     return Math.round((completed / recoveryTasks.length) * 100);
   };
+
+  // Chart-ready view of the server-side trend series
+  const insightTrends = (insights?.trends || []).map((t) => ({
+    ...t,
+    label: new Date(t.date).toLocaleDateString("default", {
+      month: "short",
+      day: "numeric",
+    }),
+  }));
+  const insightHasRecovery = insightTrends.some(
+    (t) => t.recovery_percent !== null && t.recovery_percent !== undefined
+  );
+  const insightHasVitals = insightTrends.some(
+    (t) => t.heart_rate !== null && t.heart_rate !== undefined
+  );
+
+  // Alerts: keep only warnings / missed medicines / abnormal readings /
+  // critical notices. Appointment reminders, medicine reminders and task
+  // reminders are dropped because those sections already cover them.
+  const ALERT_KEEP_TYPES = ["warning", "critical", "danger"];
+  const ALERT_DUPLICATE_TITLES =
+    /^(Medicine Reminder|Recovery Task Missed|Appointment\b)/i;
+  const actionableAlerts = (() => {
+    const seen = new Set();
+    return alerts.filter((a) => {
+      const type = String(a.type || "").toLowerCase();
+      const title = String(a.title || "");
+      if (!ALERT_KEEP_TYPES.includes(type)) return false;
+      if (ALERT_DUPLICATE_TITLES.test(title)) return false;
+      const key = title.toLowerCase();
+      if (seen.has(key)) return false; // collapse repeated alert titles
+      seen.add(key);
+      return true;
+    });
+  })();
+
+  // Medicines: the card is a "today's schedule" view, so only keep the
+  // current day's rows (falling back to the most recent day available).
+  const todayMedicines = (() => {
+    if (medicines.length === 0) return [];
+    const today = new Date().toISOString().slice(0, 10);
+    const todays = medicines.filter((m) => m.date === today);
+    if (todays.length > 0) return todays;
+    const latest = medicines.reduce(
+      (acc, m) => (m.date > acc ? m.date : acc),
+      medicines[0].date
+    );
+    return medicines.filter((m) => m.date === latest);
+  })();
+
+  // One-line summary built from the assigned patient's latest real readings
+  const latestHealthSummary = (() => {
+    const latest = insights?.latest;
+    if (!insights?.has_data || !latest) return "No health records yet";
+    const parts = [];
+    if (latest.blood_sugar?.value != null)
+      parts.push(`Sugar ${Math.round(latest.blood_sugar.value)} mg/dL`);
+    if (latest.heart_rate?.value != null)
+      parts.push(`Pulse ${Math.round(latest.heart_rate.value)} BPM`);
+    if (latest.blood_pressure?.systolic != null)
+      parts.push(
+        `BP ${Math.round(latest.blood_pressure.systolic)}/${Math.round(
+          latest.blood_pressure.diastolic
+        )}`
+      );
+    if (latest.hemoglobin?.value != null)
+      parts.push(`Hb ${latest.hemoglobin.value} g/dL`);
+    if (latest.spo2?.value != null)
+      parts.push(`SpO2 ${Math.round(latest.spo2.value)}%`);
+    return parts.join(" · ") || "No health records yet";
+  })();
 
   return (
     <div className={`caretaker-dashboard ${darkMode ? "dark-mode" : ""}`}>
@@ -128,15 +239,6 @@ function Caretaker() {
           >
             <span className="caretaker-menu-icon">📊</span>
             Dashboard
-          </button>
-          <button
-            className={`caretaker-menu-item ${
-              activeTab === "vitals" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("vitals")}
-          >
-            <span className="caretaker-menu-icon">❤️</span>
-            Vitals
           </button>
           <button
             className={`caretaker-menu-item ${
@@ -186,7 +288,10 @@ function Caretaker() {
             </span>
             {darkMode ? "Light Mode" : "Dark Mode"}
           </button>
-          <button className="caretaker-logout-button" onClick={handleLogout}>
+          <button
+            className="caretaker-logout-button"
+            onClick={() => setShowLogoutConfirm(true)}
+          >
             <span className="caretaker-menu-icon">🚪</span>
             Logout
           </button>
@@ -208,7 +313,7 @@ function Caretaker() {
             </button>
             <button className="caretaker-notification">
               🔔
-              {alerts.length > 0 && <span></span>}
+              {actionableAlerts.length > 0 && <span></span>}
             </button>
             <div className="caretaker-profile">
               <div className="caretaker-avatar">
@@ -246,7 +351,9 @@ function Caretaker() {
                     </div>
                   </div>
 
-                  {patientData ? (
+                  {loading && !patientData ? (
+                    <p>Loading patient details...</p>
+                  ) : patientData ? (
                     <div className="connected-patient">
                       <div className="patient-large-avatar">
                         {patientData.name.charAt(0).toUpperCase()}
@@ -256,13 +363,23 @@ function Caretaker() {
                         <p>
                           Age: {patientData.age} • {patientData.gender}
                         </p>
-                        <p>Recovery: {patientData.recoveryType || patientData.recovery_type}</p>
                         <p>
-                          Doctor: {doctorInfo?.name || patientData.assignedDoctor?.name || "Not assigned"}
+                          Recovery:{" "}
+                          {patientData.recovery_type || "Not specified"}
                         </p>
                         <p>
-                          Care team: {doctorInfo?.specialization || "Monitoring support"}
+                          Doctor: {doctorInfo?.name || "Not assigned"}
                         </p>
+                        <p>
+                          Care team:{" "}
+                          {doctorInfo?.specialization || "Monitoring support"}
+                        </p>
+                        <p>
+                          Recovery Status:{" "}
+                          {insights?.recovery?.overall_health ||
+                            (insights?.has_data ? "Recorded" : "No data")}
+                        </p>
+                        <p>Latest Health Summary: {latestHealthSummary}</p>
                         <span className="patient-connected-badge">
                           ✓ Connected
                         </span>
@@ -270,7 +387,7 @@ function Caretaker() {
                       </div>
                     </div>
                   ) : (
-                    <p>No patient data available</p>
+                    <p>No patient assigned to this caretaker</p>
                   )}
                 </div>
 
@@ -305,21 +422,20 @@ function Caretaker() {
 
                       <div className="progress-row">
                         <span>Completed</span>
-                        <strong>
-                          {recoveryTasks.filter((t) => t.status === "completed")
-                            .length}
-                        </strong>
+                        <strong>{recoveryTasks.filter(isTaskDone).length}</strong>
                       </div>
 
                       <div className="progress-row">
                         <span>Pending</span>
                         <strong>
-                          {recoveryTasks.filter((t) => t.status === "pending")
-                            .length}
+                          {recoveryTasks.filter((t) => !isTaskDone(t)).length}
                         </strong>
                       </div>
 
-                      <button className="caretaker-outline-button">
+                      <button
+                        className="caretaker-outline-button"
+                        onClick={() => setActiveTab("tasks")}
+                      >
                         View All Tasks
                       </button>
                     </div>
@@ -376,15 +492,15 @@ function Caretaker() {
                       <h2>🔔 Alerts</h2>
                       <p>Health warnings</p>
                     </div>
-                    <div className="alert-count">{alerts.length}</div>
+                    <div className="alert-count">{actionableAlerts.length}</div>
                   </div>
 
-                  {alerts.length === 0 ? (
+                  {actionableAlerts.length === 0 ? (
                     <p style={{ color: "#9690a2", fontSize: "12px" }}>
                       No alerts at the moment
                     </p>
                   ) : (
-                    alerts.slice(0, 3).map((alert, idx) => (
+                    actionableAlerts.slice(0, 3).map((alert, idx) => (
                       <div
                         key={idx}
                         className={`caretaker-alert ${alert.type}`}
@@ -415,20 +531,22 @@ function Caretaker() {
                       <h2>💊 Medicines</h2>
                       <p>Today's medication schedule</p>
                     </div>
-                    <span>{medicines.length}</span>
+                    <span>{todayMedicines.length}</span>
                   </div>
 
-                  {medicines.length === 0 ? (
+                  {todayMedicines.length === 0 ? (
                     <p style={{ color: "#9690a2", fontSize: "12px" }}>
                       No medicines scheduled
                     </p>
                   ) : (
-                    medicines.slice(0, 3).map((med, idx) => (
+                    todayMedicines.slice(0, 3).map((med, idx) => (
                       <div key={idx} className="health-record">
                         <div className="record-icon">💊</div>
                         <div>
                           <strong>{med.name}</strong>
-                          <p>{med.instruction}</p>
+                          <p>
+                            {med.frequency} • {med.timing || "Any time"}
+                          </p>
                         </div>
                         <span
                           style={{
@@ -460,19 +578,24 @@ function Caretaker() {
                   </div>
 
                   <div className="ai-insight-message">
-                    <strong>Patient Recovery Status</strong>
+                    <strong>
+                      {patientData ? `${patientData.name}'s Recovery Status` : "Recovery Status"}
+                    </strong>
                     <p>
-                      Based on recent vitals and activity, the patient is
-                      showing steady progress. Continue with current medication
-                      schedule.
+                      {insights?.ai_summary ||
+                        "No insights available yet for this patient."}
                     </p>
-                    <div className="ai-insight-tip">
-                      💡 <strong>Tip:</strong> Ensure patient drinks 2-3 liters
-                      of water daily and maintains regular sleep schedule.
-                    </div>
+                    {insights?.health_tips?.length > 0 && (
+                      <div className="ai-insight-tip">
+                        💡 <strong>Tip:</strong> {insights.health_tips[0]}
+                      </div>
+                    )}
                   </div>
 
-                  <button className="caretaker-ai-button">
+                  <button
+                    className="caretaker-ai-button"
+                    onClick={() => setActiveTab("insights")}
+                  >
                     Get More Insights →
                   </button>
                 </div>
@@ -552,7 +675,10 @@ function Caretaker() {
                       <div className="record-icon">💊</div>
                       <div>
                         <strong>{med.name}</strong>
-                        <p>{med.instruction}</p>
+                        <p>
+                          {med.date} • {med.frequency} •{" "}
+                          {med.timing || "Any time"}
+                        </p>
                       </div>
                       <span
                         style={{
@@ -594,14 +720,8 @@ function Caretaker() {
                       </div>
                       <span
                         style={{
-                          background:
-                            task.status === "completed"
-                              ? "#eaf9f2"
-                              : "#fff6e5",
-                          color:
-                            task.status === "completed"
-                              ? "#209364"
-                              : "#d88a16",
+                          background: isTaskDone(task) ? "#eaf9f2" : "#fff6e5",
+                          color: isTaskDone(task) ? "#209364" : "#d88a16",
                         }}
                       >
                         {task.status.toUpperCase()}
@@ -610,6 +730,174 @@ function Caretaker() {
                   ))
                 )}
               </div>
+            </div>
+          )}
+
+          {/* AI Insights Tab */}
+          {activeTab === "insights" && (
+            <div>
+              <div className="caretaker-page-heading">
+                <h1>🤖 AI Insights</h1>
+                <p>Detailed progress, adherence and vitals summary</p>
+              </div>
+
+              {insightsError && (
+                <p
+                  style={{
+                    color: "#d88a16",
+                    fontSize: "13px",
+                    padding: "12px 0",
+                  }}
+                >
+                  {insightsError}
+                </p>
+              )}
+
+              {!insights && !insightsError && (
+                <p style={{ color: "#9690a2", fontSize: "14px" }}>
+                  Loading insights...
+                </p>
+              )}
+
+              {insights && (
+                <>
+                  <div className="caretaker-insight-metrics">
+                    <div className="caretaker-card">
+                      <strong>
+                        {insights.recovery?.recovery_percent ?? "—"}%
+                      </strong>
+                      <span>Recovery Progress</span>
+                    </div>
+                    <div className="caretaker-card">
+                      <strong>{insights.medication?.percent ?? 0}%</strong>
+                      <span>
+                        Medication Adherence ({insights.medication?.taken ?? 0}/
+                        {insights.medication?.total ?? 0})
+                      </span>
+                    </div>
+                    <div className="caretaker-card">
+                      <strong>
+                        {insights.recovery?.completion_percent ?? 0}%
+                      </strong>
+                      <span>
+                        Task Completion ({insights.recovery?.completed_tasks ?? 0}
+                        /{insights.recovery?.total_tasks ?? 0})
+                      </span>
+                    </div>
+                    <div className="caretaker-card">
+                      <strong>{insights.risk?.level ?? "—"}</strong>
+                      <span>Risk Level</span>
+                    </div>
+                  </div>
+
+                  {/* Recovery progress graph */}
+                  <div className="caretaker-card caretaker-chart-card">
+                    <div className="caretaker-card-title">
+                      <div>
+                        <h2>📈 Recovery Progress</h2>
+                        <p>Last 7 days</p>
+                      </div>
+                    </div>
+                    {insightHasRecovery ? (
+                      <ResponsiveContainer width="100%" height={220}>
+                        <LineChart data={insightTrends}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                          <XAxis
+                            dataKey="label"
+                            tick={{ fontSize: 11, fill: "#6b7280" }}
+                          />
+                          <YAxis
+                            domain={[0, 100]}
+                            tick={{ fontSize: 11, fill: "#6b7280" }}
+                          />
+                          <Tooltip />
+                          <Line
+                            type="monotone"
+                            dataKey="recovery_percent"
+                            name="Recovery %"
+                            stroke="#667eea"
+                            strokeWidth={2}
+                            connectNulls
+                            dot={{ r: 3 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <p style={{ color: "#9690a2", fontSize: "12px" }}>
+                        Not enough recovery readings yet.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Basic vitals trend — only when the patient has data */}
+                  {insightHasVitals && (
+                    <div className="caretaker-card caretaker-chart-card">
+                      <div className="caretaker-card-title">
+                        <div>
+                          <h2>🫀 Vitals Trend</h2>
+                          <p>Last 7 days</p>
+                        </div>
+                      </div>
+                      <ResponsiveContainer width="100%" height={220}>
+                        <LineChart data={insightTrends}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                          <XAxis
+                            dataKey="label"
+                            tick={{ fontSize: 11, fill: "#6b7280" }}
+                          />
+                          <YAxis
+                            tick={{ fontSize: 11, fill: "#6b7280" }}
+                          />
+                          <Tooltip />
+                          <Line
+                            type="monotone"
+                            dataKey="heart_rate"
+                            name="Heart Rate (BPM)"
+                            stroke="#e05d7d"
+                            strokeWidth={2}
+                            connectNulls
+                            dot={{ r: 3 }}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="blood_sugar"
+                            name="Blood Sugar (mg/dL)"
+                            stroke="#209364"
+                            strokeWidth={2}
+                            connectNulls
+                            dot={{ r: 3 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+
+                  {/* Summary based on the patient's actual data */}
+                  <div className="caretaker-card">
+                    <div className="caretaker-card-title">
+                      <div>
+                        <h2>🧠 Summary</h2>
+                        <p>Based on {insights.patient?.name}'s records</p>
+                      </div>
+                      <div className="ai-insights-icon">✨</div>
+                    </div>
+                    <div className="ai-insight-message">
+                      <p>{insights.ai_summary}</p>
+                      {insights.risk?.factors?.length > 0 && (
+                        <div className="ai-insight-tip">
+                          <strong>Watch:</strong>{" "}
+                          {insights.risk.factors.join(" · ")}
+                        </div>
+                      )}
+                      {insights.last_checkup && (
+                        <div className="ai-insight-tip">
+                          Last checkup: {insights.last_checkup}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
 
@@ -663,12 +951,12 @@ function Caretaker() {
               </div>
 
               <div className="caretaker-card">
-                {alerts.length === 0 ? (
+                {actionableAlerts.length === 0 ? (
                   <p style={{ color: "#9690a2", fontSize: "14px" }}>
                     No alerts at the moment
                   </p>
                 ) : (
-                  alerts.map((alert, idx) => (
+                  actionableAlerts.map((alert, idx) => (
                     <div
                       key={idx}
                       className={`caretaker-alert ${alert.type}`}
@@ -692,6 +980,40 @@ function Caretaker() {
           )}
         </div>
       </div>
+
+      {showLogoutConfirm && (
+        <div
+          className="logout-confirm-overlay"
+          onClick={() => setShowLogoutConfirm(false)}
+        >
+          <div
+            className="logout-confirm-box"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="caretaker-logout-confirm-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="caretaker-logout-confirm-title">Confirm Logout</h2>
+            <p>Are you sure you want to logout?</p>
+            <div className="logout-confirm-actions">
+              <button
+                className="caretaker-outline-button"
+                type="button"
+                onClick={() => setShowLogoutConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="caretaker-ai-button"
+                type="button"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

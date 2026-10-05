@@ -818,6 +818,71 @@ select {
   font-weight: 400;
 }
 
+.patient-dashboard .status-ok {
+  color: #1f9d55;
+}
+
+.patient-dashboard .status-warning {
+  color: #c77d0a;
+}
+
+.patient-dashboard .status-critical {
+  color: #d13329;
+  font-weight: 600;
+}
+
+.patient-dashboard .summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.patient-dashboard .summary-list > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #e6efee;
+}
+
+.patient-dashboard .summary-list > div:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.patient-dashboard .summary-list span {
+  font-size: 13px;
+  color: #597477;
+}
+
+.patient-dashboard .summary-list strong {
+  font-size: 14px;
+  color: #155c62;
+  text-transform: capitalize;
+}
+
+.patient-dashboard .tip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.patient-dashboard .tip-list > div {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #3d5a5c;
+  padding: 9px 11px;
+  background: #f2faf9;
+  border-radius: 8px;
+  border-left: 3px solid #4fb3ad;
+}
+
+.patient-dashboard.dark-mode .tip-list > div {
+  background: #1b344a;
+  color: #d7e8ea;
+  border-left-color: #7fd6cf;
+}
+
 .patient-dashboard .health-card label {
   display: inline-block;
   margin-top: 5px;

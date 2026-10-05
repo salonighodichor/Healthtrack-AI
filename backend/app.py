@@ -2,6 +2,7 @@ import os
 import re
 import random
 from datetime import datetime, date, timedelta
+from zoneinfo import ZoneInfo
 
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
@@ -155,6 +156,233 @@ def get_status(field, value):
     if value > high:
         return "high"
     return "normal"
+
+
+# =====================================================
+# HEALTH ANALYTICS ENGINE  (reusable helpers)
+# Used by the Health Overview page. Every value shown on
+# the frontend is computed here from the latest readings —
+# nothing is hardcoded on the client.
+# =====================================================
+
+# Normal band = medically ideal range; danger band = extremes
+# beyond which the metric is critically abnormal. Wellness scores
+# are interpolated linearly between the two bands.
+RECOVERY_METRICS = {
+    "blood_sugar": {"normal": (70, 140), "danger": (40, 350), "weight": 0.30},
+    "heart_rate": {"normal": (60, 100), "danger": (40, 180), "weight": 0.25},
+    "systolic": {"normal": (90, 120), "danger": (70, 200), "weight": 0.15},
+    "diastolic": {"normal": (60, 80), "danger": (40, 120), "weight": 0.10},
+    "hemoglobin": {"normal": (12, 16), "danger": (7, 20), "weight": 0.20},
+}
+
+
+def latest_vitals(user_id):
+    """Most recent health reading for a user (or None).
+
+    Older rows share the same 1-second 'recorded_at' timestamp
+    (SQLite CURRENT_TIMESTAMP), so id DESC breaks ties deterministically."""
+    return (
+        HealthRecord.query
+        .filter_by(user_id=user_id)
+        .order_by(HealthRecord.recorded_at.desc(), HealthRecord.id.desc())
+        .first()
+    )
+
+
+# SQLite stores recorded_at via CURRENT_TIMESTAMP, which is UTC.
+# Build times are always rendered in IST (Asia/Kolkata, UTC+5:30), e.g.
+# "02 Oct 2026, 02:22 PM".
+IST = ZoneInfo("Asia/Kolkata")
+
+
+def to_ist(dt):
+    """Interpret a naive datetime as UTC (SQLite default) and convert to IST."""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=ZoneInfo("UTC"))
+    return dt.astimezone(IST)
+
+
+def format_ist_timestamp(dt):
+    """Format a UTC-stored naive datetime as IST: DD MMM YYYY, hh:mm AM/PM.
+    Aware datetimes are converted, never re-interpreted."""
+    if dt is None:
+        return None
+    return to_ist(dt).strftime("%d %b %Y, %I:%M %p")
+
+
+def _metric_score(field, value):
+    """Map one reading to a 0..100 wellness score.
+    100 = inside the normal band; 0 = at/past the danger boundary."""
+    if value is None:
+        return None
+    if field not in RECOVERY_METRICS:
+        return 100
+    normal_low, normal_high = RECOVERY_METRICS[field]["normal"]
+    danger_low, danger_high = RECOVERY_METRICS[field]["danger"]
+
+    if normal_low <= value <= normal_high:
+        return 100
+
+    if value < normal_low:
+        deviation = normal_low - value
+        allowed = normal_low - danger_low
+    else:
+        deviation = value - normal_high
+        allowed = danger_high - normal_high
+
+    if allowed <= 0:
+        return 0
+    ratio = min(deviation / allowed, 1.0)
+    return round(100 * (1 - ratio))
+
+
+def compute_metric_scores(record):
+    """Per-metric wellness scores (None for missing metrics)."""
+    if record is None:
+        return {}
+    return {
+        field: _metric_score(field, getattr(record, field))
+        for field in RECOVERY_METRICS
+    }
+
+
+def compute_recovery_percentage(record):
+    """Weighted average of the available per-metric wellness scores."""
+    if record is None:
+        return None
+    total_weight = 0.0
+    weighted = 0.0
+    for field, cfg in RECOVERY_METRICS.items():
+        value = getattr(record, field, None)
+        if value is None:
+            continue
+        score = _metric_score(field, value)
+        total_weight += cfg["weight"]
+        weighted += cfg["weight"] * score
+    if total_weight <= 0:
+        return None
+    return int(round(weighted / total_weight))
+
+
+def compute_health_score_from_record(record):
+    """0..100 overall health score derived from the latest readings."""
+    if record is None:
+        return None
+    scores = [s for s in compute_metric_scores(record).values() if s is not None]
+    if not scores:
+        return None
+    return int(round(sum(scores) / len(scores)))
+
+
+def compute_overall_health(record):
+    """Dynamic overall health: Excellent / Good / Fair / Needs Attention / Critical."""
+    if record is None:
+        return None
+    scores = [s for s in compute_metric_scores(record).values() if s is not None]
+    if not scores:
+        return None
+    mean = sum(scores) / len(scores)
+    worst = min(scores)
+    if worst < 20 or mean < 30:
+        return "Critical"
+    if mean < 50:
+        return "Needs Attention"
+    if mean < 70:
+        return "Fair"
+    if mean < 85:
+        return "Good"
+    return "Excellent"
+
+
+def compute_heart_status(record):
+    """Dynamic heart status: Normal / Low / High / Critical (latest heart rate)."""
+    if record is None or record.heart_rate is None:
+        return None
+    hr = record.heart_rate
+    if hr > 150 or hr < 35:
+        return "Critical"
+    if hr > 100:
+        return "High"
+    if hr < 60:
+        return "Low"
+    return "Normal"
+
+
+def generate_health_tips(record):
+    """Tips generated from the latest readings; only relevant tips are returned."""
+    if record is None:
+        return []
+    tips = []
+
+    sugar_status = get_status("blood_sugar", record.blood_sugar)
+    if sugar_status == "high":
+        tips.append("Blood sugar is high — reduce sugar intake and monitor your glucose regularly.")
+    elif sugar_status == "low":
+        tips.append("Blood sugar is low — eat a balanced meal and monitor your glucose levels.")
+
+    hr_status = get_status("heart_rate", record.heart_rate)
+    if record.heart_rate is not None and (record.heart_rate > 150 or record.heart_rate < 35):
+        tips.append("Heart rate is in a critical range — cardiac monitoring and prompt medical attention advised.")
+    elif hr_status == "high":
+        tips.append("Heart rate is elevated — avoid strenuous activity and consult your doctor.")
+    elif hr_status == "low":
+        tips.append("Heart rate is low — cardiac monitoring is advised.")
+
+    bp_high = get_status("systolic", record.systolic) == "high" or get_status("diastolic", record.diastolic) == "high"
+    bp_low = get_status("systolic", record.systolic) == "low" or get_status("diastolic", record.diastolic) == "low"
+    if bp_high:
+        tips.append("Blood pressure is high — limit salt intake and monitor your blood pressure daily.")
+    if bp_low:
+        tips.append("Blood pressure is low — stay hydrated and review your readings with a doctor.")
+
+    hb_status = get_status("hemoglobin", record.hemoglobin)
+    if hb_status == "low":
+        tips.append("Hemoglobin is low — increase iron-rich foods such as spinach, lentils, and lean meat.")
+    elif hb_status == "high":
+        tips.append("Hemoglobin is high — stay hydrated and review your readings with a doctor.")
+
+    if not tips:
+        tips.append("Your latest readings look good. Keep up your healthy routine!")
+        tips.append("Stay active, stay hydrated, and follow your medication schedule.")
+    return tips
+
+
+def generate_reading_alerts(record):
+    """Alerts derived from the current readings; conditions always match displayed values."""
+    if record is None:
+        return []
+    conditions = [
+        ("blood_sugar", "Blood Sugar", "mg/dL"),
+        ("heart_rate", "Heart Rate", "BPM"),
+        ("systolic", "Blood Pressure (Systolic)", "mmHg"),
+        ("diastolic", "Blood Pressure (Diastolic)", "mmHg"),
+        ("hemoglobin", "Hemoglobin", "g/dL"),
+    ]
+    alerts = []
+    for field, label, unit in conditions:
+        value = getattr(record, field)
+        status = get_status(field, value)
+        if status in ("high", "low"):
+            alerts.append({
+                "type": "warning",
+                "title": f"{label} {status.capitalize()}",
+                "message": (
+                    f"Latest {label} reading is {value} {unit}, which is {status}. "
+                    "Please consult your doctor."
+                ),
+                "status": status,
+            })
+    if not alerts:
+        alerts.append({
+            "type": "success",
+            "title": "All readings normal",
+            "message": "Your latest readings are within the normal range.",
+            "status": "normal",
+        })
+    return alerts
 
 
 # =====================================================
@@ -891,8 +1119,6 @@ def get_caretaker_patient(caretaker_id):
     patient = None
     if caretaker.patient_id:
         patient = User.query.get(caretaker.patient_id)
-    if not patient:
-        patient = User.query.filter_by(role="patient").order_by(User.id.asc()).first()
 
     doctor = None
     if patient:
@@ -929,6 +1155,325 @@ def get_caretaker_patient(caretaker_id):
 def get_users():
     users = User.query.all()
     return jsonify([{"id": u.id, "name": u.name, "email": u.email, "role": u.role} for u in users])
+
+
+# =====================================================
+# CARETAKER PATIENT INSIGHTS
+# Caretaker dashboard reads real patient data from here:
+# vitals (incl. SpO2), recovery %, tasks, trends, risk and
+# medication compliance. Reuses the health analytics helpers.
+# =====================================================
+
+CARETAKER_SPO2_LOW = 92
+TASK_DONE_STATES = ("done", "completed")
+
+
+def task_completion(tasks):
+    """Task counts using the statuses actually stored (done / pending)."""
+    total = len(tasks)
+    completed = len([t for t in tasks if str(t.status).lower() in TASK_DONE_STATES])
+    return {
+        "total_tasks": total,
+        "completed_tasks": completed,
+        "pending_tasks": total - completed,
+        "completion_percent": round((completed / total) * 100, 1) if total else 0,
+    }
+
+
+def latest_spo2(user_id):
+    """Latest SpO2 for a user — wearable sensor first, then daily check-in."""
+    wearable = (
+        WearableReading.query
+        .filter_by(user_id=user_id)
+        .filter(WearableReading.spo2.isnot(None))
+        .order_by(WearableReading.recorded_at.desc())
+        .first()
+    )
+    if wearable:
+        return wearable.spo2, "Wearable sensor"
+
+    checkin = (
+        DailyCheckin.query
+        .filter_by(user_id=user_id)
+        .filter(DailyCheckin.spo2.isnot(None))
+        .order_by(DailyCheckin.checkin_date.desc())
+        .first()
+    )
+    if checkin:
+        return checkin.spo2, "Daily check-in"
+
+    return None, None
+
+
+def vitals_trend(user_id, days):
+    """Per-day series (IST dates) for the insight charts."""
+    today = to_ist(datetime.utcnow()).date()
+    records = HealthRecord.query.filter_by(user_id=user_id).order_by(
+        HealthRecord.recorded_at.desc()
+    ).all()
+
+    by_date = {}
+    for record in records:
+        ist_dt = to_ist(record.recorded_at)
+        if ist_dt is None:
+            continue
+        by_date.setdefault(ist_dt.date(), record)
+
+    checkins = {
+        c.checkin_date: c.spo2
+        for c in DailyCheckin.query.filter_by(user_id=user_id).all()
+        if c.spo2 is not None
+    }
+
+    wearable_by_date = {}
+    for r in WearableReading.query.filter_by(user_id=user_id).all():
+        if r.spo2 is None:
+            continue
+        ist_dt = to_ist(r.recorded_at)
+        if ist_dt is None:
+            continue
+        wearable_by_date.setdefault(ist_dt.date(), r.spo2)
+
+    series = []
+    for offset in range(days - 1, -1, -1):
+        day = today - timedelta(days=offset)
+        record = by_date.get(day)
+        series.append({
+            "date": day.isoformat(),
+            "blood_sugar": record.blood_sugar if record else None,
+            "heart_rate": record.heart_rate if record else None,
+            "hemoglobin": record.hemoglobin if record else None,
+            "spo2": checkins.get(day, wearable_by_date.get(day)),
+            "recovery_percent": (
+                compute_recovery_percentage(record) if record else None
+            ),
+        })
+    return series
+
+
+def build_risk_indicators(vital_statuses, recovery_percent, compliance_percent,
+                          pending_tasks, spo2):
+    """Risk level + factors, derived from the patient's real readings."""
+    factors = []
+    abnormal = [
+        label for label, status in vital_statuses if status not in (None, "normal")
+    ]
+
+    if spo2 is not None and spo2 < CARETAKER_SPO2_LOW:
+        factors.append(f"Low blood oxygen (SpO2 {spo2:.0f}%)")
+    if recovery_percent is not None:
+        if recovery_percent < 40:
+            factors.append(f"Low recovery score ({recovery_percent}%)")
+        elif recovery_percent < 70:
+            factors.append(f"Moderate recovery score ({recovery_percent}%)")
+    if abnormal:
+        factors.append("Out-of-range readings: " + ", ".join(abnormal))
+    if compliance_percent < 80:
+        factors.append(f"Medication adherence {compliance_percent:.0f}%")
+    if pending_tasks:
+        factors.append(f"{pending_tasks} pending recovery task(s)")
+
+    if spo2 is not None and spo2 < CARETAKER_SPO2_LOW or len(abnormal) >= 3 \
+            or (recovery_percent is not None and recovery_percent < 40):
+        level = "High"
+    elif factors:
+        level = "Medium"
+    else:
+        level = "Low"
+
+    return {"level": level, "factors": factors}
+
+
+def build_caretaker_ai_summary(trend, recovery_percent, tasks, medication,
+                               vital_statuses, spo2):
+    """AI-style narrative assembled from the patient's actual data."""
+    parts = []
+
+    measured = [p["recovery_percent"] for p in trend if p["recovery_percent"] is not None]
+    if len(measured) >= 2:
+        delta = measured[-1] - measured[0]
+        if delta >= 3:
+            parts.append(
+                f"Recovery is improving steadily ({measured[0]}% to {measured[-1]}% "
+                f"over the last {len(measured)} readings)"
+            )
+        elif delta <= -3:
+            parts.append(
+                f"Recovery has declined ({measured[0]}% to {measured[-1]}% "
+                f"over the last {len(measured)} readings)"
+            )
+        else:
+            parts.append(
+                f"Recovery is stable around {measured[-1]}% "
+                f"over the last {len(measured)} readings"
+            )
+    elif recovery_percent is not None:
+        parts.append(f"Recovery is currently at {recovery_percent}%")
+    else:
+        parts.append("No health readings have been recorded yet")
+
+    if tasks["total_tasks"]:
+        parts.append(
+            f"Task completion is {tasks['completed_tasks']} of "
+            f"{tasks['total_tasks']} ({tasks['completion_percent']}%)"
+        )
+
+    if medication["total"]:
+        parts.append(
+            f"Medication adherence is {medication['percent']:.0f}% "
+            f"({medication['taken']} of {medication['total']} taken on time)"
+        )
+
+    abnormal = [
+        label for label, status in vital_statuses if status not in (None, "normal")
+    ]
+    if abnormal:
+        parts.append(
+            "Keep monitoring " + ", ".join(abnormal) + " until readings return to normal"
+        )
+    elif spo2 is not None:
+        parts.append("All monitored readings are currently within the normal range")
+
+    return ". ".join(parts) + "."
+
+
+@app.route("/api/caretaker/<int:caretaker_id>/insights", methods=["GET"])
+def get_caretaker_insights(caretaker_id):
+    """Everything the Caretaker dashboard needs about the assigned patient.
+
+    All values are derived from live patient data — nothing is hardcoded."""
+    caretaker = User.query.get_or_404(caretaker_id)
+    if caretaker.role != "caretaker":
+        return jsonify({"message": "Only caretakers can access this"}), 403
+
+    patient = User.query.get(caretaker.patient_id) if caretaker.patient_id else None
+    if not patient:
+        return jsonify({"message": "No patient assigned to this caretaker"}), 404
+
+    patient_id = patient.id
+
+    doctor = None
+    connection = (
+        DoctorPatient.query
+        .filter_by(patient_id=patient_id)
+        .order_by(DoctorPatient.connected_at.desc())
+        .first()
+    )
+    if connection:
+        doctor = User.query.get(connection.doctor_id)
+
+    days = request.args.get("days", 7, type=int)
+    days = max(2, min(days, 30))
+
+    record = latest_vitals(patient_id)
+    tasks = task_completion(
+        RecoveryTask.query.filter_by(user_id=patient_id).all()
+    )
+
+    medicines = Medicine.query.filter_by(user_id=patient_id).all()
+    taken = len([m for m in medicines if str(m.status).lower() == "taken"])
+    medication = {
+        "total": len(medicines),
+        "taken": taken,
+        "pending": len([m for m in medicines if str(m.status).lower() == "pending"]),
+        "missed": len([m for m in medicines if str(m.status).lower() == "missed"]),
+        "percent": round((taken / len(medicines)) * 100, 1) if medicines else 0,
+    }
+
+    spo2, spo2_source = latest_spo2(patient_id)
+
+    recovery_percent = compute_recovery_percentage(record) if record else None
+    health_score = compute_health_score_from_record(record) if record else None
+
+    vital_statuses = [
+        ("blood sugar", get_status("blood_sugar", record.blood_sugar) if record else None),
+        ("heart rate", get_status("heart_rate", record.heart_rate) if record else None),
+        ("blood pressure", get_status("systolic", record.systolic) if record else None),
+        ("hemoglobin", get_status("hemoglobin", record.hemoglobin) if record else None),
+    ]
+    if spo2 is not None:
+        vital_statuses.append(
+            ("blood oxygen", "low" if spo2 < CARETAKER_SPO2_LOW else "normal")
+        )
+
+    alerts = generate_reading_alerts(record) if record else []
+    if spo2 is not None and spo2 < CARETAKER_SPO2_LOW:
+        alerts.insert(0, {
+            "type": "warning",
+            "title": "Low Blood Oxygen",
+            "message": (
+                f"SpO2 is {spo2:.0f}% ({spo2_source}), below the safe "
+                f"{CARETAKER_SPO2_LOW}% threshold. Seek medical attention."
+            ),
+        })
+
+    trend = vitals_trend(patient_id, days)
+    risk = build_risk_indicators(
+        vital_statuses, recovery_percent, medication["percent"],
+        tasks["pending_tasks"], spo2,
+    )
+
+    return jsonify({
+        "patient": {
+            "id": patient.id,
+            "name": patient.name,
+            "age": patient.age,
+            "gender": patient.gender,
+            "recovery_type": patient.recovery_type,
+        },
+        "doctor": {
+            "id": doctor.id,
+            "name": doctor.name,
+            "specialization": doctor.specialization,
+        } if doctor else None,
+        "has_data": record is not None,
+        "last_checkup": format_ist_timestamp(record.recorded_at) if record else None,
+        "latest": {
+            "blood_sugar": {
+                "value": record.blood_sugar if record else None,
+                "unit": "mg/dL",
+                "status": get_status("blood_sugar", record.blood_sugar) if record else None,
+            },
+            "heart_rate": {
+                "value": record.heart_rate if record else None,
+                "unit": "BPM",
+                "status": get_status("heart_rate", record.heart_rate) if record else None,
+            },
+            "blood_pressure": {
+                "systolic": record.systolic if record else None,
+                "diastolic": record.diastolic if record else None,
+                "unit": "mmHg",
+                "status": get_status("systolic", record.systolic) if record else None,
+            },
+            "hemoglobin": {
+                "value": record.hemoglobin if record else None,
+                "unit": "g/dL",
+                "status": get_status("hemoglobin", record.hemoglobin) if record else None,
+            },
+            "spo2": {
+                "value": spo2,
+                "unit": "%",
+                "status": ("low" if spo2 < CARETAKER_SPO2_LOW else "normal")
+                          if spo2 is not None else None,
+                "source": spo2_source,
+            },
+        },
+        "recovery": {
+            "recovery_percent": recovery_percent,
+            "health_score": health_score,
+            "overall_health": compute_overall_health(record) if record else None,
+            "heart_status": compute_heart_status(record) if record else None,
+            **tasks,
+        },
+        "trends": trend,
+        "risk": risk,
+        "medication": medication,
+        "alerts": alerts,
+        "health_tips": generate_health_tips(record) if record else [],
+        "ai_summary": build_caretaker_ai_summary(
+            trend, recovery_percent, tasks, medication, vital_statuses, spo2
+        ),
+    }), 200
 
 
 @app.route("/db-path")
@@ -993,7 +1538,7 @@ def get_health_records(user_id):
             "systolic": r.systolic,
             "diastolic": r.diastolic,
             "hemoglobin": r.hemoglobin,
-            "recorded_at": r.recorded_at.strftime("%d %b %Y, %I:%M %p") if r.recorded_at else None
+            "recorded_at": format_ist_timestamp(r.recorded_at)
         }
         for r in records
     ]), 200
@@ -1001,26 +1546,39 @@ def get_health_records(user_id):
 
 @app.route("/api/health-record/<int:user_id>/latest", methods=["GET"])
 def get_latest_health_record(user_id):
-    """Health Overview page ke liye — latest reading, status ke saath."""
-    record = (
-        HealthRecord.query
-        .filter_by(user_id=user_id)
-        .order_by(HealthRecord.recorded_at.desc())
-        .first()
-    )
+    """Health Overview page — latest reading, status, and all computed
+    summaries (overall health, heart status, recovery %, tips, alerts)."""
+    record = latest_vitals(user_id)
 
     if not record:
         return jsonify({
             "has_data": False,
+            "recorded_at": None,
+            "last_checkup": None,
+            "overall_health": None,
+            "heart_status": None,
+            "recovery_percent": None,
+            "health_score": None,
+            "health_tips": [],
+            "alerts": [],
             "blood_sugar": None,
             "heart_rate": None,
             "blood_pressure": None,
             "hemoglobin": None,
         }), 200
 
+    recorded_str = format_ist_timestamp(record.recorded_at)
+
     return jsonify({
         "has_data": True,
-        "recorded_at": record.recorded_at.strftime("%d %b %Y, %I:%M %p") if record.recorded_at else None,
+        "recorded_at": recorded_str,
+        "last_checkup": recorded_str,
+        "overall_health": compute_overall_health(record),
+        "heart_status": compute_heart_status(record),
+        "recovery_percent": compute_recovery_percentage(record),
+        "health_score": compute_health_score_from_record(record),
+        "health_tips": generate_health_tips(record),
+        "alerts": generate_reading_alerts(record),
         "blood_sugar": {
             "value": record.blood_sugar, "unit": "mg/dL",
             "status": get_status("blood_sugar", record.blood_sugar)
@@ -2398,7 +2956,7 @@ def get_doctor_summary(doctor_id):
             "patientName": p.name,
             "title": f"{p.name} - Latest vitals",
             "subtitle": (
-                f"Latest update: {latest.recorded_at.strftime('%d %b %Y, %I:%M %p')}"
+                f"Latest update: {format_ist_timestamp(latest.recorded_at)}"
                 if latest and latest.recorded_at
                 else "No recent vitals recorded"
             ),
